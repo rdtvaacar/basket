@@ -6,7 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Auth;
 
-class Acr_user extends Authenticatable
+class Acr_Ftr_user extends Authenticatable
 {
     use Notifiable;
     protected $connection = 'mysql';
@@ -35,13 +35,19 @@ class Acr_user extends Authenticatable
         return $this->hasMany('Acr\Ftr\Model\Product', 'user_id');
     }
 
-    function sepets()
+    function sepet()
     {
-        return $this->hasMany('Acr\Ftr\Model\Sepet', 'user_id');
+        return $this->hasOne('Acr\Ftr\Model\Sepet', 'user_id');
     }
 
     function roles()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\Role', 'role_user', 'role_id');
+        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrRole', 'role_user', 'role_id', 'user_id');
     }
+
+    function adresses()
+    {
+        return $this->hasMany('Acr\Ftr\Model\AcrFtrAdress', 'user_id');
+    }
+
 }

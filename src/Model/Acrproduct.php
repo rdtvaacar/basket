@@ -17,7 +17,7 @@ class Acrproduct extends Model
      */
     function attributes()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\Attribute', 'attribute_product', 'product_id', 'attribute_id');
+        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrAttribute', 'attribute_product', 'product_id', 'attribute_id');
     }
 
     function u_kats()

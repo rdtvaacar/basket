@@ -7,6 +7,7 @@ use App\User;
 use Auth;
 use DB;
 use Acr\Ftr\Facades\AcrFtr;
+use Acr\Ftr\Model\Acrproduct;
 
 class Sepet extends Model
 
@@ -20,28 +21,28 @@ class Sepet extends Model
      */
 
 
-    function create($data)
+    function create($session_id = null, $product_id)
     {
-        Sepet::insert($data);
-    }
+        $sepet_id = self::product_sepet_id($session_id);
+        if (empty($sepet_id)) {
+            if (Auth::check()) {
+                $sepet_id = Sepet::insertGetId(['user_id' => Auth::user()->id]);
+            } else {
+                $sepet_id = Sepet::insertGetId(['session_id' => $session_id]);
+            }
+        }
 
-    function user_plus($product_id, $user_id)
-    {
-        $sorgu = Sepet::where('product_id', $product_id)->where('user_id', $user_id);
-        $satir = $sorgu->first();
-        $sorgu->update(['adet' => $satir->adet + 1]);
-    }
-
-    function session_plus($product_id, $session_id)
-    {
-        $sorgu = Sepet::where('product_id', $product_id)->where('session_id', $session_id);
-        $satir = $sorgu->first();
-        $sorgu->update(['adet' => $satir->adet + 1]);
+        Product_sepet::insert(['product_id' => $product_id, 'sepet_id' => $sepet_id]);
     }
 
     function product()
     {
         return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
+    }
+
+    function Acrproducts()
+    {
+        return $this->belongsToMany('Acr\Ftr\Model\Acrproduct', 'product_sepet', 'sepet_id', 'product_id')->withPivot('adet', 'lisans_ay');
     }
 
     function delete()
@@ -51,27 +52,50 @@ class Sepet extends Model
 
     function sepet_birle($session_id)
     {
-        Sepet::where('session_id', $session_id)->update(['user_id' => Auth::user()->id]);
+        Sepet::where('session_id', $session_id)->where('siparis', 0)->update(['user_id' => Auth::user()->id]);
 
+    }
+
+    function product_sepet_id($session_id = null)
+    {
+        if (Auth::check()) {
+            $sepet_sorgu = Sepet::where('user_id', Auth::user()->id)->where('siparis', 0);
+            if ($sepet_sorgu->count() > 0) {
+                $sepet_id = $sepet_sorgu->first()->id;
+
+            } else {
+                $sepet_id = 0;
+            }
+        } else {
+            $sepet_id = Sepet::where('session_id', $session_id)->where('siparis', 0)->first()->id;
+        }
+        return $sepet_id;
+    }
+
+    function product_sepet($session_id = null)
+    {
+        $sepet_id = self::product_sepet_id($session_id);
+        return Product_sepet::where('sepet_id', $sepet_id)->with('product')->get();
     }
 
     function sepets($session_id = null)
     {
 
-        if (Auth::check()) {
-            return Sepet::where('user_id', Auth::user()->id)->sum('adet');
-        } else {
-            return Sepet::where('session_id', $session_id)->sum('adet');
+        $sepet_id = self::product_sepet_id($session_id);
+        if ($sepet_id == 0) {
+            return 0;
         }
+        return Product_sepet::where('sepet_id', $sepet_id)->sum('adet');
     }
 
     function delete_all($session_id = null)
     {
+        $sepet_id = self::product_sepet_id($session_id);
+        return Product_sepet::where('sepet_id', $sepet_id)->delete();
+    }
 
-        if (Auth::check()) {
-            return Sepet::where('user_id', Auth::user()->id)->delete();
-        } else {
-            return Sepet::where('session_id', $session_id)->delete();
-        }
+    function price_update($sepet_id, $total_price)
+    {
+        Sepet::where('id', $sepet_id)->where('siparis', 0)->update(['price' => $total_price]);
     }
 }

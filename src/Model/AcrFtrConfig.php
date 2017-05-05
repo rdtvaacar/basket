@@ -3,18 +3,17 @@
 namespace Acr\Ftr\Model;
 
 use Illuminate\Database\Eloquent\Model;
-use App\User;
 use Auth;
-use DB;
-use Acr\Ftr\Facades\AcrFtr;
 
-class Role extends Model
+class AcrFtrConfig extends Model
 
 {
-    protected $connection = 'mysql';
+    protected $table = 'acrftrconfig';
     /**
      * The database table used by the model.
      *
      * @var string
      */
+
+
 }

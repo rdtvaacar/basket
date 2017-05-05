@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Attribute_product extends Model
+class AcrFtrAttribute_product extends Model
 {
     protected $connection = 'mysql2';
     protected $table = 'attribute_product';

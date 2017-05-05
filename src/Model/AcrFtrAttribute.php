@@ -4,21 +4,22 @@ namespace Acr\Ftr\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Attribute extends Model
+class AcrFtrAttribute extends Model
 {
     protected $connection = 'mysql2';
+    protected $table = 'Attributes';
 
     function attributes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Attribute', 'attribute_id', 'id');
+        return $this->hasMany('Acr\Ftr\Model\AcrFtrAttribute', 'attribute_id', 'id');
     }
 
     function attribute_create($att_id, $data)
     {
         if (empty($att_id)) {
-            return Attribute::insertGetId($data);
+            return AcrFtrAttribute::insertGetId($data);
         } else {
-            Attribute::where('id', $att_id)->update($data);
+            AcrFtrAttribute::where('id', $att_id)->update($data);
             return $att_id;
         }
 
@@ -27,9 +28,9 @@ class Attribute extends Model
     function sil($data_id)
     {
         if (is_array($data_id)) {
-            Attribute::whereIn('id', $data_id)->update(['sil' => 3]);
+            AcrFtrAttribute::whereIn('id', $data_id)->update(['sil' => 3]);
         } else {
-            Attribute::where('id', $data_id)->update(['sil' => 3]);
+            AcrFtrAttribute::where('id', $data_id)->update(['sil' => 3]);
         }
 
     }
@@ -37,16 +38,16 @@ class Attribute extends Model
     function cope_tasi($data_id)
     {
         if (is_array($data_id)) {
-            Attribute::whereIn('id', $data_id)->update(['yayin' => 3]);
+            AcrFtrAttribute::whereIn('id', $data_id)->update(['yayin' => 3]);
         } else {
-            Attribute::where('id', $data_id)->update(['yayin' => 3]);
+            AcrFtrAttribute::where('id', $data_id)->update(['yayin' => 3]);
         }
 
     }
 
     function attribute_multi_create($data)
     {
-        return Attribute::insert($data);
+        return AcrFtrAttribute::insert($data);
     }
 
     function att_ids_kaydet($product_id, $data)

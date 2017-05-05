@@ -1,5 +1,11 @@
 @extends('acr_ftr.index')
+@section('header')
+    <link rel="stylesheet" href="/css/acr_ftr/sepet.css">
+@stop
 @section('acr_ftr')
+    <?php
+    echo $sepet_nav;
+    ?>
     <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
         <div class="box-header with-border">Sepetiniz</div>
         <div class="box-body">
@@ -16,8 +22,7 @@
                 <tbody id="sepet_tbody"><?php echo $sepet_row; ?></tbody>
                 <tfoot>
                 <tr>
-                    <td><a style="float: left;" class="btn btn-warning" href="/acr/ftr/card/">SATIN AL</a></td>
-
+                    <td><a style="float: left;" class="btn btn-lg btn-warning" href="/acr/ftr/card/adress">ADRES BİLGİLERİ <span class="fa fa-angle-double-right"></span></a></td>
                     <td colspan="3">
                         <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
                     </td>
@@ -30,7 +35,6 @@
 @section('footer')
     <script>
         function sepet_adet_guncelle(sepet_id) {
-
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
                 type   : 'post',

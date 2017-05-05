@@ -21,7 +21,7 @@ class Product extends Model
 
     function attributes()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\Attribute');
+        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrAttribute');
     }
 
     function u_kats()

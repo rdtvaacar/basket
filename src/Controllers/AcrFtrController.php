@@ -3,10 +3,11 @@
 namespace Acr\Ftr\Controllers;
 
 use Acr\Ftr\Model\acr_files;
-use Acr\Ftr\Model\Acr_user;
+use Acr\Ftr\Model\Acr_Ftr_user;
 use Acr\Ftr\Model\Acrproduct;
+use Acr\Ftr\Model\Bank;
 use Acr\Ftr\Model\Product;
-use Acr\Ftr\Model\Attribute;
+use Acr\Ftr\Model\AcrFtrAttribute;
 use Acr\Ftr\Model\Product_u_kat;
 use Acr\Ftr\Model\Sepet;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class AcrFtrController extends Controller
 {
     function index()
     {
-        $user_model = new Acr_user();
+        $user_model = new Acr_Ftr_user();
         $products   = $user_model->find(Auth::user()->id)->products()->get();
         return View('acr_ftr::anasayfa');
     }
@@ -134,7 +135,8 @@ class AcrFtrController extends Controller
         $product_model = new Acrproduct();
         $sepet_model   = new Sepet();
         $controller    = new AcrFtrController();
-        $products      = $product_model->where('yayin', 1)->where('sil', 0)->with([
+
+        $products = $product_model->where('yayin', 1)->where('sil', 0)->with([
             'u_kats'     => function ($query) {
                 //  $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
             },
@@ -143,6 +145,7 @@ class AcrFtrController extends Controller
                 $query->where('attributes.attribute_id', 0);
             }
         ])->get();
+
         //dd(Auth::user()->id);
         $session_id = $request->session()->get('session_id');
         if (Auth::check() && !empty($session_id)) {
@@ -155,7 +158,7 @@ class AcrFtrController extends Controller
 
     function attribute_modal(Request $request)
     {
-        $att_model     = new Attribute();
+        $att_model     = new AcrFtrAttribute();
         $product_model = new Acrproduct();
         $att_id        = $request->input('att_id');
         $product_id    = $request->input('product_id');
@@ -187,5 +190,107 @@ class AcrFtrController extends Controller
         return $row;
     }
 
+    function config(Request $request)
+    {
+        $bank_model = new Bank();
+        $banks      = $bank_model->where('user_id', Auth::user()->id)->where('sil', 0)->get();
+        $bank_form  = self::bank_form($request);
+        return View('acr_ftr::config', compact('banks', 'bank_form'));
+    }
+
+    function active_bank(Request $request)
+    {
+        $bank_model = new Bank();
+        $bank_model->where('id', $request->input('bank_id'))->update(['active' => 1]);
+    }
+
+    function deactive_bank(Request $request)
+    {
+        $bank_model = new Bank();
+        $bank_model->where('id', $request->input('bank_id'))->update(['active' => 2]);
+    }
+
+    function bank_edit(Request $request)
+    {
+        $bank_model = new Bank();
+        $bank_id    = $request->input('bank_id');
+        $bank       = $bank_model->where('id', $bank_id)->first();
+        return self::bank_form($request, $bank);
+    }
+
+    function bank_delete(Request $request)
+    {
+        $bank_model = new Bank();
+        $bank_id    = $request->input('bank_id');
+        $bank_model->where('id', $bank_id)->update(['sil' => 1]);
+
+    }
+
+    function bank_create(Request $request)
+    {
+        $bank_model = new Bank();
+        $data       = [
+            'user_id'     => Auth::user()->id,
+            'name'        => $request->input('name'),
+            'bank_name'   => $request->input('bank_name'),
+            'user_name'   => $request->input('user_name'),
+            'iban'        => $request->input('iban'),
+            'bank_number' => $request->input('bank_number'),
+            'active'      => $request->input('active'),
+
+        ];
+        $bank_id    = empty($request->input('bank_id')) ? 0 : $request->input('bank_id');
+        $bank_model->create($bank_id, $data);
+        return redirect()->back();
+    }
+
+    function bank_form(Request $request, $bank = null)
+    {
+
+        $row = '<form method="post" action="/acr/ftr/bank/create">';
+        $row .= csrf_field();
+        $row .= '<div class="form-group">';
+        $row .= '<label>Görünen İsim</label>';
+        $row .= '<input required name="name" id="name" class="form-control" placeholder="Görünen İsim" value="' . @$bank->name . '">';
+        $row .= '</div>';
+
+        $row .= '<div class="form-group">';
+        $row .= '<label>Banka İsmi </label>';
+        $row .= '<input required name="bank_name"  class="form-control" placeholder="Banka Sahibi" value="' . @$bank->bank_name . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>Hesap Sahibi</label>';
+        $row .= '<input required name="user_name"  class="form-control" placeholder="Hesap Sahibi" value="' . @$bank->user_name . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>İban</label>';
+        $row .= '<input required name="iban"  class="form-control" placeholder="İban" value="' . @$bank->iban . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>Hesap Numarası</label>';
+        $row .= '<input required name="bank_number"  class="form-control" placeholder="Hesap Numarası" value="' . @$bank->bank_number . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        if (@$bank->active == 1 || empty(@$bank->active)) {
+            $aktif   = 'checked';
+            $deaktif = '';
+        } else {
+            $aktif   = '';
+            $deaktif = 'checked';
+        }
+        $row .= '<label>';
+        $row .= '<input ' . $aktif . ' type="radio"  required name="active" class="flat-red" value="1">';
+        $row .= 'Aktif Et';
+        $row .= '</label>';
+        $row .= '<label>';
+        $row .= '<input ' . $deaktif . ' type="radio" required name="active" class="flat-red" value="2">';
+        $row .= 'Deaktif Et';
+        $row .= '</label>';
+        $row .= '</div>';
+        $row .= '<input type="hidden" name="bank_id"  value="' . @$bank->id . '">';
+        $row .= '<button type="submit" class="btn btn-primary">BANKA BİLGİLERİNİ KAYDET </button>';
+        $row .= '</form>';
+        return $row;
+    }
 
 }
