@@ -23,7 +23,9 @@ class Sepet extends Model
 
     function create($session_id = null, $product_id)
     {
-        $sepet_id = self::product_sepet_id($session_id);
+        $sepet_id      = self::product_sepet_id($session_id);
+        $product_model = new Product();
+        $product       = $product_model->where('id', $product_id)->first();
         if (empty($sepet_id)) {
             if (Auth::check()) {
                 $sepet_id = Sepet::insertGetId(['user_id' => Auth::user()->id]);
@@ -31,15 +33,17 @@ class Sepet extends Model
                 $sepet_id = Sepet::insertGetId(['session_id' => $session_id]);
             }
         }
+        if (Auth::check()) {
+            Product_sepet::insert(['product_id' => $product_id, 'user_id' => Auth::user()->id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
 
-        Product_sepet::insert(['product_id' => $product_id, 'sepet_id' => $sepet_id]);
+        } else {
+            Product_sepet::insert(['product_id' => $product_id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
+        }
     }
-
     function product()
     {
         return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
     }
-
     function Acrproducts()
     {
         return $this->belongsToMany('Acr\Ftr\Model\Acrproduct', 'product_sepet', 'sepet_id', 'product_id')->withPivot('adet', 'lisans_ay');
@@ -53,7 +57,8 @@ class Sepet extends Model
     function sepet_birle($session_id)
     {
         Sepet::where('session_id', $session_id)->where('siparis', 0)->update(['user_id' => Auth::user()->id]);
-
+        $sepet_id = $this->sepet_birle();
+        Product_sepet::where('sepet_id', $sepet_id)->update('user_id', Auth::user()->id);
     }
 
     function product_sepet_id($session_id = null)

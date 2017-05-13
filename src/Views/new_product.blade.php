@@ -1,25 +1,27 @@
 @extends('acr_ftr.index')
 @section('acr_ftr')
-    <table id="example1" class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th>#ID</th>
+    <div class=" col-md-12">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>#ID</th>
 
-            <th>İsim</th>
-            <th>Kategori 1</th>
-            <th>Kategori 2</th>
-            <th>Kategori 3</th>
-            <th>Ekle</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($products as $product) {
-            echo $controller->product_row($product);
-        } ?>
-        </tbody>
-    </table>
-    <div id="search_div" class="">
+                <th>İsim</th>
+                <th>Kategori 1</th>
+                <th>Kategori 2</th>
+                <th>Kategori 3</th>
+                <th>Ekle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($products as $product) {
+                echo $controller->product_row($product);
+            } ?>
+            </tbody>
+        </table>
+        <div id="search_div" class="">
 
+        </div>
     </div>
 @stop
 @section('header')

@@ -5,7 +5,7 @@
 @stop
 @section('acr_ftr')
     <div class="col-md-6">
-        <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
+        <div class="box box-warning">
             <div class="box-header with-border">BANKA BİLGİLERİ
                 <button style="float: right;" data-toggle="modal" data-target="#myModal" class="btn btn-success">YENİ BANKA EKLE</button>
             </div>
@@ -34,6 +34,97 @@
                 <?php }?>
             </div>
             <div style="clear:both;"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="box box-warning">
+            <div class="box-header with-border">KREDİ KARTI BİLGİLERİ İYZİCO</div>
+            <div class="box-body">
+                <form method="post" action="/acr/ftr/config/iyzico/update">
+                    <?php echo csrf_field() ?>
+                    <div class="form-group with-border">
+                        <label>SetApiKey</label>
+                        <input class="form-control" name="setApiKey" value="{{@$iyzico->setApiKey}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>SetSecretKey</label>
+                        <input class="form-control" name="setSecretKey" value="{{@$iyzico->setSecretKey}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>SetBaseUrl</label>
+                        <input class="form-control" name="setBaseUrl" value="{{@$iyzico->setBaseUrl}}"/>
+                    </div>
+                    <button class="btn btn-primary"> KAYDET</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="box box-warning">
+            <div class="box-header with-border">Database Tablo Ayarları</div>
+            <div class="box-body">
+                <form method="post" action="/acr/ftr/config/user_table_update">
+                    <?php echo csrf_field() ?>
+                    <div class="form-group with-border">
+                        <label>NAME</label>
+                        <input class="form-control" name="name" value="{{@$user_table->name}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>User_name</label>
+                        <input class="form-control" name="user_name" value="{{@$user_table->user_name}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Email</label>
+                        <input class="form-control" name="email" value="{{@$user_table->email}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Lisans Durum</label>
+                        <input class="form-control" name="lisans_durum" value="{{@$user_table->lisans_durum}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Lisans Başlangıç</label>
+                        <input class="form-control" name="lisans_baslangic" value="{{@$user_table->lisans_baslangic}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Lisans Bitiş</label>
+                        <input class="form-control" name="lisans_bitis" value="{{@$user_table->lisans_bitis}}"/>
+                    </div>
+                    <input name="id" type="hidden" value="{{@$user_table->id}}"/>
+                    <button class="btn btn-primary"> KAYDET</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="box box-warning">
+            <div class="box-header with-border">Paraşüt Fatura Bilgileri</div>
+            <div class="box-body">
+                <form method="post" action="/acr/ftr/config/parasut/conf/update">
+                    <?php echo csrf_field() ?>
+                    <div class="form-group with-border">
+                        <label>Client ID</label>
+                        <input class="form-control" name="client_id" value="{{@$parasut_conf->client_id}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Client Secret</label>
+                        <input class="form-control" name="client_secret" value="{{@$parasut_conf->client_secret}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Üyelik Numarsı (Campany ID)</label>
+                        <input class="form-control" type="number" name="company_id" value="{{@$parasut_conf->company_id}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Email</label>
+                        <input class="form-control" type="email" name="username" value="{{@$parasut_conf->username}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Şifre</label>
+                        <input class="form-control" type="password" name="password" value="{{@$parasut_conf->password}}"/>
+                    </div>
+                    <input name="id" type="hidden" value="{{@$parasut_conf->id}}"/>
+                    <button class="btn btn-primary"> KAYDET</button>
+                </form>
+            </div>
         </div>
     </div>
     <div id="myModal" class="modal">

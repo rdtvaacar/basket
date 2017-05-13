@@ -15,5 +15,7 @@
       "Acr\\Ftr\\": "src/"
     }
   },
-  "require": {}
+  "require": {
+
+  }
 }

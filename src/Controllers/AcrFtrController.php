@@ -4,8 +4,11 @@ namespace Acr\Ftr\Controllers;
 
 use Acr\Ftr\Model\acr_files;
 use Acr\Ftr\Model\Acr_Ftr_user;
+use Acr\Ftr\Model\Acr_user_table_conf;
+use Acr\Ftr\Model\AcrFtrIyzico;
 use Acr\Ftr\Model\Acrproduct;
 use Acr\Ftr\Model\Bank;
+use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\AcrFtrAttribute;
 use Acr\Ftr\Model\Product_u_kat;
@@ -93,19 +96,29 @@ class AcrFtrController extends Controller
     function add_product(Request $request)
     {
         $acr_product_model = new Acrproduct();
+        $parasut           = new ParasutController();
+        $product_model     = new Product();
         $id                = $request->input('id');
+
+        $product_row = $product_model->where('id', $id)->first();
+        $data        = [
+            'name'       => $product_row->product_name,
+            'quantity'   => 1,
+            'unit_price' => $product_row->price,
+            'vat_rate'   => $product_row->kdv
+        ];
+        $product_id  = $parasut->product($data);
         if ($acr_product_model->where('product_id', $id)->count() > 0) {
             $acr_product_model->where('product_id', $id)->update(['sil' => 0]);
             $product_id = $id;
         } else {
             $data       = [
                 'product_id' => $id,
+                'parasut_id' => $product_id,
                 'user_id'    => Auth::user()->id
             ];
             $product_id = $acr_product_model->insertGetId($data);
         }
-
-
         return $this->delete_product_btn($product_id);
     }
 
@@ -192,10 +205,84 @@ class AcrFtrController extends Controller
 
     function config(Request $request)
     {
-        $bank_model = new Bank();
-        $banks      = $bank_model->where('user_id', Auth::user()->id)->where('sil', 0)->get();
-        $bank_form  = self::bank_form($request);
-        return View('acr_ftr::config', compact('banks', 'bank_form'));
+        $bank_model      = new Bank();
+        $user_conf_model = new Acr_user_table_conf();
+        $parasut_model   = new Parasut_conf();
+
+        $user_table_conf_sorgu = $user_conf_model->where('user_id', Auth::user()->id);
+        $user_table_conf_sayi  = $user_table_conf_sorgu->count();
+
+        if ($user_table_conf_sayi == 0) {
+            $user_conf_model->insert(['user_id' => 1]);
+        }
+        $parasut_conf_sorgu = $parasut_model->where('user_id', Auth::user()->id);
+        $parasut_conf_sayi  = $parasut_conf_sorgu->count();
+        if ($parasut_conf_sayi == 0) {
+            $parasut_model->insert(['user_id' => 1]);
+        }
+        $user_table   = $user_table_conf_sorgu->first();
+        $iyzi_model   = new AcrFtrIyzico();
+        $banks        = $bank_model->where('user_id', Auth::user()->id)->where('sil', 0)->get();
+        $bank_form    = self::bank_form($request);
+        $iyzico       = $iyzi_model->where('user_id', Auth::user()->id)->first();
+        $parasut_conf = $parasut_model->where('user_id', Auth::user()->id)->first();
+        return View('acr_ftr::config', compact('banks', 'bank_form', 'iyzico', 'user_table', 'parasut_conf'));
+    }
+
+    function user_table_update(Request $request)
+    {
+        $user_conf_model = new Acr_user_table_conf();
+
+        $data = [
+            'user_id'          => Auth::user()->id,
+            'name'             => $request->input('name'),
+            'user_name'        => $request->input('user_name'),
+            'email'            => $request->input('email'),
+            'lisans_durum'     => $request->input('lisans_durum'),
+            'lisans_baslangic' => $request->input('lisans_baslangic'),
+            'lisans_bitis'     => $request->input('lisans_bitis')
+        ];
+        $user_conf_model->where('user_id', Auth::user()->id)->update($data);
+        return redirect()->back();
+    }
+
+    function parasut_conf_update(Request $request)
+    {
+        $parasut_conf = new Parasut_conf();
+
+        $data = [
+            'user_id'       => Auth::user()->id,
+            'client_id'     => $request->input('client_id'),
+            'client_secret' => $request->input('client_secret'),
+            'username'      => $request->input('username'),
+            'password'      => $request->input('password'),
+            'company_id'    => $request->input('company_id')
+
+        ];
+        $parasut_conf->where('user_id', Auth::user()->id)->update($data);
+        $parasut    = new ParasutController();
+        $account_id = $parasut->account_id();
+        $parasut_conf->where('user_id', Auth::user()->id)->update(['account_id' => $account_id]);
+        return redirect()->back();
+    }
+
+    function iyzico_update(Request $request)
+    {
+        $iyzi_model = new AcrFtrIyzico();
+        $data       = [
+            'user_id'      => Auth::user()->id,
+            'setApiKey'    => $request->input('setApiKey'),
+            'setSecretKey' => $request->input('setSecretKey'),
+            'setBaseUrl'   => $request->input('setBaseUrl'),
+        ];
+        $sorgu      = $iyzi_model->where('user_id', Auth::user()->id);
+        $sayi       = $sorgu->count();
+        if ($sayi > 0) {
+            $sorgu->update($data);
+        } else {
+            $iyzi_model->insert($data);
+        };
+        return redirect()->back();
     }
 
     function active_bank(Request $request)

@@ -24,6 +24,16 @@ class Product_sepet extends Model
         return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
     }
 
+    function acr_product()
+    {
+        return $this->hasOne('Acr\Ftr\Model\Acrproduct', 'product_id', 'product_id');
+    }
+
+    function sepet()
+    {
+        return $this->hasOne('Acr\Ftr\Model\Sepet', 'id', 'sepet_id');
+    }
+
     function use_plus($product_id, $sepet_id)
     {
         $sorgu = Product_sepet::where('product_id', $product_id)->where('sepet_id', $sepet_id);

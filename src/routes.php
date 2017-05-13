@@ -10,24 +10,32 @@ Route::group(['middleware' => ['web']], function () {
         Route::post('/product/sepet/sepet_lisans_ay_guncelle', 'AcrSepetController@sepet_lisans_ay_guncelle');
         Route::post('/product/sepet/delete', 'AcrSepetController@delete');
         Route::post('/product/sepet/delete_all', 'AcrSepetController@delete_all');
-
         Route::get('/card/sepet', 'AcrSepetController@card');
+        // paraşüt
+
+        Route::get('/parasut', 'ParasutController@index');
+        Route::get('/fit', 'FitBulutController@getUserLists'); // fit client akif bağlantı
+
+        Route::get('/soap', 'AcrSoapController@show');
+        Route::get('/acrFit', 'FitController@connect');
+
+
         Route::group(['middleware' => ['auth']], function () {
             // adress
             Route::get('/card/adress', 'AcrSepetController@adress');
             Route::post('/card/adress/county', 'AcrSepetController@county_row');
             Route::post('/card/adress/create', 'AcrSepetController@adress_create');
-
             Route::post('/card/adress/edit', 'AcrSepetController@adress_edit');
             Route::get('/card/adress/edit', 'AcrSepetController@card_adress_edit');
-
             Route::post('/card/adress/delete', 'AcrSepetController@adress_delete');
             //payment
             Route::get('/card/payment', 'AcrSepetController@payment');
             Route::post('/card/payment', 'AcrSepetController@payment');
             Route::post('/card/payment/havale_eft', 'AcrSepetController@paymet_havale_eft');
+            Route::get('/card/payment/bank_card', 'AcrSepetController@payment_bank_card');
 
-
+            // orders
+            Route::get('/orders', 'AcrSepetController@orders');
             /// admin
             Route::group(['middleware' => ['admin']], function () {
                 Route::get('/product/new', 'AcrFtrController@new_product');
@@ -41,6 +49,16 @@ Route::group(['middleware' => ['web']], function () {
                 Route::post('/bank/delete', 'AcrFtrController@bank_delete');
                 Route::post('/bank/active', 'AcrFtrController@active_bank');
                 Route::post('/bank/deactive', 'AcrFtrController@deactive_bank');
+
+                Route::post('/config/user_table_update', 'AcrFtrController@user_table_update');
+                Route::post('/config/parasut/conf/update', 'AcrFtrController@parasut_conf_update');
+                Route::post('/config/iyzico/update', 'AcrFtrController@iyzico_update');
+
+
+                Route::get('/admin/orders', 'AcrSepetController@admin_orders');
+                Route::post('/order/active', 'AcrSepetController@orders_active');
+                Route::post('/order/deactive', 'AcrSepetController@orders_deactive');
+
 
             });
         });

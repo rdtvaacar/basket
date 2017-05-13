@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="/plugins/iCheck/all.css">
 @stop
 @section('acr_ftr')
-
     <div class=" col-md-12">
         <div class="box box-warning">
             <div class="box-header with-border"><?php echo $sepet_nav ?>
@@ -13,13 +12,8 @@
             <div class="box-body">
                 <div style="text-align: center; font-size: 18pt;" class="alert alert-danger"> SİPARİŞ NUMARANIZ : <?php echo $siparis_id = empty($siparis->id) ? 0 : $siparis->id; ?></div>
             </div>
-            <div style="text-align: center; font-size: 16pt;">
-                <ul style="width: 380px; margin-left: auto; margin-right: auto;" class="list-group">
-                    <li class="list-group-item">{{$bank->bank_name}}</li>
-                    <li class="list-group-item">{{$bank->user_name}}</li>
-                    <li class="list-group-item">{{$bank->iban}}</li>
-                    <li class="list-group-item">{{$bank->bank_number}}</li>
-                </ul>
+            <div>
+                <?php echo $odemeForm ?>
             </div>
         </div>
     </div>

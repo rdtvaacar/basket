@@ -4,45 +4,49 @@
     <link rel="stylesheet" href="/plugins/iCheck/all.css">
 @stop
 @section('acr_ftr')
-    <?php echo $sepet_nav ?>
-    <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
-        <div class="box-header with-border">TESLİMAT BİLGİLERİ
-            <button style="float: right;" data-toggle="modal" data-target="#myModal" class="btn btn-success">YENİ ADRES EKLE</button>
-        </div>
-        <div class="box-body">
-            @if (count($errors) > 0)
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-            <form method="post" action="/acr/ftr/card/payment">
-                <?php
-                echo csrf_field();
-                foreach ($adresses as $adress) {
-                $checked = @$adress->active== 1 ? 'checked':'';
-                ?>
-                <div id="adres_div_{{$adress->id}}" class="box-header with-border">
-                    <label style="width: 80%;">
-                        <div style="float: left; " class="borderTd">
-                            <input type="radio" name="adress" id="adress" value="<?php echo $adress->id ?>" class="flat-red" <?php echo $checked ?> style="position: absolute; opacity: 0;"></div>
-                        <div style="float: left; width: 90%; margin-left: 20px;">
-                            <div style="font-size: 14pt; "><?php echo $adress->name ?> - <span style="font-weight: 200;"><?php echo $adress->county->name . '/' . $adress->city->name ?></span></div>
-                        </div>
-                    </label>
-                    <div style="font-size: 16pt; float: right; width: 15%; ">
-                        <a style="margin-left: 30px; cursor:pointer;" href="/acr/ftr/card/adress/edit?adres_id=<?php echo $adress->id ?>" class="fa fa-edit"></a>
-                        <span style="margin-left: 30px; cursor:pointer;" onclick="adress_delete(<?php echo $adress->id ?>)" class="fa fa-trash"></span>
-                    </div>
-                </div>
 
-                <?php }?>
-                <button type="submit" class="btn btn-lg btn-warning"> ÖDEME BİLGİLERİ <span class="fa fa-angle-double-right"></span></button>
-            </form>
-            <div style="clear:both;"></div>
+    <div class=" col-md-12">
+        <div class="box box-warning">
+            <div class="box-header with-border"><?php echo $sepet_nav ?>
+                <button style="float: right;" data-toggle="modal" data-target="#myModal" class="btn btn-success">YENİ ADRES EKLE</button>
+            </div>
+            <div class="box-body">
+                @if (count($errors) > 0)
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <form method="post" action="/acr/ftr/card/payment">
+                    <?php
+                    echo csrf_field();
+                    foreach ($adresses as $adress) {
+                    $checked = @$adress->active== 1 ? 'checked':'';
+                    ?>
+                    <div id="adres_div_{{$adress->id}}" class="box-header with-border">
+                        <label style="width: 80%;">
+                            <div style="float: left; " class="borderTd">
+                                <input type="radio" name="adress" id="adress" value="<?php echo $adress->id ?>" class="flat-red" <?php echo $checked ?> style="position: absolute; opacity: 0;"></div>
+                            <div style="float: left; width: 90%; margin-left: 20px;">
+                                <div style="font-size: 14pt; "><?php echo $adress->name ?> - <span style="font-weight: 200;"><?php echo $adress->county->name . '/' . $adress->city->name ?></span></div>
+                            </div>
+                        </label>
+                        <div style="font-size: 16pt; float: right; width: 15%; ">
+                            <a style="margin-left: 30px; cursor:pointer;" href="/acr/ftr/card/adress/edit?adres_id=<?php echo $adress->id ?>" class="fa fa-edit"></a>
+                            <span style="margin-left: 30px; cursor:pointer;" onclick="adress_delete(<?php echo $adress->id ?>)" class="fa fa-trash"></span>
+                        </div>
+                    </div>
+
+                    <?php }
+                    if($adresses->count() > 0) {?>
+                    <button type="submit" class="btn btn-lg btn-warning"> ÖDEME BİLGİLERİ <span class="fa fa-angle-double-right"></span></button>
+                    <?php } ?>
+                </form>
+                <div style="clear:both;"></div>
+            </div>
         </div>
     </div>
     <div id="myModal" class="modal">

@@ -3,32 +3,32 @@
     <link rel="stylesheet" href="/css/acr_ftr/sepet.css">
 @stop
 @section('acr_ftr')
-    <?php
-    echo $sepet_nav;
-    ?>
-    <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
-        <div class="box-header with-border">Sepetiniz</div>
-        <div class="box-body">
-            <table width="100%" class="table table-striped">
-                <thead>
-                <tr>
-                    <th width="40%">Ürün</th>
-                    <th>Türü</th>
-                    <th>Adet</th>
-                    <th>Fiyat</th>
-                    <th style="text-align: right">Sil</th>
-                </tr>
-                </thead>
-                <tbody id="sepet_tbody"><?php echo $sepet_row; ?></tbody>
-                <tfoot>
-                <tr>
-                    <td><a style="float: left;" class="btn btn-lg btn-warning" href="/acr/ftr/card/adress">ADRES BİLGİLERİ <span class="fa fa-angle-double-right"></span></a></td>
-                    <td colspan="3">
-                        <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
-                    </td>
-                </tr>
-                </tfoot>
-            </table>
+
+    <div class=" col-md-12">
+        <div class="box box-warning">
+            <div class="box-header with-border"><?php  echo $sepet_nav; ?></div>
+            <div class="box-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th width="40%">Ürün</th>
+                        <th>Türü</th>
+                        <th>Adet</th>
+                        <th>Fiyat</th>
+                        <th style="text-align: right">Sil</th>
+                    </tr>
+                    </thead>
+                    <tbody id="sepet_tbody"><?php echo $sepet_row; ?></tbody>
+                    <tfoot>
+                    <tr>
+                        <td><a style="float: left;" class="btn btn-lg btn-warning" href="/acr/ftr/card/adress">ADRES BİLGİLERİ <span class="fa fa-angle-double-right"></span></a></td>
+                        <td colspan="3">
+                            <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 @stop

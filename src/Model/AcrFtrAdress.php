@@ -15,7 +15,8 @@ class AcrFtrAdress extends Model
     {
         AcrFtrAdress::where('user_id', Auth::user()->id)->update(['active' => 2]);
         if (empty($adress_id)) {
-            return AcrFtrAdress::insertGetId($data);
+            $adress_id = AcrFtrAdress::insertGetId($data);
+            return $adress_id;
         } else {
             AcrFtrAdress::where('id', $adress_id)->update($data);
             return $adress_id;
@@ -37,7 +38,7 @@ class AcrFtrAdress extends Model
     {
         AcrFtrAdress::where('user_id', Auth::user()->id)->update(['active' => 2]);
         AcrFtrAdress::where('id', $adress_id)->update(['active' => 1]);
-      
+
     }
 
 }

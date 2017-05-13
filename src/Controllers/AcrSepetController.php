@@ -3,8 +3,10 @@
 namespace Acr\Ftr\Controllers;
 
 use Acr\Ftr\Model\Acr_Ftr_user;
+use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrAdress;
 use Acr\Ftr\Model\County;
+use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\Product_sepet;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\City;
@@ -17,11 +19,39 @@ use Acr\Ftr\Model\Bank;
 
 class AcrSepetController extends Controller
 {
+    protected $config_name;
+    protected $config_user_name;
+    protected $config_email;
+    protected $config_lisans_durum;
+    protected $config_lisans_baslangic;
+    protected $config_lisans_bitis;
+
+    function __construct()
+    {
+        $conf_table_model  = new Acr_user_table_conf();
+        $conf_table        = $conf_table_model->first();
+        $this->config_name = $conf_table->name;
+    }
+
     function index()
     {
         $user_model = new Acr_Ftr_user();
         $sepets     = $user_model->find(Auth::user()->id)->sepets()->get();
         return View('acr_ftr::anasayfa');
+    }
+
+    function orders(Request $request)
+    {
+        $sepet_model = new Sepet();
+        $orders      = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 1)->get();
+        return View('acr_ftr::acr_orders', compact('orders'));
+    }
+
+    function admin_orders(Request $request)
+    {
+        $sepet_model = new Sepet();
+        $orders      = $sepet_model->where('siparis', 1)->get();
+        return View('acr_ftr::acr_admin_orders', compact('orders'));
     }
 
     function create(Request $request, $product_id = null)
@@ -32,7 +62,7 @@ class AcrSepetController extends Controller
             $product_id = $request->input('product_id');
         }
         if (Auth::check()) {
-            $sepet_id = $sepet_model->product_sepet_id();
+            $sepet_id = $sepet_model->product_sepet_id();;
             if ($ps_model->where('sepet_id', $sepet_id)->where('product_id', $product_id)->count() > 0) {
                 return $ps_model->use_plus($product_id, $sepet_id);
             }
@@ -46,7 +76,7 @@ class AcrSepetController extends Controller
             $sepet_id = $sepet_model->product_sepet_id($session_id);
 
             if ($sepet_model->where('product_id', $product_id)->where('sepet_id', $sepet_id)->count() > 0) {
-                return $sepet_model->use_plus($product_id, $sepet_id);
+                return $ps_model->use_plus($product_id, $sepet_id);
             }
         }
         $session_id = empty($session_id) ? null : $session_id;
@@ -121,6 +151,17 @@ class AcrSepetController extends Controller
         return $discount;
     }
 
+    function dis_rate($price, $dis_price)
+    {
+        $discount = 100 - round($dis_price / $price, 2) * 100;
+        if ($discount > 0) {
+            $discount = $discount;
+        } else {
+            $discount = 0;
+        }
+        return ($discount / 100);
+    }
+
     function sepet_row($products)
     {
         $veri        = '';
@@ -144,7 +185,6 @@ class AcrSepetController extends Controller
             $veri .= '</td>';
             $veri .= '<td style="text-align: right"><span style="font-size:14pt; padding-top: 6px; cursor:pointer;" onclick="sepet_delete(' . $product->id . ')" class="fa fa-trash"></span></td>
                         </tr>';
-
         }
         $veri .= '<tr>
                   <td></td>
@@ -234,42 +274,48 @@ Kaç Aylık
         $session_id = $request->session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
         $sepet_row  = self::sepet_row_detail($products);
-        $sepet_nav  = self::sepet_nav(1);
+        $sepet_id   = $sepet_model->product_sepet_id();
+        $sepet_nav  = self::sepet_nav($sepet_id, 1);
         return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav'));
     }
 
     function adress(Request $request)
     {
+        $sepet_model  = new Sepet();
         $adress_model = new AcrFtrAdress();
-        $sepet_nav    = self::sepet_nav(2);
+        $sepet_id     = $sepet_model->product_sepet_id();
+        $sepet_nav    = self::sepet_nav($sepet_id, 2);
         $adres_form   = self::adress_form($request);
         $adresses     = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
-
         return View('acr_ftr::card_adress', compact('sepet_nav', 'adres_form', 'adresses'));
     }
 
     function payment(Request $request)
     {
         $adress_model = new AcrFtrAdress();
-        $user_model   = new Acr_Ftr_user();
+        $sepet_model  = new Sepet();
         $bank_model   = new Bank();
         $adress_id    = $request->input('adress');
-        $adress_model->active_adress($adress_id);
-        $banks            = $bank_model->where('active', 1)->where('sil', 0)->get();
-        $iyzicoController = new iyzicoController();
-        $sepet            = $user_model->find(Auth::user()->id)->sepet()->first();
-        $odemeForm        = $iyzicoController->odemeForm(1, $sepet->price, $sepet->id);
-        $sepet_nav        = self::sepet_nav(3);
-        return View('acr_ftr::card_payment', compact('odemeForm', 'sepet_nav', 'banks'));
+        if (!empty($adress_id)) {
+            $adress_model->active_adress($adress_id);
+        }
+        $order_id    = $request->input('order_id');
+        $sepet_id    = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $order_link  = empty($order_id) ? '' : '?order_id=' . $order_id;
+        $order_input = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
+        $banks       = $bank_model->where('active', 1)->where('sil', 0)->get();
+        $sepet_nav   = self::sepet_nav($sepet_id, 3);
+        return View('acr_ftr::card_payment', compact('sepet_nav', 'banks', 'order_link', 'order_input'));
+
+
     }
 
-    function sepet_total_price()
+    function sepet_total_price($sepet_id)
     {
-        $sepet_model = new Sepet();
-        $ps_model    = new Product_sepet();
-        $sepet_id    = $sepet_model->product_sepet_id();
-        $products    = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
-        $price       = [];
+
+        $ps_model = new Product_sepet();
+        $products = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
+        $price    = [];
         foreach ($products as $product) {
             $price[] = self::price_set($product);
         }
@@ -278,36 +324,85 @@ Kaç Aylık
         return $prices;
     }
 
-    function paymet_havale_eft(Request $request)
+    function product_sepet_total_price($sepet_id)
+    {
+
+        $ps_model = new Product_sepet();
+        $products = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
+        $price    = [];
+        foreach ($products as $product) {
+            $price[] = $product->product->price * $product->lisans_ay * $product->adet;
+        }
+        $prices = array_sum($price);
+        $prices = round($prices, 2);
+        return $prices;
+    }
+
+    function order_set($data, $sepet_id)
     {
         $sepet_model = new Sepet();
-        $bank_id     = $request->input('bank_id');
-        $bank_model  = new Bank();
-        $sepet_id    = $sepet_model->product_sepet_id();
-        $price       = self::sepet_total_price();
-        $dataSepet   = [
-            'bank_id'      => $bank_id,
-            'payment_type' => '1',
+        $sepet_model->where('id', $sepet_id)->update($data);
+    }
+
+    function paymet_havale_eft(Request $request)
+    {
+        $sepet_model   = new Sepet();
+        $bank_id       = $request->input('bank_id');
+        $bank_model    = new Bank();
+        $order_id      = $request->input('order_id');
+        $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $price         = round(self::sepet_total_price($sepet_id), 2);
+        $price_product = round(self::product_sepet_total_price($sepet_id), 2);
+        $dis_rate      = self::dis_rate($price_product, $price);
+        $data_sepet    = [
             'siparis'      => 1,
-            'price'        => $price
+            'price'        => $price,
+            'bank_id'      => $bank_id,
+            'payment_type' => 1,
+            'dis_rate'     => $dis_rate
         ];
-
-        $sepet_model->where('id', $sepet_id)->update($dataSepet);
-        $siparis   = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
+        self::order_set($data_sepet, $sepet_id);
+        $siparis = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
+        if (empty($sepet_id)) {
+            return redirect()->to('/acr/ftr/orders');
+        }
         $bank      = $bank_model->where('id', $bank_id)->first();
-        $sepet_nav = self::sepet_nav(4);
-
+        $sepet_nav = self::sepet_nav($sepet_id, 4);
         return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank'));
 
     }
 
-    function sepet_nav($step)
+    function payment_bank_card(Request $request)
     {
-        $navs = [
+        $sepet_model      = new Sepet();
+        $iyzicoController = new iyzicoController();
+        $order_id         = $request->input('order_id');
+        $sepet_id         = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $price            = round(self::sepet_total_price($sepet_id), 2);
+        $data_sepet       = [
+            'siparis'      => 1,
+            'price'        => $price,
+            'payment_type' => 2,
+        ];
+        self::order_set($data_sepet, $sepet_id);
+        $odemeForm = $iyzicoController->odemeForm(1, $price, $sepet_id);
+        $siparis   = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
+        if (empty($sepet_id)) {
+            return redirect()->to('/acr/ftr/orders');
+        }
+        $sepet_nav = self::sepet_nav($order_id, 4);
+        return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm'));
+
+    }
+
+    function sepet_nav($order_id = null, $step)
+    {
+        $sepet_link = empty($order_id) ? '' : '?order_id=' . $order_id;
+        $navs       = [
             1 => ['sepet', 'SEPET', 11],
             ['adress', 'TESLİMAT BİLGİLERİ', 10],
-            ['payment', 'ÖDEME BİLGİLERİ', 9],
-            ['result', ' ALIŞVERİŞ SONUCU', 8]
+            ['payment', 'ÖDEME YÖNETİ', 9],
+            ['result', ' ÖDEME', 8]
         ];
 
         $row = '<div id="breadcrumb">';
@@ -317,7 +412,7 @@ Kaç Aylık
             $row   .= '<li class="first ">';
             $row   .= '<a ';
             if ($step >= $key) {
-                $row .= ' href="/acr/ftr/card/' . $nav[0] . '/"';
+                $row .= ' href="/acr/ftr/card/' . $nav[0] . $sepet_link . '"';
             }
             $row .= 'style="z-index:' . $nav[2] . '; ' . $color . '"><span></span>' . $key . ' ' . $nav[1] . '</a>';
             $row .= '</li>';
@@ -338,6 +433,14 @@ Kaç Aylık
         $row .= '<div class="form-group">';
         $row .= '<label>Adres İsmi</label>';
         $row .= '<input required name="name" id="name" class="form-control" placeholder="Adres İsmi" value="' . @$adress->name . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>Alıcı İsmi</label>';
+        $row .= '<input required name="invoice_name" id="invoice_name" class="form-control" placeholder="İsminiz" value="' . @$adress->invoice_name . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>T.C. Kimlik No </label>';
+        $row .= '<input  required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranız" value="' . @$adress->tc . '">';
         $row .= '</div>';
         // citys
         $row .= '<div class="form-group">';
@@ -479,31 +582,52 @@ Kaç Aylık
             $e_fatura     = empty($request->input('e_fatura')) ? 1 : $request->input('e_fatura');
             $adress_model = new AcrFtrAdress();
             $data         = [
-                'user_id'    => Auth::user()->id,
-                'name'       => $request->input('name'),
-                'adress'     => $request->input('adress'),
-                'city_id'    => $request->input('city'),
-                'county_id'  => $request->input('county'),
-                'post_code'  => $request->input('post_code'),
-                'tel'        => $request->input('tel'),
-                'type'       => $request->input('type'),
-                'campany'    => $request->input('campany'),
-                'tax_number' => $request->input('tax_number'),
-                'tax_office' => $request->input('tax_office'),
-                'e_fatura'   => $e_fatura,
+                'user_id'      => Auth::user()->id,
+                'name'         => $request->input('name'),
+                'invoice_name' => $request->input('invoice_name'),
+                'tc'           => $request->input('tc'),
+                'adress'       => $request->input('adress'),
+                'city_id'      => $request->input('city'),
+                'county_id'    => $request->input('county'),
+                'post_code'    => $request->input('post_code'),
+                'tel'          => $request->input('tel'),
+                'type'         => $request->input('type'),
+                'campany'      => $request->input('campany'),
+                'tax_number'   => $request->input('tax_number'),
+                'tax_office'   => $request->input('tax_office'),
+                'e_fatura'     => $e_fatura,
+                'active'       => 1,
 
             ];
             $adress_id    = $request->input('adress_id') ? $request->input('adress_id') : 0;
-            $adress_model->create($adress_id, $data);
+
+            $adress_id = $adress_model->create($adress_id, $data);
+            self::parasut_contact_update($adress_id);
+
             return Redirect()->back();
         }
 
     }
 
+    function parasut_contact_update($adress_id)
+    {
+        $adress_model    = new AcrFtrAdress();
+        $parasut         = new ParasutController();
+        $adress_row      = $adress_model->where('id', $adress_id)->first();
+        $parasut_contact = self::parasut_contact_data($adress_row);
+        if (empty($adress_row->parasut_id)) {
+            $contact_id = $parasut->contact($parasut_contact);
+            $adress_model->where('id', $adress_id)->update(['parasut_id' => $contact_id]);
+        } else {
+            $parasut->contact_update($adress_row->parasut_id, $parasut_contact);
+        }
+    }
+
     function card_adress_edit(Request $request)
     {
         $adress_model = new AcrFtrAdress();
-        $sepet_nav    = self::sepet_nav(2);
+        $sepet_id     = $request->input('sepet_id');
+        $sepet_nav    = self::sepet_nav($sepet_id, 2);
         $adres_id     = $request->input('adres_id');
         $adress       = $adress_model->where('id', $adres_id)->with('city', 'county')->first();
         $adres_form   = self::adress_form($request, $adress);
@@ -524,6 +648,180 @@ Kaç Aylık
         $adress_model = new AcrFtrAdress();
         $adres_id     = $request->input('adres_id');
         $adress_model->where('id', $adres_id)->update(['sil' => 1]);
+
+    }
+
+    function parasut_contact_data($adress_row)
+    {
+
+        if ($adress_row->type == 1) {
+            $contact_type = 'person';
+            $tax_number   = $adress_row->tc;
+            $invoice_name = $adress_row->invoice_name;
+            $contact_name = $adress_row->invoice_name;
+        } else {
+            $contact_type = 'company';
+            $tax_number   = $adress_row->tax_number;
+            $invoice_name = $adress_row->campany;
+            $contact_name = $adress_row->invoice_name;
+        }
+        $parasut_contact = [
+            'name'                      => $invoice_name,
+            'contact_type'              => $contact_type,
+            'tax_number'                => $tax_number,
+            'tax_office'                => $adress_row->office,
+            'category_id'               => null,
+            'city'                      => $adress_row->city->name,
+            'district'                  => $adress_row->county->name,
+            'address_attributes'        => [
+                'address' => $adress_row->adress,
+                'phone'   => $adress_row->tel,
+                'fax'     => null,
+            ],
+            'contact_people_attributes' => [
+                [
+                    'name'  => $contact_name,
+                    'phone' => $adress_row->tel,
+                ],
+            ],
+        ];
+        return $parasut_contact;
+    }
+
+    function orders_active(Request $request, $order_id = null)
+    {
+        $parasut = new ParasutController();
+
+        $order_id    = empty($order_id) ? $request->input('order_id') : $order_id;
+        $sepet_model = new Sepet();
+        $ps_model    = new Product_sepet();
+        $user_model  = new Acr_Ftr_user();
+        /*$parasut_conf     = new Parasut_conf();
+        $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
+        $adress_model = new AcrFtrAdress();
+        $sepet_row    = $sepet_model->where('id', $order_id)->first();
+
+        $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
+
+
+        if (empty($adress_row->parasut_id)) {
+            $adress             = $adress_model->find($adress_row->id);
+            $parasut_contact    = self::parasut_contact_data($adress_row);
+            $parasut_contact_id = $parasut->contact($parasut_contact);
+            $adress->parasut_id = $parasut_contact_id;
+            $adress->save();
+
+        } else {
+            $parasut_contact_id = $adress_row->parasut_id;
+        }
+
+        $user                = $user_model->find($sepet_row->user_id);
+        $user_row            = $user_model->where('id', $sepet_row->user_id)->first();
+        $sepet               = $sepet_model->find($order_id);
+        $sepet->active       = 1;
+        $sepet->order_result = 2;
+        $sepet->save();
+        $orders = $ps_model->where('sepet_id', $order_id)->with('product', 'acr_product', 'sepet')->get();
+        foreach ($orders as $order) {
+            if ($order->type == 2) {
+                $user->lisans_durum = 1;
+                if (strtotime($user_row->lisans_bitis) < time()) {
+                    $lisans_bitis = time();
+                } else {
+                    $lisans_bitis = strtotime($user_row->lisans_bitis);
+                }
+                $user->lisans_bitis = self::son_aktif_tarih($order->lisans_ay, $lisans_bitis);
+                $user->save();
+            }
+            $parasut_product_data[] = [
+                'product_id'    => $order->acr_product->parasut_id, // the parasut products
+                'quantity'      => $order->adet,
+                'unit_price'    => round(self::price_set($order) / $order->adet, 4),
+                'discount'      => round($order->product->price * $order->sepet->dis_rate, 4),
+                'vat_rate'      => $order->product->kdv,
+                'discount_type' => 'amount',
+                'discount_rate' => $order->sepet->dis_rate,
+            ];
+            $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $order->product->kdv;
+        }
+        $parasut_sale_data = [
+            'description'        => $adress_row->invoice_name,
+            'item_type'          => 'invoice',
+            'contact_id'         => $parasut_contact_id,
+            'gross_total'        => $sepet_row->price,
+            'archived'           => null,
+            'issue_date'         => date('Y-m-d'),
+            'details_attributes' => $parasut_product_data,
+
+        ];
+        $invoice           = $parasut->sale($parasut_sale_data);
+        //  dd($invoice_id);
+        $payment_data = [
+            "amount"        => $invoice->net_total,
+            "date"          => date('Y-m-d'),
+            // "description"   => "Açıklama",
+            "account_id"    => $parasut->account_id,
+            "exchange_rate" => "1.0"
+        ];
+        $e_arsiv      = [
+            // "note"                      => "Fatura notu",
+            "to"       => "urn=>mail=>",
+            "scenario" => "commercial"
+        ];
+
+        $parasut->paid($invoice->id, $payment_data);
+        $parasut->e_arsiv($invoice->id, $e_arsiv);
+
+    }
+
+    function son_aktif_tarih($ay = null, $lisans_bitis)
+    {
+        $ekle = $lisans_bitis - time();
+
+        if ($ekle < 0) {
+            $ekle = 0;
+        }
+        $odemeZaman = $ekle + mktime(0, 0, 0, date('m') + $ay, date('d'), date('Y'));
+        return date('Y-m-d H:i:s', $odemeZaman);
+    }
+
+    function invers_son_aktif_tarih($ay = null, $lisans_bitis)
+    {
+        $ekle = $lisans_bitis - time();
+
+        if ($ekle < 0) {
+            $ekle = 0;
+        }
+        $odemeZaman = $ekle - mktime(0, 0, 0, date('m') + $ay, date('d'), date('Y'));
+        return date('Y-m-d H:i:s', $odemeZaman);
+    }
+
+    function orders_deactive(Request $request, $order_id = null)
+    {
+        $order_id            = empty($order_id) ? $request->input('order_id') : $order_id;
+        $sepet_model         = new Sepet();
+        $ps_model            = new Product_sepet();
+        $user_model          = new Acr_Ftr_user();
+        $sepet               = $sepet_model->find($order_id);
+        $sepet->active       = 0;
+        $sepet->order_result = 1;
+        $sepet->save();
+        $sepet_row = $sepet_model->where('id', $order_id)->first();
+        $orders    = $ps_model->where('sepet_id', $order_id)->get();
+        foreach ($orders as $order) {
+            if ($order->type == 2) {
+                $user               = $user_model->find($sepet_row->user_id);
+                $user_row           = $user_model->where('id', $sepet_row->user_id)->first();
+                $user->lisans_durum = 0;
+                if (strtotime($user_row->lisans_bitis) < time()) {
+                    $lisans_bitis = time();
+                } else {
+                    $lisans_bitis = strtotime($user_row->lisans_bitis);
+                }
+                $user->lisans_bitis = self::invers_son_aktif_tarih($order->lisans_ay, $lisans_bitis);
+                $user->save();
+            }
+        }
 
     }
 

@@ -4,55 +4,58 @@
     <link rel="stylesheet" href="/plugins/iCheck/all.css">
 @stop
 @section('acr_ftr')
-    <?php echo $sepet_nav ?>
-    <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
-        <div class="box-header with-border">ÖDEME BİLGİLERİ</div>
 
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs">
-                <li class=""><a href="#havale_eft" data-toggle="tab" aria-expanded="true">Havale/EFT</a></li>
-                <li class="active"><a href="#kredi_karti" data-toggle="tab" aria-expanded="false">Kredi Kartı</a></li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane " id="havale_eft">
-                    <form method="post" action="/acr/ftr/card/payment/havale_eft">
-                        <?php
-                        echo csrf_field();
-                        foreach ($banks as $bank) {
+    <div class=" col-md-12">
+        <div class="box box-warning">
+            <div class="box-header with-border"><?php echo $sepet_nav ?></div>
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class=""><a href="#havale_eft" data-toggle="tab" aria-expanded="true">Havale/EFT</a></li>
+                    <li class="active"><a href="#kredi_karti" data-toggle="tab" aria-expanded="false">Kredi Kartı</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane " id="havale_eft">
+                        <form method="post" action="/acr/ftr/card/payment/havale_eft">
+                            <?php
+                            echo csrf_field();
 
-                        ?>
-                        <div style="width: 100%; cursor:pointer;" class="box-header with-border">
-                            <label style="width:80%; cursor:pointer;">
-                                <div style="float: left; " class="borderTd">
-                                    <input required type="radio" name="bank_id" value="<?php echo $bank->id ?>" class="flat-red" style="position: absolute; opacity: 0;"></div>
-                                <div style="float: left; width: 90%; margin-left: 20px;">
-                                    <div style="font-size: 14pt; float: left; width: 80%; "><?php echo $bank->name ?> - <span style="font-weight: 200;"><?php echo $bank->bank_name . '/' . $bank->user_name ?></span></div>
-                                </div>
-                            </label>
-                        </div>
+                            foreach ($banks as $bank) {
 
-                        <?php }?>
-                        <div style="clear:both;"></div>
-                        <br>
-                        <button class="btn btn-lg btn-warning">ÖDEMEYİ HAVALE/EFT İLE TAMAMLA <span class="fa fa-angle-double-right"></span></button>
-                    </form>
+                            ?>
+                            <div style="width: 100%; cursor:pointer;" class="box-header with-border">
+                                <label style="width:80%; cursor:pointer;">
+                                    <div style="float: left; " class="borderTd">
+                                        <input required type="radio" name="bank_id" value="<?php echo $bank->id ?>" class="flat-red" style="position: absolute; opacity: 0;"></div>
+                                    <div style="float: left; width: 90%; margin-left: 20px;">
+                                        <div style="font-size: 14pt; float: left; width: 80%; "><?php echo $bank->name ?> - <span style="font-weight: 200;"><?php echo $bank->bank_name . '/' . $bank->user_name ?></span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <?php }?>
+                            <div style="clear:both;"></div>
+                            <br>
+                            <?php echo $order_input ?>
+                            <button class="btn btn-lg btn-warning">ÖDEMEYİ HAVALE/EFT İLE TAMAMLA <span class="fa fa-angle-double-right"></span></button>
+                        </form>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div style="text-align: center;" class="tab-pane active" id="kredi_karti">
+                        <a href="/acr/ftr/card/payment/bank_card<?php echo $order_link?>"><img src="/img/simdiAl.png"/> </a>
+                    </div>
+                    <!-- /.tab-pane -->
+
+
+                    <!-- /.tab-pane -->
                 </div>
-                <!-- /.tab-pane -->
-                <div class="tab-pane active" id="kredi_karti">
-                    <?php echo $odemeForm ?>
-                </div>
-                <!-- /.tab-pane -->
-
-
-                <!-- /.tab-pane -->
+                <!-- /.tab-content -->
             </div>
-            <!-- /.tab-content -->
+
         </div>
 
-
-        <div style="clear:both;"></div>
     </div>
-    </div>
+    <div style="clear:both;"></div>
     <div id="myModal" class="modal">
         <div class="modal-dialog">
             <div class="modal-content">
