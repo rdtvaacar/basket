@@ -3,7 +3,7 @@
 namespace Acr\Ftr\Controllers;
 
 use Acr\Ftr\Model\acr_files;
-use Acr\Ftr\Model\Acr_Ftr_user;
+use Acr\Ftr\Model\AcrUser;
 use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrIyzico;
 use Acr\Ftr\Model\Acrproduct;
@@ -25,7 +25,7 @@ class AcrFtrController extends Controller
 {
     function index()
     {
-        $user_model = new Acr_Ftr_user();
+        $user_model = new AcrUser();
         $products   = $user_model->find(Auth::user()->id)->products()->get();
         return View('acr_ftr::anasayfa');
     }

@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\User;
 use Auth;
 use DB;
-use Acr\Ftr\Facades\AcrFtr;
 
-class AcrFtrRole extends Model
+class AcrRole extends Model
 
 {
     protected $table = 'roles';

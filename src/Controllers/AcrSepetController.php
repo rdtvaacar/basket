@@ -2,7 +2,7 @@
 
 namespace Acr\Ftr\Controllers;
 
-use Acr\Ftr\Model\Acr_Ftr_user;
+use Acr\Ftr\Model\AcrUser;
 use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrAdress;
 use Acr\Ftr\Model\County;
@@ -35,7 +35,7 @@ class AcrSepetController extends Controller
 
     function index()
     {
-        $user_model = new Acr_Ftr_user();
+        $user_model = new AcrUser();
         $sepets     = $user_model->find(Auth::user()->id)->sepets()->get();
         return View('acr_ftr::anasayfa');
     }
@@ -695,7 +695,7 @@ Kaç Aylık
         $order_id    = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model = new Sepet();
         $ps_model    = new Product_sepet();
-        $user_model  = new Acr_Ftr_user();
+        $user_model  = new AcrUser();
         /*$parasut_conf     = new Parasut_conf();
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
@@ -801,7 +801,7 @@ Kaç Aylık
         $order_id            = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model         = new Sepet();
         $ps_model            = new Product_sepet();
-        $user_model          = new Acr_Ftr_user();
+        $user_model          = new AcrUser();
         $sepet               = $sepet_model->find($order_id);
         $sepet->active       = 0;
         $sepet->order_result = 1;

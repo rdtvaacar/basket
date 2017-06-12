@@ -2,7 +2,7 @@
 
 namespace Acr\Ftr\Controllers;
 
-use Acr\Ftr\Model\Acr_Ftr_user;
+use Acr\Ftr\Model\AcrUser;
 use Mail;
 use Auth;
 use View;
@@ -11,7 +11,7 @@ class MailController
 {
     function mailGonder($view = null, $mail, $isim = null, $subject = null, $ekMesaj = null)
     {
-        $user_model = new Acr_Ftr_user();
+        $user_model = new AcrUser();
         $admin      = $user_model->find(1)->first();
         $email      = empty(Auth::user()->email) ? Auth:: user()->username : Auth::user()->email;
         $admin_mail = empty($admin->email) ? $admin->username : $admin->email;

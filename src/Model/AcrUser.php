@@ -6,7 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Auth;
 
-class Acr_Ftr_user extends Authenticatable
+class AcrUser extends Authenticatable
 {
     use Notifiable;
     protected $connection = 'mysql';
@@ -42,12 +42,12 @@ class Acr_Ftr_user extends Authenticatable
 
     function roles()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrRole', 'role_user', 'role_id', 'user_id');
+        return $this->belongsToMany('Acr\Ftr\Model\AcrRole', 'role_user', 'user_id', 'role_id');
     }
 
     function adresses()
     {
-        return $this->hasMany('Acr\Ftr\Model\AcrFtrAdress', 'user_id');
+        return $this->hasMany('Acr\Ftr\Model\AcrMenuAdress', 'user_id');
     }
 
 }

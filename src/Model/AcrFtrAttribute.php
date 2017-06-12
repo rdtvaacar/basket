@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AcrFtrAttribute extends Model
 {
     protected $connection = 'mysql2';
-    protected $table = 'Attributes';
+    protected $table = 'attributes';
 
     function attributes()
     {
