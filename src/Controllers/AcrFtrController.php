@@ -259,7 +259,11 @@ class AcrFtrController extends Controller
             'company_id'    => $request->input('company_id')
 
         ];
-        $parasut_conf->where('user_id', Auth::user()->id)->update($data);
+        if ($parasut_conf->where('user_id', Auth::user()->id)->count() > 0) {
+            $parasut_conf->where('user_id', Auth::user()->id)->update($data);
+        } else {
+            $parasut_conf->insert($data);
+        }
         $parasut    = new ParasutController();
         $account_id = $parasut->account_id();
         $parasut_conf->where('user_id', Auth::user()->id)->update(['account_id' => $account_id]);
