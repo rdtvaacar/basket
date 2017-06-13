@@ -232,7 +232,6 @@ class AcrFtrController extends Controller
     function user_table_update(Request $request)
     {
         $user_conf_model = new Acr_user_table_conf();
-
         $data = [
             'user_id'          => Auth::user()->id,
             'name'             => $request->input('name'),
@@ -242,7 +241,11 @@ class AcrFtrController extends Controller
             'lisans_baslangic' => $request->input('lisans_baslangic'),
             'lisans_bitis'     => $request->input('lisans_bitis')
         ];
-        $user_conf_model->where('user_id', Auth::user()->id)->update($data);
+        if ($user_conf_model->where('user_id', Auth::user()->id)->count() > 0) {
+            $user_conf_model->where('user_id', Auth::user()->id)->update($data);
+        } else {
+            $user_conf_model->insert($data);
+        }
         return redirect()->back();
     }
 
