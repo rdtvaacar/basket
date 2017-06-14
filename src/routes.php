@@ -9,8 +9,12 @@ Route::group(['middleware' => ['web']], function () {
         Route::post('/product/sepet/sepet_adet_guncelle', 'AcrSepetController@sepet_adet_guncelle');
         Route::post('/product/sepet/sepet_lisans_ay_guncelle', 'AcrSepetController@sepet_lisans_ay_guncelle');
         Route::post('/product/sepet/delete', 'AcrSepetController@delete');
+        Route::post('/product/sepet/sepet_total_price', 'AcrSepetController@sepet_total_price');
+        Route::post('/product/sepet/product_sepet_total_price', 'AcrSepetController@product_sepet_total_price');
+        Route::post('/product/sepet/discount', 'AcrSepetController@discount');
         Route::post('/product/sepet/delete_all', 'AcrSepetController@delete_all');
         Route::get('/card/sepet', 'AcrSepetController@card');
+
         // paraşüt
 
         Route::get('/parasut', 'ParasutController@index');

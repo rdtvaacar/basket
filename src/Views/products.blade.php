@@ -364,7 +364,6 @@
             $('#sepet_row').hide();
         }
         function sepet_adet_guncelle(sepet_id) {
-
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
                 type   : 'post',
@@ -372,6 +371,25 @@
                 data   : 'sepet_id=' + sepet_id + '&adet=' + adet,
                 success: function (veri) {
                     $('#sepet_count').html(veri);
+                    $.ajax({
+                        type   : 'post',
+                        url    : '/acr/ftr/product/sepet/sepet_total_price',
+                        data   : 'sepet_id=' + sepet_id,
+                        success: function (msg) {
+                            $('#product_price_' + sepet_id).html(msg + '₺');
+                            $.ajax({
+                                type   : 'post',
+                                url    : '/acr/ftr/product/sepet/product_sepet_total_price',
+                                data   : 'sepet_id=' + sepet_id,
+                                success: function (msg) {
+                                    $('#acr_sepet_total_price').html(msg + '₺');
+                                    $('#product_dis_' + sepet_id).hide();
+
+                                }
+                            });
+                        }
+                    });
+
                 }
             });
         }

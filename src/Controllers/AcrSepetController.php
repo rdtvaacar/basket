@@ -133,16 +133,22 @@ class AcrSepetController extends Controller
         }
 
         if ((($dis_price / $price_not_dis) - ((100 - $product->product->max_dis) / 100)) < 0) {
-            $price = ((100 - $product->product->max_dis) / 100) * $price_not_dis;
+            if (((100 - $product->product->max_dis) / 100) > 0) {
+                $price = ((100 - $product->product->max_dis) / 100) * $price_not_dis;
+            } else {
+                $price = $dis_price;
+            }
         } else {
             $price = $dis_price;
         }
         return $price;
     }
 
-    function discount($price, $dis_price)
+    function discount($price = null, $dis_price = null, Request $request = null)
     {
-        $discount = 100 - round($dis_price / $price, 2) * 100;
+        $price     = empty($price) ? $request->price : $price;
+        $dis_price = empty($dis_price) ? $request->dis_price : $dis_price;
+        $discount  = 100 - round($dis_price / $price, 2) * 100;
         if ($discount > 0) {
             $discount = ' <span style="color: #0b7c0f; font-size: 9pt;">%' . $discount . '</span>';
         } else {
@@ -177,10 +183,12 @@ class AcrSepetController extends Controller
                             </td>
                              <td>';
             if ($price > $dis_price) {
-                $veri .= '<strike style="color: #be3946; font-size: 9pt;">' . round($price, 2) . '</strike>   ' . self::discount($price, $dis_price);
-                $veri .= ' <span style="color: #2d7c32; font-size: 12pt;">' . $total_price[] = round($dis_price, 2) . '₺</span> ';
+                $veri          .= '<span  id="product_dis_' . $product->id . '"><strike style="color: #be3946; font-size: 9pt;">' . round($price, 2) . '</strike>   ' . self::discount($price, $dis_price) . '</span>';
+                $veri          .= ' <span id="product_price_' . $product->id . '" style="color: #2d7c32; font-size: 12pt;">' . round($dis_price, 2) . '₺</span> ';
+                $total_price[] = round($dis_price, 2);
             } else {
-                $veri .= ' <span style="color: #2d7c32; font-size: 12pt;">' . $total_price[] = round($price, 2) . '₺</span>';
+                $veri          .= ' <span id="product_price_' . $product->id . '" style="color: #2d7c32; font-size: 12pt;">' . round($price, 2) . '₺</span>';
+                $total_price[] = round($price, 2);
             }
             $veri .= '</td>';
             $veri .= '<td style="text-align: right"><span style="font-size:14pt; padding-top: 6px; cursor:pointer;" onclick="sepet_delete(' . $product->id . ')" class="fa fa-trash"></span></td>
@@ -189,7 +197,7 @@ class AcrSepetController extends Controller
         $veri .= '<tr>
                   <td></td>
                   <td></td>';
-        $veri .= '<td colspan="2">' . array_sum($total_price) . '₺</td>';
+        $veri .= '<td id="acr_sepet_total_price" colspan="2">' . array_sum($total_price) . '₺</td>';
         $veri .= '</tr>';
 
         return $veri;
@@ -221,15 +229,17 @@ Kaç Aylık
                             </div>';
             }
             $veri .= '</td>';
-
+            $veri .= '<td>';
+            $veri .= $product->product->price . '₺';
+            $veri .= '</td>';
             $veri .= '<td>';
             if ($price > $dis_price) {
                 $total_price[] = round($dis_price, 2);
-                $veri          .= '<strike style="color: #be3946; font-size: 9pt;">' . round($price, 2) . '</strike>   ' . self::discount($price, $dis_price) . '<br>';
-                $veri          .= ' <span style="color: #2d7c32; font-size: 12pt;">' . array_sum($total_price) . '₺</span> ';
+                $veri          .= ' <span  id="product_dis_' . $product->id . '"><strike style="color: #be3946; font-size: 9pt;">' . round($price, 2) . '</strike> ' . self::discount($price, $dis_price) . '<br></span> ';
+                $veri          .= ' <span id="product_price_' . $product->id . '" style="color: #2d7c32; font-size: 12pt;">' . round($dis_price, 2) . '₺</span> ';
             } else {
                 $total_price[] = round($price, 2);
-                $veri          .= ' <span style="color: #2d7c32; font-size: 12pt;">' . array_sum($total_price) . '₺</span>';
+                $veri          .= ' <span id="product_price_' . $product->id . '"  style="color: #2d7c32; font-size: 12pt;">' . round($price, 2) . '₺</span>';
             }
             $veri .= '</td>';
             $veri .= '<td style="text-align: right"><span style="font-size:14pt; padding-top: 6px; cursor:pointer;" onclick="sepet_delete(' . $product->id . ')" class="fa fa-trash"></span></td>
@@ -237,8 +247,10 @@ Kaç Aylık
         }
         $veri .= '<tr>
                     <td></td>
-                    <td></td>';
-        $veri .= '<td colspan="3">' . array_sum($total_price) . '₺</td>';
+                    <td></td>
+                     <td></td>
+                      <td></td>';
+        $veri .= '<td id="acr_sepet_total_price" colspan="2">' . array_sum($total_price) . '₺</td>';
         $veri .= '</tr>';
 
         return $veri;
@@ -310,28 +322,26 @@ Kaç Aylık
 
     }
 
-    function sepet_total_price($sepet_id)
+    function sepet_total_price($sepet_id = null, Request $request = null)
     {
-
+        $sepet_id = empty($sepet_id) ? $request->sepet_id : $sepet_id;
         $ps_model = new Product_sepet();
-        $products = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
-        $price    = [];
-        foreach ($products as $product) {
-            $price[] = self::price_set($product);
-        }
-        $prices = array_sum($price);
-        $prices = round($prices, 2);
+        $product  = $ps_model->where('id', $sepet_id)->with('product')->first();
+        $price    = self::price_set($product);
+        $prices   = round($price, 2);
         return $prices;
     }
 
-    function product_sepet_total_price($sepet_id)
+    function product_sepet_total_price($sepet_id = null, Request $request = null)
     {
 
-        $ps_model = new Product_sepet();
-        $products = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
-        $price    = [];
+        $ps_model    = new Product_sepet();
+        $sepet_id    = empty($sepet_id) ? $request->sepet_id : $sepet_id;
+        $productData = $ps_model->where('id', $sepet_id)->first();
+        $products    = $ps_model->where('sepet_id', $productData->sepet_id)->with('product')->get();
+        $price       = [];
         foreach ($products as $product) {
-            $price[] = $product->product->price * $product->lisans_ay * $product->adet;
+            $price[] = self::price_set($product);;
         }
         $prices = array_sum($price);
         $prices = round($prices, 2);
