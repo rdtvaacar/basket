@@ -153,7 +153,9 @@ class AcrFtrController extends Controller
             'u_kats'     => function ($query) {
                 //  $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
             },
-            'product',
+            'product'    => function ($query) {
+                $query->where('sil', 0);
+            },
             'attributes' => function ($query) {
                 $query->where('attributes.attribute_id', 0);
             }
@@ -232,7 +234,7 @@ class AcrFtrController extends Controller
     function user_table_update(Request $request)
     {
         $user_conf_model = new Acr_user_table_conf();
-        $data = [
+        $data            = [
             'user_id'          => Auth::user()->id,
             'name'             => $request->input('name'),
             'user_name'        => $request->input('user_name'),
