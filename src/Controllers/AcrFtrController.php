@@ -153,9 +153,7 @@ class AcrFtrController extends Controller
             'u_kats'     => function ($query) {
                 //  $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
             },
-            'product'    => function ($query) {
-                $query->where('sil', 0);
-            },
+            'product',
             'attributes' => function ($query) {
                 $query->where('attributes.attribute_id', 0);
             }
