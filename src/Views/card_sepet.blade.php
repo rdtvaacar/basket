@@ -35,6 +35,8 @@
 @stop
 @section('footer')
     <script>
+
+
         function sepet_adet_guncelle(sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({

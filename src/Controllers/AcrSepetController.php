@@ -106,7 +106,11 @@ class AcrSepetController extends Controller
 
         $session_id = $request->session()->get('session_id');
         $sepet_id   = $sepet_model->product_sepet_id($session_id);
-        $products   = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
+        $products   = $ps_model->where('sepet_id', $sepet_id)->with([
+            'product' => function ($query) {
+                $query->where('sil', 0);
+            }
+        ])->get();
         return self::sepet_row($products);
     }
 
@@ -178,8 +182,7 @@ class AcrSepetController extends Controller
             $veri      .= '<tr class="sepet_row" id="sapet_row_' . $product->id . '">
                             <td>' . $product->product->product_name . '</td>
                             <td>
-                            <input size="3" style="width: 30px; margin: 0; padding:2px;"  id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
-                             <span style="font-size:12pt; cursor:pointer;" onclick="sepet_adet_guncelle(' . $product->id . ')" class="fa fa-refresh"></span>
+                            <input size="3" style="width: 30px; margin: 0; padding:2px;" onkeyup="sepet_adet_guncelle(' . $product->id . ')" id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
                             </td>
                              <td>';
             if ($price > $dis_price) {
@@ -217,15 +220,16 @@ class AcrSepetController extends Controller
                             <td>' . $product->product->product_name . '</td>
                             <td>' . $type . '</td>
                             <td>
-                            <div style="width: 100px; float: left;">
-                            <input size="3" style="width: 30px; margin: 0; padding:2px;"  id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
-                             <span style="font-size:12pt; cursor:pointer;" onclick="sepet_adet_guncelle(' . $product->id . ')" class="fa fa-refresh"></span>
+                            <div class="col-md-6 col-xs-12" >
+                            <input class="form-control" onkeyup="sepet_adet_guncelle(' . $product->id . ')" style="width: 50px;"  id="sepet_adet_
+                            ' . $product->id . '" value="' . $product->adet . '"/> 
                              </div>';
             if ($product->product->type == 1) {
-                $veri .= '<div style="width: 30%; float: right">
-Kaç Aylık
-                            <input size="3" style="width: 30px; margin: 0; padding:2px;"  id="sepet_lisans_ay_' . $product->id . '" value="' . $product->lisans_ay . '"/> 
-                             <span style="font-size:12pt; cursor:pointer;" onclick="sepet_lisans_ay_guncelle(' . $product->id . ')" class="fa fa-refresh"></span>
+                $veri .= '<div class="col-md-6 col-xs-12">
+<div class="col-md-6 col-xs-12">Kaç Aylık</div>
+                            <div class="col-md-6 col-xs-12">
+                            <input size="3" class="form-control"  onkeyup="sepet_lisans_ay_guncelle(' . $product->id . ')"  style="width: 50px;"   id="sepet_lisans_ay_' . $product->id . '" value="' . $product->lisans_ay . '"/> 
+                            </div>
                             </div>';
             }
             $veri .= '</td>';
