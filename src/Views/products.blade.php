@@ -230,8 +230,8 @@
     <?php // echo dd($sepets); ?>
     <div class=" col-md-12">
         <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative;">
-            <a style="float: right;" class="btn btn-app">
-                <span id="sepet_count" class="badge bg-teal " style="font-size: 12pt;"><?php echo $sepet_count ?></span>
+            <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
+                <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
                 <i class="fa  fa-shopping-cart"></i> SEPET
             </a>
             <div id="sepet_row" style="display: none;">
@@ -270,7 +270,7 @@
                     <?php
                     //  dd($products);
                     foreach ($products as $product) { ?>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <div class="price-col2">
                             <div class="title-2"><?php echo $product->product->product_name; ?></div>
                             <ul class="peice-list">
@@ -302,6 +302,7 @@
                                     <p><a href="/acr/ftr/card/sepet?product_id=<?php echo $product->product->id ?> " class="btn btn-success  ">SATIN AL</a>
                                         <button onclick="sepete_ekle(<?php echo $product->product->id ?>)" class="btn bg-orange margin">SEPETE EKLE</button>
                                     </p>
+                                    <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
                                 </li>
                             </ul>
                         </div>
@@ -343,8 +344,8 @@
                 url    : '/acr/ftr/product/sepet/create',
                 data   : 'product_id=' + product_id,
                 success: function () {
-                    var sepet_count = $('#sepet_count').html();
-                    $('#sepet_count').html(parseInt(sepet_count) + 1)
+                    var sepet_count = $('.sepet_count').html();
+                    $('.sepet_count').html(parseInt(sepet_count) + 1)
                 }
             });
         }
@@ -369,7 +370,7 @@
                 url    : '/acr/ftr/product/sepet/sepet_adet_guncelle',
                 data   : 'sepet_id=' + sepet_id + '&adet=' + adet,
                 success: function (veri) {
-                    $('#sepet_count').html(veri);
+                    $('.sepet_count').html(veri);
                     $.ajax({
                         type   : 'post',
                         url    : '/acr/ftr/product/sepet/sepet_total_price',
@@ -399,7 +400,7 @@
                 url    : '/acr/ftr/product/sepet/delete',
                 data   : 'sepet_id=' + sepet_id,
                 success: function (veri) {
-                    $('#sepet_count').html(veri);
+                    $('.sepet_count').html(veri);
                     $('#sapet_row_' + sepet_id).fadeOut(400);
                 }
             });
@@ -409,7 +410,7 @@
                 type   : 'post',
                 url    : '/acr/ftr/product/sepet/delete_all',
                 success: function (veri) {
-                    $('#sepet_count').html(0);
+                    $('.sepet_count').html(0);
                     $('.sepet_row').fadeOut(400);
                 }
             });

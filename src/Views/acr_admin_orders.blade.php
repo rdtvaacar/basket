@@ -77,7 +77,7 @@
                 url    : '/acr/ftr/product/sepet/sepet_adet_guncelle',
                 data   : 'sepet_id=' + sepet_id + '&adet=' + adet,
                 success: function (veri) {
-                    $('#sepet_count').html(veri);
+                    $('.sepet_count').html(veri);
                 }
             });
         }
@@ -99,7 +99,7 @@
                 url    : '/acr/ftr/product/sepet/delete',
                 data   : 'sepet_id=' + sepet_id,
                 success: function (veri) {
-                    $('#sepet_count').html(veri);
+                    $('.sepet_count').html(veri);
                     $('#sapet_row_' + sepet_id).fadeOut(400);
                 }
             });
@@ -109,7 +109,7 @@
                 type   : 'post',
                 url    : '/acr/ftr/product/sepet/delete_all',
                 success: function (veri) {
-                    $('#sepet_count').html(0);
+                    $('.sepet_count').html(0);
                     $('.sepet_row').fadeOut(400);
                 }
             });
