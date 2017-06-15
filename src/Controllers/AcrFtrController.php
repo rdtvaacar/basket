@@ -175,24 +175,19 @@ class AcrFtrController extends Controller
 
     function attribute_modal(Request $request)
     {
-        $att_model     = new AcrFtrAttribute();
-        $product_model = new Acrproduct();
-        $att_id        = $request->input('att_id');
-        $product_id    = $request->input('product_id');
-        $attributes    = $product_model->with([
-            'attributes' => function ($query) use ($att_id) {
-                $query->where('attributes.attribute_id', $att_id);
-            }
-        ])->where('id', $product_id)->get();
-        $attribute     = $att_model->find($att_id);
-        $row           = '<div class="modal-header">';
-        $row           .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>';
-        $row           .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $attribute->att_name . '</h4>';
-        $row           .= '</div>';
-        $row           .= '<div class="modal-body">';
-        $row           .= '<h4>Bu seçeneğin özellikleri</h4>';
-        $row           .= '<ul style="list-style-image: url(/icon/16Tik.png); font-size: 14pt;">';
-        foreach ($attributes[0]->attributes as $att) {
+        $att_model  = new AcrFtrAttribute();
+        $att_id     = $request->input('att_id');
+        $attribute  = $att_model->with([
+            'attributes'
+        ])->where('id', $att_id)->first();
+        $row        = '<div class="modal-header">';
+        $row        .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>';
+        $row        .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $attribute->att_name . '</h4>';
+        $row        .= '</div>';
+        $row        .= '<div class="modal-body">';
+        $row        .= '<h4>Bu seçeneğin özellikleri</h4>';
+        $row        .= '<ul style="list-style-image: url(/icon/16Tik.png); font-size: 14pt;">';
+        foreach ($attribute->attributes as $att) {
             $row .= '<li>' . $att->att_name . '</li>';
         }
         $row .= '</ul>';
