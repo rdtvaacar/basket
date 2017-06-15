@@ -157,6 +157,8 @@ class AcrFtrController extends Controller
                 $query->with([
                     'attributes' => function ($query) {
                         $query->where('attributes.attribute_id', 0);
+                        $query->where('attributes.sil', 0);
+
                     }
                 ]);
             },
