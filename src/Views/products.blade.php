@@ -295,7 +295,7 @@
                         </span>
                                     <br>
                                     <?php if ($product->product->dis_price && ($product->product->dis_moon > 0 || $product->product->dis_person > 0)) {
-                                        echo 'Birden fazla alımlarda indirim';
+                                        echo '%'. $product->product->max_dis. ' varan indirim ';
                                     } ?>
                                 </li>
 

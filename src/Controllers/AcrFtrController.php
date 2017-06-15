@@ -155,7 +155,7 @@ class AcrFtrController extends Controller
             },
             'product',
             'attributes' => function ($query) {
-                $query->where('attributes.attribute_id', 0);
+                $query->where('attribute_id', 0);
             }
         ])->get();
 
