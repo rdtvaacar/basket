@@ -150,13 +150,17 @@ class AcrFtrController extends Controller
         $controller    = new AcrFtrController();
 
         $products = $product_model->where('yayin', 1)->where('sil', 0)->with([
-            'u_kats'     => function ($query) {
+            'u_kats'  => function ($query) {
                 //  $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
             },
-            'product',
-            'attributes' => function ($query) {
-                $query->where('attributes.attribute_id', 0);
-            }
+            'product' => function ($query) {
+                $query->with([
+                    'attributes' => function ($query) {
+                        $query->where('attributes.attribute_id', 0);
+                    }
+                ]);
+            },
+
         ])->get();
 
         //dd(Auth::user()->id);

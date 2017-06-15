@@ -3,10 +3,8 @@
 namespace Acr\Ftr\Model;
 
 use Illuminate\Database\Eloquent\Model;
-use App\User;
 use Auth;
 use DB;
-use Acr\Ftr\Facades\AcrFtr;
 
 class Product extends Model
 
@@ -21,7 +19,7 @@ class Product extends Model
 
     function attributes()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrAttribute');
+        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrAttribute', 'attribute_product', 'product_id', 'attribute_id');
     }
 
     function u_kats()

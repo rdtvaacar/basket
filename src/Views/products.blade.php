@@ -274,9 +274,8 @@
                         <div class="price-col2">
                             <div class="title-2"><?php echo $product->product->product_name; ?></div>
                             <ul class="peice-list">
-
                                 <?php  //dd($product->attributes);
-                                foreach ($product->attributes as $attribute) { ?>
+                                foreach ($product->product->attributes as $attribute) { ?>
                                 <li>
                         <span style="cursor:pointer;" onclick="urunGoster(<?php echo $attribute->id ?>,<?php echo $product->id ?>)"><?php echo $attribute->att_name ?> <span
                                     class="glyphicon glyphicon-question-sign"></span></span>
@@ -295,7 +294,7 @@
                         </span>
                                     <br>
                                     <?php if ($product->product->dis_price && ($product->product->dis_moon > 0 || $product->product->dis_person > 0)) {
-                                        echo '%'. $product->product->max_dis. ' varan indirim ';
+                                        echo '%' . $product->product->max_dis . ' varan indirim ';
                                     } ?>
                                 </li>
 
