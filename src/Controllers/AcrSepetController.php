@@ -221,8 +221,7 @@ class AcrSepetController extends Controller
                             <td>' . $type . '</td>
                             <td>
                             <div class="col-md-6 col-xs-12" >
-                            <input class="form-control" onkeyup="sepet_adet_guncelle(' . $product->id . ')" style="width: 50px;"  id="sepet_adet_
-                            ' . $product->id . '" value="' . $product->adet . '"/> 
+                            <input class="form-control" onkeyup="sepet_adet_guncelle(' . $product->id . ')" style="width: 50px;"  id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
                              </div>';
             if ($product->product->type == 1) {
                 $veri .= '<div class="col-md-6 col-xs-12">
