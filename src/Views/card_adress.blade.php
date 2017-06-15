@@ -103,7 +103,12 @@
                 }
             });
         }
-
+        $('.type_b').on('ifChecked', function (event) {
+            $('#kurumsal').hide();
+        });
+        $('.type_k').on('ifChecked', function (event) {
+            $('#kurumsal').show();
+        });
         function adress_delete(adres_id) {
             if (confirm('Adres bilgilerini silmek istediğinizden eminmisiniz.') == true) {
                 $.ajax({
