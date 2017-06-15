@@ -278,7 +278,7 @@
                                 <?php  //dd($product->attributes);
                                 foreach ($product->attributes as $attribute) { ?>
                                 <li>
-                        <span style="cursor:pointer;" onclick="urunGoster(<?php echo $attribute->id ?>,<?php echo $product->id ?>)"><?php echo $attribute->att_name ?><span
+                        <span style="cursor:pointer;" onclick="urunGoster(<?php echo $attribute->id ?>,<?php echo $product->id ?>)"><?php echo $attribute->att_name ?> <span
                                     class="glyphicon glyphicon-question-sign"></span></span>
                                 </li>
                                 <?php } ?>
