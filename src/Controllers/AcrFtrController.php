@@ -183,10 +183,11 @@ class AcrFtrController extends Controller
         $product_id    = $request->product_id;
         $attribute     = $att_model->where('id', $att_id)->first();
         $product       = $product_model->with([
-            'product' => function ($query) {
+            'product' => function ($query) use ($att_id) {
                 $query->with([
-                    'attributes' => function ($query) {
+                    'attributes' => function ($query) use ($att_id) {
                         $query->where('attributes.attribute_id', '!=', 0);
+                        $query->where('attributes.attribute_id', $att_id);
                     }
                 ]);
 
