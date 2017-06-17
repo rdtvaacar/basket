@@ -317,6 +317,7 @@ class AcrFtrController extends Controller
             'setApiKey'    => $request->input('setApiKey'),
             'setSecretKey' => $request->input('setSecretKey'),
             'setBaseUrl'   => $request->input('setBaseUrl'),
+            'setCallbackUrl'   => $request->input('setCallbackUrl'),
         ];
 
         $sayi = $iyzi_model->count();

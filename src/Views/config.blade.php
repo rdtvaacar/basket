@@ -92,6 +92,10 @@
                                 <label>SetBaseUrl</label>
                                 <input class="form-control" name="setBaseUrl" value="{{@$iyzico->setBaseUrl}}"/>
                             </div>
+                            <div class="form-group with-border">
+                                <label>SetCallbackUrl</label>
+                                <input class="form-control" placeholder="http://example.com/odeme_sonuc" name="setCallbackUrl" value="{{@$iyzico->setCallbackUrl}}"/>
+                            </div>
                             <input name="id" type="hidden" value="{{@$iyzico->id}}"/>
                             <button class="btn btn-primary"> KAYDET</button>
                         </form>

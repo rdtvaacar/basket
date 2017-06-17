@@ -59,6 +59,8 @@ class iyzicoController extends Controller
 
     function odemeFormIc($price = null, $paidPrice = null, $basketId = null)
     {
+        $iyzico_model = new AcrFtrIyzico();
+        $iyzico       = $iyzico_model->first();
         $adress_model = new AcrFtrAdress();
         $adresses     = $adress_model->where('user_id', Auth::user()->id)->where('active', 1)->with('city', 'county')->first();
         $sehir        = $adresses->city->name;
@@ -74,7 +76,7 @@ class iyzicoController extends Controller
         $request->setCurrency(\Iyzipay\Model\Currency::TL);
         $request->setBasketId($basketId);
         $request->setPaymentGroup(\Iyzipay\Model\PaymentGroup::PRODUCT);
-        $request->setCallbackUrl("https://konaksar.com/i_odemeSonuc");
+        $request->setCallbackUrl($iyzico->setCallbackUrl);
         $request->toPKIRequestString();
         $request->setEnabledInstallments(array(2, 3, 6, 9));
         $buyer = new \Iyzipay\Model\Buyer();
@@ -84,13 +86,13 @@ class iyzicoController extends Controller
         $buyer->setGsmNumber(Auth::user()->tel);
         $buyer->setEmail(Auth::user()->email);
         $buyer->setIdentityNumber(rand(10000000000, 99999999999));
-        $buyer->setLastLoginDate("2015-10-05 12:43:35");
-        $buyer->setRegistrationDate("2013-04-21 15:12:09");
+        $buyer->setLastLoginDate(date('Y-m-d H:i:s', Auth::user()->updated_at));
+        $buyer->setRegistrationDate(date('Y-m-d H:i:s', Auth::user()->created_at));
         $buyer->setRegistrationAddress($adres);
         $buyer->setIp(Request::ip());
         $buyer->setCity($sehir);
         $buyer->setCountry("Turkey");
-        $buyer->setZipCode("34732");
+        $buyer->setZipCode($adresses->post_code);
         $request->setBuyer($buyer);
         $shippingAddress = new \Iyzipay\Model\Address();
         $shippingAddress->setContactName(Auth::user()->name);
@@ -109,8 +111,8 @@ class iyzicoController extends Controller
         $basketItems     = array();
         $firstBasketItem = new \Iyzipay\Model\BasketItem();
         $firstBasketItem->setId($basketId);
-        $firstBasketItem->setName("Üyelik İşlemi");
-        $firstBasketItem->setCategory1("konaksar.com");
+        $firstBasketItem->setName("Satis");
+        $firstBasketItem->setCategory1("Satis");
         $firstBasketItem->setCategory2("Business");
         $firstBasketItem->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
         $firstBasketItem->setPrice("1");
