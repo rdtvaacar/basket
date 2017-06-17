@@ -86,8 +86,8 @@ class iyzicoController extends Controller
         $buyer->setGsmNumber(Auth::user()->tel);
         $buyer->setEmail(Auth::user()->email);
         $buyer->setIdentityNumber(rand(10000000000, 99999999999));
-        $buyer->setLastLoginDate(date('Y-m-d H:i:s', Auth::user()->updated_at));
-        $buyer->setRegistrationDate(date('Y-m-d H:i:s', Auth::user()->created_at));
+        $buyer->setLastLoginDate(date('Y-m-d H:i:s', strtotime(Auth::user()->updated_at)));
+        $buyer->setRegistrationDate(date('Y-m-d H:i:s', strtotime(Auth::user()->created_at)));
         $buyer->setRegistrationAddress($adres);
         $buyer->setIp(Request::ip());
         $buyer->setCity($sehir);
