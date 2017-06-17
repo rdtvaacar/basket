@@ -439,8 +439,8 @@ class AcrSepetController extends Controller
         $sepet_id         = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $ps_model         = new Product_sepet();
         $ps               = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price            = round(self::sepet_total_price($ps->id), 2);
-        $not_dis_price    = round(self::product_sepet_total_price($ps->id), 2);
+        $price            = floor(self::product_sepet_total_price($ps->id));
+        $not_dis_price    = round(self::not_dis_price($ps->id), 2);
         $dis_rate         = self::dis_rate($not_dis_price, $price);
         $data_sepet       = [
             'siparis'      => 1,
