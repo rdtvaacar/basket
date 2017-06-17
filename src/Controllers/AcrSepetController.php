@@ -45,7 +45,7 @@ class AcrSepetController extends Controller
     function orders(Request $request)
     {
         $sepet_model = new Sepet();
-        $orders      = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 1)->get();
+        $orders      = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 1)->where('id', 'desc')->get();
         return View('acr_ftr::acr_orders', compact('orders'));
     }
 
@@ -433,8 +433,8 @@ class AcrSepetController extends Controller
         $ps               = $ps_model->where('sepet_id', $sepet_id)->first();
         $price            = round(self::sepet_total_price($ps->id), 2);
         $not_dis_price    = round(self::product_sepet_total_price($ps->id), 2);
-        $dis_rate   = self::dis_rate($not_dis_price, $price);
-        $data_sepet = [
+        $dis_rate         = self::dis_rate($not_dis_price, $price);
+        $data_sepet       = [
             'siparis'      => 1,
             'price'        => $price,
             'payment_type' => 2,
@@ -443,7 +443,7 @@ class AcrSepetController extends Controller
         self::order_set($data_sepet, $sepet_id);
         $odemeForm = $iyzicoController->odemeForm(1, $price, $sepet_id);
         $siparis   = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
-        $ps      = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
+        $ps        = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
         if (empty($sepet_id)) {
             return redirect()->to('/acr/ftr/orders');
         }

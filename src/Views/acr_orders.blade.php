@@ -7,7 +7,7 @@
         <div class="row">
             <div class=" col-md-12">
                 <div class="box box-warning">
-                    <div class="box-header with-border">Siparişler</div>
+                    <div class="box-header with-border">Siparişlerim</div>
                     <div class="box-body">
                         <table width="100%" id="data_table" class="table table-striped">
                             <thead>
