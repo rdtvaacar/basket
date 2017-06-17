@@ -25,7 +25,7 @@
                     </div>
                     <div class="box-body">
                         <div class="row invoice-info">
-                            <div class="col-sm-4 invoice-col">
+                            <div class="col-sm-5 invoice-col">
                                 Satıcı
                                 <address>
                                     <strong>{{$company->name}}</strong><br>
@@ -36,7 +36,7 @@
                                 </address>
                             </div>
                             <!-- /.col -->
-                            <div class="col-sm-4 invoice-col">
+                            <div class="col-sm-5 invoice-col">
                                 Alıcı
                                 <address>
                                     <strong>{{$user_adress->type ==2 ? $user_adress->company:$user_adress->invoice_name}}</strong><br>
@@ -47,7 +47,7 @@
                                 </address>
                             </div>
                             <!-- /.col -->
-                            <div class="col-sm-4 invoice-col">
+                            <div class="col-sm-2 invoice-col">
 
                                 <b>Sipariş NO:</b> <?php echo $siparis_id = empty($siparis->id) ? 0 : $siparis->id; ?><br>
                                 <b>Tarih:</b> {{date('d/m/Y',strtotime($siparis->updated_at))}}<br>
@@ -77,10 +77,12 @@
                                     </thead>
                                     <tbody>
                                     @foreach($ps as $key=> $pss)
-                                        <?php  $toplam = round($pss->product->price * (1 - $pss->dis_rate), 2) * $pss->adet * $pss->lisans_ay;
+                                        <?php
+                                        $toplam = $sepetController->price_set($pss);
                                         $tKdv = $toplam * $pss->product->kdv / 100;
                                         $toplamKdv[] = $tKdv;
                                         $araToplam[] = $toplam - $tKdv;
+
                                         ?>
                                         <tr>
                                             <td>{{$key + 1}}</td>
@@ -88,8 +90,11 @@
                                             <td><span class="text-danger"><b>{{$u_kods[] = $pss->product->id}}</b></span></td>
                                             <td>{{$pss->adet}}</td>
                                             <td>{{$pss->lisans_ay}}</td>
-                                            <td>{{$pss->product->price}}</td>
-                                            <td>%{{$pss->dis_rate * 100}}</td>
+                                            <td>
+                                                <?php echo empty($pss->product->dis_price) ? $pss->product->price :
+                                                    '<strike style="font-size: 10pt;">' . $pss->product->price . ' </strike> ' . $pss->product->dis_price ?>₺
+                                            </td>
+                                            <td>%{{round($pss->dis_rate,2) * 100}}</td>
                                             <td><span style="font-size:8pt;" class="text-muted">%{{$pss->product->kdv}} </span>{{round($tKdv,2)}}₺</td>
                                             <td>{{round($toplam - $tKdv,2)}}₺</td>
                                             <td>{{round($toplam,2)}}₺</td>
@@ -128,8 +133,8 @@
                                         <tr>
                                             <th>Toplam:</th>
                                             <td>
-                                                <strike style="font-size: 10pt;">{{round(array_sum($araToplam) + array_sum($toplamKdv),2)}}</strike>
-                                                <span style="font-size: 14pt;" class="text-red">{{floor(array_sum($araToplam) + array_sum($toplamKdv))}}₺</span>
+                                                {{-- <strike style="font-size: 10pt;">{{round(array_sum($araToplam) + array_sum($toplamKdv),2)}}</strike>--}}
+                                                <span style="font-size: 14pt;" class="text-red">{{round((array_sum($araToplam) + array_sum($toplamKdv)),2)}}₺</span>
                                             </td>
                                         </tr>
                                         </tbody>

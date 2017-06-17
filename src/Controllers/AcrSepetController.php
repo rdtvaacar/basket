@@ -122,7 +122,9 @@ class AcrSepetController extends Controller
         if ($price_not_dis == 0) {
             $price_not_dis = 1;
         }
-        $price = $product->product->price * $product->adet * $product->lisans_ay;
+        $priceData = empty($product->product->dis_price) ? $product->product->price : $product->product->dis_price;
+
+        $price = $priceData * $product->adet * $product->lisans_ay;
         if ($product->adet > 1) {
             $price     = $product->product->dis_price * $product->adet * $product->lisans_ay;
             $dis_price = $price - ($price * $product->product->dis_person * $product->adet);
@@ -131,14 +133,14 @@ class AcrSepetController extends Controller
         }
         if ($product->lisans_ay > 1) {
             if ($product->adet == 1) {
-                $dis_price = $product->product->dis_price * $product->adet * $product->lisans_ay;
+                $dis_price = $priceData * $product->adet * $product->lisans_ay;
             }
             $dis_price = $dis_price - ($dis_price * $product->product->dis_moon * $product->lisans_ay);
         } else {
             $dis_price = $dis_price;
         }
 
-        if ((($dis_price / $price_not_dis) - ((100 - $product->product->max_dis) / 100)) < 0) {
+        if ((($price_not_dis / $price_not_dis) - ((100 - $product->product->max_dis) / 100)) < 0) {
             if (((100 - $product->product->max_dis) / 100) > 0) {
                 $price = ((100 - $product->product->max_dis) / 100) * $price_not_dis;
             } else {
@@ -318,7 +320,20 @@ class AcrSepetController extends Controller
         $adresses    = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
         $order_link  = empty($order_id) ? '' : '?order_id=' . $order_id;
         $order_input = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
+        self::ps_dis_rate_set($order_id); // product_sepet dis_rate oranlarını hesaplar
         return View('acr_ftr::card_adress', compact('sepet_nav', 'adres_form', 'adresses', 'order_input', 'order_link'));
+    }
+
+    function ps_dis_rate_set($order_id)
+    {
+        $ps_model = new Product_sepet();
+        $pss      = $ps_model->where('sepet_id', $order_id)->get();
+        foreach ($pss as $ps) {
+            $price         = self::price_set($ps);
+            $dis_not_price = self::product_not_dis_price($ps);
+            $dis_rate      = self::dis_rate($dis_not_price, $price);
+            $ps_model->where('id', $ps->id)->update(['dis_rate' => $dis_rate]);
+        }
     }
 
     function payment(Request $request)
@@ -353,9 +368,14 @@ class AcrSepetController extends Controller
         if ($product->dis_rate != $dis_rate) {
             $ps_model->where('id', $sepet_id)->update(['dis_rate' => $dis_rate]);
         }
-
         $prices = round($price, 2);
         return $prices;
+    }
+
+    function product_not_dis_price($product)
+    {
+        $price = $product->product->price * $product->adet * $product->lisans_ay;
+        return $price;
     }
 
     function not_dis_price($sepet_id = null, Request $request = null)
@@ -404,7 +424,7 @@ class AcrSepetController extends Controller
         $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $ps_model      = new Product_sepet();
         $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price         = floor(self::product_sepet_total_price($ps->id));
+        $price         = round(self::product_sepet_total_price($ps->id), 2);
         $not_dis_price = round(self::not_dis_price($ps->id), 2);
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         $data_sepet    = [
@@ -415,19 +435,19 @@ class AcrSepetController extends Controller
             'dis_rate'     => $dis_rate
         ];
         self::order_set($data_sepet, $sepet_id);
-
         $siparis = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
         $ps      = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
         if (empty($sepet_id)) {
             return redirect()->to('/acr/ftr/orders');
         }
-        $bank          = $bank_model->where('id', $bank_id)->first();
-        $sepet_nav     = self::sepet_nav($sepet_id, 4);
-        $adress_model  = new AcrFtrAdress();
-        $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
-        $company_model = new Company_conf();
-        $company       = $company_model->first();
-        return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank', 'ps', 'user_adress', 'company'));
+        $bank            = $bank_model->where('id', $bank_id)->first();
+        $sepet_nav       = self::sepet_nav($sepet_id, 4);
+        $adress_model    = new AcrFtrAdress();
+        $user_adress     = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
+        $company_model   = new Company_conf();
+        $company         = $company_model->first();
+        $sepetController = new AcrSepetController();
+        return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank', 'ps', 'user_adress', 'company', 'sepetController'));
 
     }
 
@@ -439,7 +459,7 @@ class AcrSepetController extends Controller
         $sepet_id         = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $ps_model         = new Product_sepet();
         $ps               = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price            = floor(self::product_sepet_total_price($ps->id));
+        $price            = round(self::product_sepet_total_price($ps->id), 2);
         $not_dis_price    = round(self::not_dis_price($ps->id), 2);
         $dis_rate         = self::dis_rate($not_dis_price, $price);
         $data_sepet       = [
@@ -455,12 +475,14 @@ class AcrSepetController extends Controller
         if (empty($sepet_id)) {
             return redirect()->to('/acr/ftr/orders');
         }
-        $sepet_nav     = self::sepet_nav($order_id, 4);
-        $adress_model  = new AcrFtrAdress();
-        $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
-        $company_model = new Company_conf();
-        $company       = $company_model->first();
-        return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company'));
+        $sepet_nav       = self::sepet_nav($order_id, 4);
+        $adress_model    = new AcrFtrAdress();
+        $user_adress     = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
+        $company_model   = new Company_conf();
+        $company         = $company_model->first();
+        $sepetController = new AcrSepetController();
+
+        return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company', 'sepetController'));
 
     }
 
@@ -700,6 +722,7 @@ class AcrSepetController extends Controller
         $adres_id     = $request->input('adres_id');
         $adress       = $adress_model->where('id', $adres_id)->with('city', 'county')->first();
         $adres_form   = self::adress_form($request, $adress);
+
 
         return View('acr_ftr::card_adress_edit', compact('sepet_nav', 'adres_form', 'adress'));
     }
