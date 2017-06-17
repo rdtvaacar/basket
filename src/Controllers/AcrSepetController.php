@@ -165,7 +165,7 @@ class AcrSepetController extends Controller
 
     function dis_rate($price, $dis_price)
     {
-        $discount = 100 - round($dis_price / $price, 2) * 100;
+        $discount = 100 - $dis_price / $price * 100;
         if ($discount > 0) {
             $discount = $discount;
         } else {
@@ -295,7 +295,7 @@ class AcrSepetController extends Controller
         $session_id = $request->session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
         $sepet_row  = self::sepet_row_detail($products);
-        $order_id     = $request->input('order_id');
+        $order_id   = $request->input('order_id');
         $order_id   = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $sepet_nav  = self::sepet_nav($order_id, 1);
         $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;

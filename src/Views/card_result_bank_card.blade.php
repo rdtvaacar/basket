@@ -78,7 +78,10 @@
                                     <tbody>
                                     @foreach($ps as $key=> $pss)
                                         <?php  $toplam = round($pss->product->price * (1 - $pss->dis_rate), 2) * $pss->adet * $pss->lisans_ay;
-                                        $tKdv = $toplam * $pss->product->kdv / 100;?>
+                                        $tKdv = $toplam * $pss->product->kdv / 100;
+                                        $toplamKdv[] = $tKdv;
+                                        $araToplam[] = $toplam - $tKdv;
+                                        ?>
                                         <tr>
                                             <td>{{$key}}</td>
                                             <td>{{$pss->product->product_name}}</td>
@@ -88,8 +91,8 @@
                                             <td>{{$pss->product->price}}</td>
                                             <td>%{{$pss->dis_rate * 100}}</td>
                                             <td>%{{$pss->product->kdv}}</td>
-                                            <td>{{$toplamKdv[] = round($tKdv,2)}}₺</td>
-                                            <td>{{$araToplam[] = round($toplam - $tKdv,2)}}₺</td>
+                                            <td>{{round($tKdv,2)}}₺</td>
+                                            <td>{{round($toplam - $tKdv,2)}}₺</td>
                                         </tr>
                                     @endforeach
 
