@@ -120,7 +120,7 @@ class AcrSepetController extends Controller
     {
         $price_not_dis = $product->product->price * $product->adet * $product->lisans_ay;
         if ($price_not_dis == 0) {
-            $price_not_dis = 0.0001;
+            $price_not_dis = 1;
         }
         $price = $product->product->price * $product->adet * $product->lisans_ay;
         if ($product->adet > 1) {
@@ -165,7 +165,7 @@ class AcrSepetController extends Controller
 
     function dis_rate($price, $dis_price)
     {
-        $discount = 100 - $dis_price / $price * 100;
+        $discount = 100 - ($dis_price / $price * 100);
         if ($discount > 0) {
             $discount = $discount;
         } else {

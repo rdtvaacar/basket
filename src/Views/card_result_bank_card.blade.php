@@ -83,7 +83,7 @@
                                         $araToplam[] = $toplam - $tKdv;
                                         ?>
                                         <tr>
-                                            <td>{{$key}}</td>
+                                            <td>{{$key + 1}}</td>
                                             <td>{{$pss->product->product_name}}</td>
                                             <td><span class="text-danger"><b>{{$u_kods[] = $pss->product->id}}</b></span></td>
                                             <td>{{$pss->adet}}</td>
