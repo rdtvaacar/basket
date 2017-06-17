@@ -5,11 +5,11 @@ namespace Acr\Ftr\Model;
 use Illuminate\Database\Eloquent\Model;
 use Auth;
 
-class Parasut_conf extends Model
+class Company_conf extends Model
 
 {
     protected $connection = 'mysql';
-    protected $table = 'parasut_conf';
+    protected $table      = 'acr_ftr_company_conf';
     /**
      * The database table used by the model.
      *

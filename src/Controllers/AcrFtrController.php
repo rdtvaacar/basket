@@ -8,6 +8,7 @@ use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrIyzico;
 use Acr\Ftr\Model\Acrproduct;
 use Acr\Ftr\Model\Bank;
+use Acr\Ftr\Model\Company_conf;
 use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\AcrFtrAttribute;
@@ -217,28 +218,29 @@ class AcrFtrController extends Controller
 
     function config(Request $request)
     {
-        $bank_model      = new Bank();
-        $user_conf_model = new Acr_user_table_conf();
-        $parasut_model   = new Parasut_conf();
-
-        $user_table_conf_sorgu = $user_conf_model->where('user_id', Auth::user()->id);
+        $bank_model            = new Bank();
+        $user_conf_model       = new Acr_user_table_conf();
+        $parasut_model         = new Parasut_conf();
+        $company_conf_model    = new Company_conf();
+        $user_table_conf_sorgu = $user_conf_model;
         $user_table_conf_sayi  = $user_table_conf_sorgu->count();
 
         if ($user_table_conf_sayi == 0) {
             $user_conf_model->insert(['user_id' => 1]);
         }
-        $parasut_conf_sorgu = $parasut_model->where('user_id', Auth::user()->id);
+        $parasut_conf_sorgu = $parasut_model;
         $parasut_conf_sayi  = $parasut_conf_sorgu->count();
         if ($parasut_conf_sayi == 0) {
             $parasut_model->insert(['user_id' => 1]);
         }
         $user_table   = $user_table_conf_sorgu->first();
         $iyzi_model   = new AcrFtrIyzico();
-        $banks        = $bank_model->where('user_id', Auth::user()->id)->where('sil', 0)->get();
+        $banks        = $bank_model->where('sil', 0)->get();
+        $company_conf = $company_conf_model->first();
         $bank_form    = self::bank_form($request);
-        $iyzico       = $iyzi_model->where('user_id', Auth::user()->id)->first();
-        $parasut_conf = $parasut_model->where('user_id', Auth::user()->id)->first();
-        return View('acr_ftr::config', compact('banks', 'bank_form', 'iyzico', 'user_table', 'parasut_conf'));
+        $iyzico       = $iyzi_model->first();
+        $parasut_conf = $parasut_model->first();
+        return View('acr_ftr::config', compact('banks', 'bank_form', 'iyzico', 'user_table', 'parasut_conf', 'company_conf'));
     }
 
     function user_table_update(Request $request)
@@ -253,8 +255,8 @@ class AcrFtrController extends Controller
             'lisans_baslangic' => $request->input('lisans_baslangic'),
             'lisans_bitis'     => $request->input('lisans_bitis')
         ];
-        if ($user_conf_model->where('user_id', Auth::user()->id)->count() > 0) {
-            $user_conf_model->where('user_id', Auth::user()->id)->update($data);
+        if ($user_conf_model->count() > 0) {
+            $user_conf_model->where('id', $request->id)->update($data);
         } else {
             $user_conf_model->insert($data);
         }
@@ -274,14 +276,36 @@ class AcrFtrController extends Controller
             'company_id'    => $request->input('company_id')
 
         ];
-        if ($parasut_conf->where('user_id', Auth::user()->id)->count() > 0) {
-            $parasut_conf->where('user_id', Auth::user()->id)->update($data);
+        if ($parasut_conf->count() > 0) {
+            $parasut_conf->where('id', $request->id)->update($data);
         } else {
             $parasut_conf->insert($data);
         }
         $parasut    = new ParasutController();
         $account_id = $parasut->account_id();
-        $parasut_conf->where('user_id', Auth::user()->id)->update(['account_id' => $account_id]);
+        $parasut_conf->where('id', $request->id)->update(['account_id' => $account_id]);
+        return redirect()->back();
+    }
+
+    function company_conf_update(Request $request)
+    {
+        $company_model = new Company_conf();
+
+        $data = [
+            'user_id' => Auth::user()->id,
+            'name'    => $request->input('name'),
+            'city'    => $request->input('city'),
+            'county'  => $request->input('county'),
+            'adress'  => $request->input('adress'),
+            'tel'     => $request->input('tel'),
+            'email'   => $request->input('email')
+
+        ];
+        if ($company_model->count() > 0) {
+            $company_model->where('id', $request->id)->update($data);
+        } else {
+            $company_model->insert($data);
+        }
         return redirect()->back();
     }
 
@@ -294,10 +318,10 @@ class AcrFtrController extends Controller
             'setSecretKey' => $request->input('setSecretKey'),
             'setBaseUrl'   => $request->input('setBaseUrl'),
         ];
-        $sorgu      = $iyzi_model->where('user_id', Auth::user()->id);
-        $sayi       = $sorgu->count();
+
+        $sayi = $iyzi_model->count();
         if ($sayi > 0) {
-            $sorgu->update($data);
+            $iyzi_model->where('id', $request->id)->update($data);
         } else {
             $iyzi_model->insert($data);
         };

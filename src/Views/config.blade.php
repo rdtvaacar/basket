@@ -6,6 +6,42 @@
 @section('acr_ftr')
     <div class="col-md-6">
         <div class="box box-warning">
+            <div class="box-header with-border">Şirket Bilgileri</div>
+            <div class="box-body">
+                <form method="post" action="/acr/ftr/config/company/conf/update">
+                    <?php echo csrf_field() ?>
+                    <div class="form-group with-border">
+                        <label>Şirket İsmi</label>
+                        <input class="form-control" name="name" value="{{@$company_conf->name}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Şehir</label>
+                        <input class="form-control" name="city" value="{{@$company_conf->city}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>İlçe</label>
+                        <input class="form-control" name="county" value="{{@$company_conf->county}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Adres</label>
+                        <textarea class="form-control" type="adress" name="adress">{{@$company_conf->adress}}</textarea>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Email</label>
+                        <input class="form-control" type="email" name="email" value="{{@$company_conf->email}}"/>
+                    </div>
+                    <div class="form-group with-border">
+                        <label>Telefon</label>
+                        <input class="form-control" type="text" name="tel" value="{{@$company_conf->tel}}"/>
+                    </div>
+                    <input name="id" type="hidden" value="{{@$company_conf->id}}"/>
+                    <button class="btn btn-primary"> KAYDET</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="box box-warning">
             <div class="box-header with-border">BANKA BİLGİLERİ
                 <button style="float: right;" data-toggle="modal" data-target="#myModal" class="btn btn-success">YENİ BANKA EKLE</button>
             </div>
@@ -54,6 +90,7 @@
                         <label>SetBaseUrl</label>
                         <input class="form-control" name="setBaseUrl" value="{{@$iyzico->setBaseUrl}}"/>
                     </div>
+                        <input name="id" type="hidden" value="{{@$iyzico->id}}"/>
                     <button class="btn btn-primary"> KAYDET</button>
                 </form>
             </div>
@@ -110,7 +147,7 @@
                         <input class="form-control" name="client_secret" value="{{@$parasut_conf->client_secret}}"/>
                     </div>
                     <div class="form-group with-border">
-                        <label>Üyelik Numarsı (Campany ID)</label>
+                        <label>Üyelik Numarsı (Company ID)</label>
                         <input class="form-control" type="number" name="company_id" value="{{@$parasut_conf->company_id}}"/>
                     </div>
                     <div class="form-group with-border">
@@ -127,6 +164,7 @@
             </div>
         </div>
     </div>
+
     <div id="myModal" class="modal">
         <div class="modal-dialog">
             <div class="modal-content">

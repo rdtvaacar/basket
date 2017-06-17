@@ -8,6 +8,8 @@ use Auth;
 class Bank extends Model
 
 {
+    protected $connection = 'mysql';
+
     /**
      * The database table used by the model.
      *

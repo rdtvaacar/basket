@@ -3,11 +3,13 @@
 namespace Acr\Ftr\Controllers;
 
 use Acr\Ftr\Model\AcrFtrAdress;
-use Input, Auth, Request;
-use App\Http\Controllers\marketController;
+use Acr\Ftr\Model\Sepet;
+use Auth;
+use App\Http\Controllers\MarketController;
 use App\Siparis;
 use DB;
 use Acr\Ftr\Model\AcrFtrIyzico;
+use Request;
 
 class iyzicoController extends Controller
 {
@@ -34,7 +36,7 @@ class iyzicoController extends Controller
 
     public function odemeForm($price = null, $paidPrice = null, $basketId = null)
     {
-        
+
         self::odemeFormIc($price, $paidPrice, $basketId);
         ?>
         <html>
@@ -65,7 +67,7 @@ class iyzicoController extends Controller
         $sehir        = $adresses->city->name;
         $adres        = $adresses->adress;
         $user_name    = empty(Auth::user()->name) ? Auth::user()->ad : Auth::user()->name;
-        $ad           = $adresses->type == 2 ? $adresses->campany : $user_name;
+        $ad           = $adresses->type == 2 ? $adresses->company : $adresses->invoice_name;
         # create request class
         $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);
@@ -124,11 +126,11 @@ class iyzicoController extends Controller
         print_r($checkoutFormInitialize->getCheckoutFormContent());
     }
 
-    function odemeSonuc()
+    function odemeSonuc(Request $request)
     {
-        $mail  = new MailController();
-        $token = Input::get('token');
+        $sepet_model = new Sepet();
 
+        $token   = $request->token;
         $request = new \Iyzipay\Request\RetrieveCheckoutFormRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);
         $request->setConversationId("123456789");
@@ -136,41 +138,12 @@ class iyzicoController extends Controller
         # make request
         $checkoutForm = \Iyzipay\Model\CheckoutForm::retrieve($request, Self::option());
         # print result
-        $siparis = Siparis::where('id', $checkoutForm->getBasketId())->first();
-
-        switch ($siparis->urunIsim) {
-            case 'sms100';
-            case 'sms250';
-            case 'sms500';
-            case 'sms1000';
-                $uyeSmsSorgu = DB::table('smspaketi')->where('uyeID', Auth::user()->id);
-                if ($uyeSmsSorgu->count() > 0) {
-                    $uyeSms = $uyeSmsSorgu->first();
-                    $data   = [
-                        'miktar' => $uyeSms->miktar + $siparis->paket
-                    ];
-                    DB::table('smspaketi')->where('uyeID', Auth::user()->id)->update($data);
-                } else {
-                    $data = [
-                        'miktar' => $siparis->paket,
-                        'uyeID'  => Auth::user()->id
-                    ];
-                    DB::table('smspaketi')->insert($data);
-                }
-                Siparis::where('id', $siparis->id)->update(['siparis_onay' => 1]);
-                my::mail('acarbey15@gmail.com', 'Aydın ', 'Yeni SMS Siparişi', 'mail.yeniSiparis', Auth::user()->ad . '<br>' . Auth::user()->tel . '<br> Az önce ödeme yaptı <br> Adet : ' . $siparis->paket . '<br> Paket :  <br>Ödeme Şekli : Kredi Kartı <br>' . Auth::user()->email);
-                return redirect()->to('i_smsBasarili');
-                break;
-            default;
-                if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
-
-                    $siparis = Siparis::where('id', $checkoutForm->getBasketId())->first();
-                    marketController::siparisOnayla($checkoutForm->getBasketId());
-                    $mail->mailGonder('mail.orders');
-                }
-                return redirect()->to('i_basarili');
-                break;
+        $siparis = $sepet_model->where('id', $checkoutForm->getBasketId())->first();
+        if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
+            $marketController = new MarketController();
+            $marketController->siparisOnayla($checkoutForm->getBasketId());
         }
+
 
     }
 }

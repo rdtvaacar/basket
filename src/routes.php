@@ -36,6 +36,8 @@ Route::group(['middleware' => ['web']], function () {
             Route::get('/card/payment', 'AcrSepetController@payment');
             Route::post('/card/payment', 'AcrSepetController@payment');
             Route::post('/card/payment/havale_eft', 'AcrSepetController@paymet_havale_eft');
+            Route::get('/card/payment/havale_eft', 'AcrSepetController@paymet_havale_eft');
+
             Route::get('/card/payment/bank_card', 'AcrSepetController@payment_bank_card');
 
             // orders
@@ -47,6 +49,8 @@ Route::group(['middleware' => ['web']], function () {
                 Route::post('/product/add', 'AcrFtrController@add_product');
                 Route::post('/product/delete', 'AcrFtrController@delete_product');
                 Route::get('/config', 'AcrFtrController@config');
+                Route::post('/config/company/conf/update', 'AcrFtrController@company_conf_update');
+
 
                 Route::post('/bank/create', 'AcrFtrController@bank_create');
                 Route::post('/bank/edit', 'AcrFtrController@bank_edit');
