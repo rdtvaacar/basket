@@ -71,8 +71,8 @@
                                         <th>Birim Fiyatı</th>
                                         <th>İndirim Oranı</th>
                                         <th>KDV</th>
-                                        <th>KDV</th>
                                         <th>Fiyat</th>
+                                        <th>Toplam</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -90,9 +90,9 @@
                                             <td>{{$pss->lisans_ay}}</td>
                                             <td>{{$pss->product->price}}</td>
                                             <td>%{{$pss->dis_rate * 100}}</td>
-                                            <td>%{{$pss->product->kdv}}</td>
-                                            <td>{{round($tKdv,2)}}₺</td>
+                                            <td><span style="font-size:8pt;" class="text-muted">%{{$pss->product->kdv}} </span>{{round($tKdv,2)}}₺</td>
                                             <td>{{round($toplam - $tKdv,2)}}₺</td>
+                                            <td>{{round($toplam,2)}}₺</td>
                                         </tr>
                                     @endforeach
 
@@ -127,7 +127,10 @@
                                         </tr>
                                         <tr>
                                             <th>Toplam:</th>
-                                            <td>{{round(array_sum($araToplam) + array_sum($toplamKdv),2)}}₺</td>
+                                            <td>
+                                                <strike style="font-size: 10pt;">{{round(array_sum($araToplam) + array_sum($toplamKdv),2)}}</strike>
+                                                <span style="font-size: 14pt;" class="text-red">{{floor(array_sum($araToplam) + array_sum($toplamKdv))}}₺</span>
+                                            </td>
                                         </tr>
                                         </tbody>
                                     </table>

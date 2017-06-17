@@ -172,7 +172,7 @@ class AcrFtrController extends Controller
             $sepet_model->sepet_birle($session_id);
             $request->session()->forget('session_id');
         }
-        $sepet_count = $sepet_model->sepets($session_id);
+        @$sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
         return View('acr_ftr::products', compact('products', 'controller', 'sepet_count'));
     }
 
@@ -313,11 +313,11 @@ class AcrFtrController extends Controller
     {
         $iyzi_model = new AcrFtrIyzico();
         $data       = [
-            'user_id'      => Auth::user()->id,
-            'setApiKey'    => $request->input('setApiKey'),
-            'setSecretKey' => $request->input('setSecretKey'),
-            'setBaseUrl'   => $request->input('setBaseUrl'),
-            'setCallbackUrl'   => $request->input('setCallbackUrl'),
+            'user_id'        => Auth::user()->id,
+            'setApiKey'      => $request->input('setApiKey'),
+            'setSecretKey'   => $request->input('setSecretKey'),
+            'setBaseUrl'     => $request->input('setBaseUrl'),
+            'setCallbackUrl' => $request->input('setCallbackUrl'),
         ];
 
         $sayi = $iyzi_model->count();

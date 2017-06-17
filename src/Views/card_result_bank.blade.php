@@ -63,8 +63,8 @@
                         <th>Birim Fiyatı</th>
                         <th>İndirim Oranı</th>
                         <th>KDV</th>
-                        <th>KDV</th>
                         <th>Fiyat</th>
+                        <th>Toplam</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -82,9 +82,9 @@
                             <td>{{$pss->lisans_ay}}</td>
                             <td>{{$pss->product->price}}</td>
                             <td>%{{$pss->dis_rate * 100}}</td>
-                            <td>%{{$pss->product->kdv}}</td>
-                            <td>{{round($tKdv,2)}}₺</td>
+                            <td><span style="font-size:8pt;" class="text-muted">%{{$pss->product->kdv}} </span>{{round($tKdv,2)}}₺</td>
                             <td>{{round($toplam - $tKdv,2)}}₺</td>
+                            <td>{{round($toplam,2)}}₺</td>
                         </tr>
                     @endforeach
 

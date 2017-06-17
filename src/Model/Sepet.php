@@ -40,10 +40,12 @@ class Sepet extends Model
             Product_sepet::insert(['product_id' => $product_id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
         }
     }
+
     function product()
     {
         return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
     }
+
     function Acrproducts()
     {
         return $this->belongsToMany('Acr\Ftr\Model\Acrproduct', 'product_sepet', 'sepet_id', 'product_id')->withPivot('adet', 'lisans_ay');
@@ -57,14 +59,15 @@ class Sepet extends Model
     function sepet_birle($session_id)
     {
         Sepet::where('session_id', $session_id)->where('siparis', 0)->update(['user_id' => Auth::user()->id]);
-        $sepet_id = $this->sepet_birle();
-        Product_sepet::where('sepet_id', $sepet_id)->update('user_id', Auth::user()->id);
+        $sepet_id = $this->product_sepet_id();
+        Product_sepet::where('sepet_id', $sepet_id)->update(['user_id' => Auth::user()->id]);
     }
 
     function product_sepet_id($session_id = null)
     {
+        $sepet_model = new Sepet();
         if (Auth::check()) {
-            $sepet_sorgu = Sepet::where('user_id', Auth::user()->id)->where('siparis', 0);
+            $sepet_sorgu = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 0);
             if ($sepet_sorgu->count() > 0) {
                 $sepet_id = $sepet_sorgu->first()->id;
 
@@ -72,7 +75,17 @@ class Sepet extends Model
                 $sepet_id = 0;
             }
         } else {
-            $sepet_id = Sepet::where('session_id', $session_id)->where('siparis', 0)->first()->id;
+            $sepet_sorgu = $sepet_model->where('session_id', $session_id)->where('siparis', 0);
+            if ($sepet_sorgu->count() > 0) {
+                $sepet_id = $sepet_sorgu->first()->id;
+
+            } else {
+                if (empty($session_id)) {
+                    $sepet_id = 0;
+                } else {
+                    $sepet_id = $sepet_model->insertGetId(['session_id' => $session_id]);
+                }
+            }
         }
         return $sepet_id;
     }
