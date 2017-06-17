@@ -39,14 +39,10 @@ class iyzicoController extends Controller
     {
 
         self::odemeFormIc($price, $paidPrice, $basketId);
-        ?>
-        <html>
-        <body>
-        <div id="iyzipay-checkout-form" class="responsive"></div>
-        </body>
-        </html>
 
-    <?php }
+        return '<div id="iyzipay-checkout-form" class="responsive"></div>';
+
+    }
 
     public function odemeFormPopup($price = null, $paidPrice = null, $basketId = null)
     {
