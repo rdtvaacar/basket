@@ -140,7 +140,7 @@ class AcrSepetController extends Controller
             $dis_price = $dis_price;
         }
 
-        if ((($price_not_dis / $price_not_dis) - ((100 - $product->product->max_dis) / 100)) < 0) {
+        if ((($dis_price / $price_not_dis) - ((100 - $product->product->max_dis) / 100)) < 0) {
             if (((100 - $product->product->max_dis) / 100) > 0) {
                 $price = ((100 - $product->product->max_dis) / 100) * $price_not_dis;
             } else {
@@ -453,34 +453,34 @@ class AcrSepetController extends Controller
 
     function payment_bank_card(Request $request)
     {
-        $sepet_model      = new Sepet();
-        $iyzicoController = new iyzicoController();
-        $order_id         = $request->input('order_id');
-        $sepet_id         = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
-        $ps_model         = new Product_sepet();
-        $ps               = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price            = round(self::product_sepet_total_price($ps->id), 2);
-        $not_dis_price    = round(self::not_dis_price($ps->id), 2);
-        $dis_rate         = self::dis_rate($not_dis_price, $price);
-        $data_sepet       = [
+        $sepet_model   = new Sepet();
+        $order_id      = $request->input('order_id');
+        $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $ps_model      = new Product_sepet();
+        $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
+        $price         = round(self::product_sepet_total_price($ps->id), 2);
+        $not_dis_price = round(self::not_dis_price($ps->id), 2);
+        $dis_rate      = self::dis_rate($not_dis_price, $price);
+        $data_sepet    = [
             'siparis'      => 1,
             'price'        => $price,
             'payment_type' => 2,
             'dis_rate'     => $dis_rate
         ];
         self::order_set($data_sepet, $sepet_id);
-        $odemeForm = $iyzicoController->odemeForm(1, $price, $sepet_id);
-        $siparis   = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
-        $ps        = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
+        $siparis = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
+        $ps      = $ps_model->where('sepet_id', $sepet_id)->with('product')->get();
         if (empty($sepet_id)) {
             return redirect()->to('/acr/ftr/orders');
         }
-        $sepet_nav       = self::sepet_nav($order_id, 4);
-        $adress_model    = new AcrFtrAdress();
-        $user_adress     = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
-        $company_model   = new Company_conf();
-        $company         = $company_model->first();
-        $sepetController = new AcrSepetController();
+        $sepet_nav        = self::sepet_nav($sepet_id, 4);
+        $adress_model     = new AcrFtrAdress();
+        $user_adress      = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
+        $company_model    = new Company_conf();
+        $company          = $company_model->first();
+        $sepetController  = new AcrSepetController();
+        $iyzicoController = new iyzicoController();
+        $odemeForm        = $iyzicoController->odemeForm(1, $price, $sepet_id);
 
         return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company', 'sepetController'));
 
