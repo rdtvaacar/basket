@@ -23,7 +23,7 @@
                             <tbody id="sepet_tbody"><?php echo $sepet_row; ?></tbody>
                             <tfoot>
                             <tr>
-                                <td><a style="float: left;" class="btn btn-lg btn-warning" href="/acr/ftr/card/adress">ADRES BİLGİLERİ <span class="fa fa-angle-double-right"></span></a></td>
+                                <td><a style="float: left;" class="btn btn-lg btn-warning" href="/acr/ftr/card/adress<?php echo $order_link?>">ADRES BİLGİLERİ <span class="fa fa-angle-double-right"></span></a></td>
                                 <td colspan="3">
                                     <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
                                 </td>

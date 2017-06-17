@@ -40,7 +40,7 @@
                                     <span style="margin-left: 30px; cursor:pointer;" onclick="adress_delete(<?php echo $adress->id ?>)" class="fa fa-trash"></span>
                                 </div>
                             </div>
-
+                            <?php echo $order_input ?>
                             <?php }
                             if($adresses->count() > 0) {?>
                             <button type="submit" class="btn btn-lg btn-warning"> ÖDEME BİLGİLERİ <span class="fa fa-angle-double-right"></span></button>

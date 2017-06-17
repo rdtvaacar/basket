@@ -45,7 +45,7 @@ class AcrSepetController extends Controller
     function orders(Request $request)
     {
         $sepet_model = new Sepet();
-        $orders      = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 1)->where('id', 'desc')->get();
+        $orders      = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 1)->orderBy('id', 'desc')->get();
         return View('acr_ftr::acr_orders', compact('orders'));
     }
 
@@ -295,20 +295,25 @@ class AcrSepetController extends Controller
         $session_id = $request->session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
         $sepet_row  = self::sepet_row_detail($products);
-        $sepet_id   = $sepet_model->product_sepet_id();
-        $sepet_nav  = self::sepet_nav($sepet_id, 1);
-        return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav'));
+        $order_id     = $request->input('order_id');
+        $order_id   = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $sepet_nav  = self::sepet_nav($order_id, 1);
+        $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;
+        return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav', 'order_link'));
     }
 
     function adress(Request $request)
     {
         $sepet_model  = new Sepet();
         $adress_model = new AcrFtrAdress();
-        $sepet_id     = $sepet_model->product_sepet_id();
-        $sepet_nav    = self::sepet_nav($sepet_id, 2);
+        $order_id     = $request->input('order_id');
+        $order_id     = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $sepet_nav    = self::sepet_nav($order_id, 2);
         $adres_form   = self::adress_form($request);
         $adresses     = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
-        return View('acr_ftr::card_adress', compact('sepet_nav', 'adres_form', 'adresses'));
+        $order_link   = empty($order_id) ? '' : '?order_id=' . $order_id;
+        $order_input  = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
+        return View('acr_ftr::card_adress', compact('sepet_nav', 'adres_form', 'adresses', 'order_input', 'order_link'));
     }
 
     function payment(Request $request)
@@ -317,18 +322,16 @@ class AcrSepetController extends Controller
         $sepet_model  = new Sepet();
         $bank_model   = new Bank();
         $order_id     = $request->input('order_id');
-        $sepet_id     = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $order_id     = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $adress_id    = $request->input('adress');
-
         if (!empty($adress_id)) {
             $adress_model->active_adress($adress_id);
-            $sepet_model->where('id', $sepet_id)->update(['adress_id' => $adress_id]);
+            $sepet_model->where('id', $order_id)->update(['adress_id' => $adress_id]);
         }
-
         $order_link  = empty($order_id) ? '' : '?order_id=' . $order_id;
         $order_input = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
         $banks       = $bank_model->where('active', 1)->where('sil', 0)->get();
-        $sepet_nav   = self::sepet_nav($sepet_id, 3);
+        $sepet_nav   = self::sepet_nav($order_id, 3);
         return View('acr_ftr::card_payment', compact('sepet_nav', 'banks', 'order_link', 'order_input'));
 
 
