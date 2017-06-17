@@ -6,7 +6,7 @@
 @section('acr_ftr')
     <section class="content">
         <div class="row">
-            <div class=" col-md-12">
+            <div class=" col-md-4">
                 <div class="box box-warning">
                     <div class="box-header with-border"><?php echo $sepet_nav ?>
                         <a href="/acr/ftr/orders" style="float: right;" class="btn btn-success">SİPARİŞLERİM</a>
@@ -16,7 +16,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-8">
                 <div class="box box-warning">
                     <div class="box-header with-border">
                         <h2 class="page-header">
