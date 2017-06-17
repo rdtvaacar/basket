@@ -20,9 +20,10 @@ class iyzicoController extends Controller
 
         $options      = new \Iyzipay\Options();
         $iyzico_model = new AcrFtrIyzico();
-        $options->setApiKey($iyzico_model->setApiKey);
-        $options->setSecretKey($iyzico_model->setSecretKey);
-        $options->setBaseUrl($iyzico_model->setBaseUrl);
+        $iyzico       = $iyzico_model->first();
+        $options->setApiKey($iyzico->setApiKey);
+        $options->setSecretKey($iyzico->setSecretKey);
+        $options->setBaseUrl($iyzico->setBaseUrl);
 
         return $options;
     }
@@ -96,14 +97,14 @@ class iyzicoController extends Controller
         $buyer->setZipCode("34732");
         $request->setBuyer($buyer);
         $shippingAddress = new \Iyzipay\Model\Address();
-        $shippingAddress->setContactName(Auth::user()->ad);
+        $shippingAddress->setContactName(Auth::user()->name);
         $shippingAddress->setCity($sehir);
         $shippingAddress->setCountry("Turkey");
         $shippingAddress->setAddress($adres);
         $shippingAddress->setZipCode("34742");
         $request->setShippingAddress($shippingAddress);
         $billingAddress = new \Iyzipay\Model\Address();
-        $billingAddress->setContactName(Auth::user()->ad);
+        $billingAddress->setContactName(Auth::user()->name);
         $billingAddress->setCity($sehir);
         $billingAddress->setCountry("Turkey");
         $billingAddress->setAddress($adres);
