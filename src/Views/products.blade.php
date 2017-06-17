@@ -228,60 +228,62 @@
 @stop
 @section('acr_ftr')
     <?php // echo dd($sepets); ?>
-    <div class=" col-md-12">
-        <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative;">
-            <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
-                <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
-                <i class="fa  fa-shopping-cart"></i> SEPET
-            </a>
-            <div id="sepet_row" style="display: none;">
-                <div class="box box-warning" style="width: 550px; right:0; top: 60px; position: absolute; z-index: 1; ">
-                    <div class="box-header with-border">Sepetiniz</div>
-                    <div class="box-body">
-                        <table width="100%" class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th width="60%">Ürün</th>
-                                <th width="20%">Adet</th>
-                                <th>Fiyat</th>
-                                <th style="text-align: right">Sil</th>
-                            </tr>
-                            </thead>
-                            <tbody id="sepet_tbody"></tbody>
-                            <tfoot>
-                            <tr>
-                                <td><a style="float: left;" class="btn btn-warning" href="/acr/ftr/card/sepet">SATIN AL</a></td>
+    <section class="content">
+        <div class="row">
+            <div class=" col-md-12">
+                <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative;">
+                    <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
+                        <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
+                        <i class="fa  fa-shopping-cart"></i> SEPET
+                    </a>
+                    <div id="sepet_row" style="display: none;">
+                        <div class="box box-warning" style="width: 550px; right:0; top: 60px; position: absolute; z-index: 1; ">
+                            <div class="box-header with-border">Sepetiniz</div>
+                            <div class="box-body">
+                                <table width="100%" class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th width="60%">Ürün</th>
+                                        <th width="20%">Adet</th>
+                                        <th>Fiyat</th>
+                                        <th style="text-align: right">Sil</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="sepet_tbody"></tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td><a style="float: left;" class="btn btn-warning" href="/acr/ftr/card/sepet">SATIN AL</a></td>
 
-                                <td colspan="3">
-                                    <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
-                                </td>
-                            </tr>
-                            </tfoot>
-                        </table>
+                                        <td colspan="3">
+                                            <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div style="clear:both;"></div>
-        <div class="box">
-            <div class="box-header with-border">ÜRÜNLER</div>
-            <div class="box-body">
-                <div class="price-table">
-                    <?php
-                    //  dd($products);
-                    foreach ($products as $product) { ?>
-                    <div class="col-md-3">
-                        <div class="price-col2">
-                            <div class="title-2"><?php echo $product->product->product_name; ?></div>
-                            <ul class="peice-list">
-                                <?php  //dd($product->attributes);
-                                foreach ($product->product->attributes as $attribute) { ?>
-                                <li>
+                <div style="clear:both;"></div>
+                <div class="box">
+                    <div class="box-header with-border">ÜRÜNLER</div>
+                    <div class="box-body">
+                        <div class="price-table">
+                            <?php
+                            //  dd($products);
+                            foreach ($products as $product) { ?>
+                            <div class="col-md-3">
+                                <div class="price-col2">
+                                    <div class="title-2"><?php echo $product->product->product_name; ?></div>
+                                    <ul class="peice-list">
+                                        <?php  //dd($product->attributes);
+                                        foreach ($product->product->attributes as $attribute) { ?>
+                                        <li>
                         <span style="cursor:pointer;" onclick="urunGoster(<?php echo $attribute->id ?>,<?php echo $product->id ?>)"><?php echo $attribute->att_name ?> <span
                                     class="glyphicon glyphicon-question-sign"></span></span>
-                                </li>
-                                <?php } ?>
-                                <li class="pack-price">
+                                        </li>
+                                        <?php } ?>
+                                        <li class="pack-price">
                         <span>
                             <?php
                             if ($product->product->type == 1) {?>
@@ -292,37 +294,39 @@
                             <?php }
                             ?>
                         </span>
-                                    <br>
-                                    <?php if ($product->product->dis_price && ($product->product->dis_moon > 0 || $product->product->dis_person > 0)) {
-                                        echo '%' . $product->product->max_dis . ' varan indirim ';
-                                    } ?>
-                                </li>
+                                            <br>
+                                            <?php if ($product->product->dis_price && ($product->product->dis_moon > 0 || $product->product->dis_person > 0)) {
+                                                echo '%' . $product->product->max_dis . ' varan indirim ';
+                                            } ?>
+                                        </li>
 
-                                <li>
-                                    <p><a href="/acr/ftr/card/sepet?product_id=<?php echo $product->product->id ?> " class="btn btn-success  ">SATIN AL</a>
-                                        <button onclick="sepete_ekle(<?php echo $product->product->id ?>)" class="btn bg-orange margin">SEPETE EKLE</button>
-                                    </p>
-                                    <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
-                                </li>
-                            </ul>
+                                        <li>
+                                            <p><a href="/acr/ftr/card/sepet?product_id=<?php echo $product->product->id ?> " class="btn btn-success  ">SATIN AL</a>
+                                                <button onclick="sepete_ekle(<?php echo $product->product->id ?>)" class="btn bg-orange margin">SEPETE EKLE</button>
+                                            </p>
+                                            <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <?php }
+
+                            ?>
                         </div>
-                    </div>
-
-                    <?php }
-
-                    ?>
-                </div>
-                <div class="modal fade" id="sepetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div id="sepetAciklama"></div>
+                        <div class="modal fade" id="sepetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div id="sepetAciklama"></div>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
-
             </div>
         </div>
-    </div>
+    </section>
 @stop
 @section('footer')
     <script>

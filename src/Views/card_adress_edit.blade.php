@@ -4,17 +4,21 @@
     <link rel="stylesheet" href="/plugins/iCheck/all.css">
 @stop
 @section('acr_ftr')
-    <div class=" col-md-12">
-        <?php echo $sepet_nav ?>
-        <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
-            <div class="box-header with-border">TESLİMAT BİLGİLERİ
-                <button style="float: right;" data-toggle="modal" data-target="#myModal" class="btn btn-success">YENİ ADRES EKLE</button>
-            </div>
-            <div class="box-body">
-                <?php echo $adres_form ?>
+    <section class="content">
+        <div class="row">
+            <div class=" col-md-12">
+                <?php echo $sepet_nav ?>
+                <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
+                    <div class="box-header with-border">TESLİMAT BİLGİLERİ
+                        <button style="float: right;" data-toggle="modal" data-target="#myModal" class="btn btn-success">YENİ ADRES EKLE</button>
+                    </div>
+                    <div class="box-body">
+                        <?php echo $adres_form ?>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 @stop
 @section('footer')
     <script src="/plugins/iCheck/icheck.min.js"></script>

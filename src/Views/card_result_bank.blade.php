@@ -152,6 +152,7 @@
             </div>
             <!-- /.col -->
         </div>
+
         <!-- /.row -->
 
         <!-- this row will not appear when printing -->

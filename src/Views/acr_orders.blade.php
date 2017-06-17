@@ -3,42 +3,46 @@
     <link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
 @stop
 @section('acr_ftr')
-    <div class=" col-md-12">
-        <div class="box box-warning">
-            <div class="box-header with-border">Siparişler</div>
-            <div class="box-body">
-                <table width="100%" id="data_table" class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Sipariş NO:</th>
-                        <th>Ödeme Türü</th>
-                        <th>Fiyat</th>
-                        <th>Oluşturma Tarihi</th>
-                        <th>Ödeme Sonucu</th>
-                    </tr>
-                    </thead>
-                    <tbody id="sepet_tbody">
-                    <?php foreach ($orders as $order) {
-                    $payment_type = $order->payment_type == 1 ? '<span style="color: #3a7c67;">HAVALE / EFT</span>' : '<span style="color: #7c3108;">KREDİ KARTI</span>';
-                    $order_result = $order->order_result == 1 ? '
+    <section class="content">
+        <div class="row">
+            <div class=" col-md-12">
+                <div class="box box-warning">
+                    <div class="box-header with-border">Siparişler</div>
+                    <div class="box-body">
+                        <table width="100%" id="data_table" class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Sipariş NO:</th>
+                                <th>Ödeme Türü</th>
+                                <th>Fiyat</th>
+                                <th>Oluşturma Tarihi</th>
+                                <th>Ödeme Sonucu</th>
+                            </tr>
+                            </thead>
+                            <tbody id="sepet_tbody">
+                            <?php foreach ($orders as $order) {
+                            $payment_type = $order->payment_type == 1 ? '<span style="color: #3a7c67;">HAVALE / EFT</span>' : '<span style="color: #7c3108;">KREDİ KARTI</span>';
+                            $order_result = $order->order_result == 1 ? '
 <span style="color: #7c3422;">ÖDENMEDİ</span>
 <br>
 <a class="btn btn-xs btn-warning" href="/acr/ftr/card/payment?order_id=' . $order->id . '">ŞİMDİ ÖDE</a>
 ' : '<span style="color: #357c14;"> ÖDENDİ</span>';
-                    ?>
-                    <tr>
-                        <td>{{$order->id}}</td>
-                        <td><?php echo $payment_type ?></td>
-                        <td>{{$order->price}}</td>
-                        <td>{{$order->created_at}}</td>
-                        <td><?php echo $order_result?></td>
-                    </tr>
-                    <?php } ?>
-                    </tbody>
-                </table>
+                            ?>
+                            <tr>
+                                <td>{{$order->id}}</td>
+                                <td><?php echo $payment_type ?></td>
+                                <td>{{$order->price}}</td>
+                                <td>{{$order->created_at}}</td>
+                                <td><?php echo $order_result?></td>
+                            </tr>
+                            <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 @stop
 @section('footer')
     <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
