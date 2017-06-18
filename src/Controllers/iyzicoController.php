@@ -125,7 +125,7 @@ class iyzicoController extends Controller
         print_r($checkoutFormInitialize->getCheckoutFormContent());
     }
 
-    function odemeSonuc(Request $request)
+    function order_result(Request $request)
     {
         $sepet_model = new Sepet();
 
@@ -139,10 +139,10 @@ class iyzicoController extends Controller
         # print result
         $siparis = $sepet_model->where('id', $checkoutForm->getBasketId())->first();
         if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
-            $marketController = new MarketController();
-            $marketController->siparisOnayla($checkoutForm->getBasketId());
-        }
+            $sepet_model->where('id', $checkoutForm->getBasketId())->update(['order_result' => 2]);
 
+        }
+        return redirect()->to('/order/result');
 
     }
 }
