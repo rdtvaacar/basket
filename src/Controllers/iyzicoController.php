@@ -142,7 +142,6 @@ class iyzicoController extends Controller
             $sepet_model->where('id', $checkoutForm->getBasketId())->update(['order_result' => 2]);
 
         }
-        return redirect()->to('/order/result');
-
+        return redirect()->to("/order/result?order_id=$checkoutForm->getBasketId()");
     }
 }
