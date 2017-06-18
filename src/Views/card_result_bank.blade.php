@@ -83,7 +83,7 @@
                             <td>{{$pss->adet}}</td>
                             <td>{{$pss->lisans_ay}}</td>
                             <td>
-                                <?php echo empty($pss->product->dis_price) ? $pss->product->price :
+                                <?php echo empty($pss->product->dis_price && $pss->product->price == $pss->product->price) ? $pss->product->price :
                                     '<strike style="font-size: 10pt;">' . $pss->product->price . ' </strike> ' . $pss->product->dis_price ?>₺
                             </td>
                             <td>%{{round($pss->dis_rate,2) * 100}}</td>

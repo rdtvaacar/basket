@@ -139,7 +139,9 @@ class AcrSepetController extends Controller
         } else {
             $dis_price = $dis_price;
         }
-
+        if ($product->lisans_ay == 1 && $product->adet == 1) {
+            $dis_price = $product->product->price;
+        }
         if ((($dis_price / $price_not_dis) - ((100 - $product->product->max_dis) / 100)) < 0) {
             if (((100 - $product->product->max_dis) / 100) > 0) {
                 $price = ((100 - $product->product->max_dis) / 100) * $price_not_dis;
