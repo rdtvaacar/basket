@@ -140,8 +140,7 @@ class iyzicoController extends Controller
         $siparis = $sepet_model->where('id', $checkoutForm->getBasketId())->first();
         if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
             $sepet_model->where('id', $checkoutForm->getBasketId())->update(['order_result' => 2]);
-
         }
-        return redirect()->to("/order/result?order_id=$checkoutForm->getBasketId()");
+        return redirect()->to("/order/result?order_id=$siparis->id");
     }
 }
