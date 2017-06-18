@@ -125,7 +125,7 @@ class iyzicoController extends Controller
         print_r($checkoutFormInitialize->getCheckoutFormContent());
     }
 
-    function order_result(Request $request)
+    function order_result(\Illuminate\Http\Request $request)
     {
         $sepet_model = new Sepet();
 
