@@ -83,7 +83,7 @@
                             <td>{{$pss->adet}}</td>
                             <td>{{$pss->lisans_ay}}</td>
                             <td>
-                                <?php echo empty($pss->product->dis_price) || $pss->product->dis_price == 0 || ($pss->product->price == $pss->product->price) ? $pss->product->dis_price :
+                                <?php echo empty($pss->product->dis_price) || $pss->product->dis_price == 0 || ($pss->product->price == $pss->product->price) || ($pss->adet == 1 && $pss->lisans_ay == 1) ? $pss->product->dis_price :
                                     '<strike style="font-size: 10pt;">' . $pss->product->price . ' </strike> ' . $pss->product->dis_price ?>₺
                             </td>
                             </td>
