@@ -188,7 +188,7 @@ class AcrSepetController extends Controller
             $veri      .= '<tr class="sepet_row" id="sapet_row_' . $product->id . '">
                             <td>' . $product->product->product_name . '</td>
                             <td>
-                            <input size="3" type="number" style="width: 30px; margin: 0; padding:2px;" onkeyup="sepet_adet_guncelle(' . $product->id . ')" id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
+                            <input size="3" type="number" style="width: 70px; margin: 0; padding:2px;" onkeyup="sepet_adet_guncelle(' . $product->id . ')" id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
                             </td>
                              <td>';
             if ($price > $dis_price) {
@@ -231,13 +231,13 @@ class AcrSepetController extends Controller
                             <td>' . $type . '</td>
                             <td>
                             <div class="col-md-6 col-xs-12" >
-                            <input type="number" class="form-control" onkeyup="sepet_adet_guncelle(' . $product->id . ')" style="width: 50px;"  id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
+                            <input type="number" class="form-control" onkeyup="sepet_adet_guncelle(' . $product->id . ')" style="width: 70px;"  id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
                              </div>';
             if ($product->product->type == 1) {
                 $veri .= '<div class="col-md-6 col-xs-12">
 <div class="col-md-6 col-xs-12">Kaç Aylık</div>
                             <div class="col-md-6 col-xs-12">
-                            <input type="number" size="3" class="form-control"  onkeyup="sepet_lisans_ay_guncelle(' . $product->id . ')"  style="width: 50px;"   id="sepet_lisans_ay_' . $product->id . '" value="' . $product->lisans_ay . '"/> 
+                            <input type="number" size="3" class="form-control"  onkeyup="sepet_lisans_ay_guncelle(' . $product->id . ')"  style="width: 70px;"   id="sepet_lisans_ay_' . $product->id . '" value="' . $product->lisans_ay . '"/> 
                             </div>
                             </div>';
             }
