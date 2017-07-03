@@ -869,6 +869,7 @@ class AcrSepetController extends Controller
         $parasut->e_arsiv($invoice->id, $e_arsiv);
         MarketController::order_result(null, $order_id);
 
+
     }
 
     function son_aktif_tarih($ay = null, $lisans_bitis)
