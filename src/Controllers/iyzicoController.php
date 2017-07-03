@@ -128,7 +128,6 @@ class iyzicoController extends Controller
     function order_result(\Illuminate\Http\Request $request)
     {
         $sepet_model = new Sepet();
-
         $token   = $request->token;
         $request = new \Iyzipay\Request\RetrieveCheckoutFormRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);

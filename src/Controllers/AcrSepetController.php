@@ -11,6 +11,7 @@ use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\Product_sepet;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\City;
+use App\Http\Controllers\MarketController;
 use App\User;
 use Auth;
 use Illuminate\Http\Request;
@@ -866,6 +867,7 @@ class AcrSepetController extends Controller
 
         $parasut->paid($invoice->id, $payment_data);
         $parasut->e_arsiv($invoice->id, $e_arsiv);
+        MarketController::order_result(null, $order_id);
 
     }
 
