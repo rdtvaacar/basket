@@ -908,6 +908,7 @@ class AcrSepetController extends Controller
         $sepet_row = $sepet_model->where('id', $order_id)->first();
         $orders    = $ps_model->where('sepet_id', $order_id)->get();
         foreach ($orders as $order) {
+            $order->where('id', $order_id)->update(['active' => 0]);
             if ($order->type == 2) {
                 $user               = $user_model->find($sepet_row->user_id);
                 $user_row           = $user_model->where('id', $sepet_row->user_id)->first();
