@@ -922,7 +922,7 @@ class AcrSepetController extends Controller
                 $user->save();
             }
         }
-        $sepet_model-where('id', $sepet->id)->update(['active' => 0]);
+        $sepet_model->where('id', $sepet->id)->update(['active' => 0]);
 
     }
 
