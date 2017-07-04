@@ -798,15 +798,12 @@ class AcrSepetController extends Controller
         $order_id          = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model       = new Sepet();
         $ps_model          = new Product_sepet();
-        $user_model        = new AcrUser();
         $market_controller = new MarketController();
         /*$parasut_conf     = new Parasut_conf();
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
         $sepet_row    = $sepet_model->where('id', $order_id)->first();
         if ($sepet_row->order_result == 2) {
-
-
             $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
             if (empty($adress_row->parasut_id)) {
                 $adress             = $adress_model->find($adress_row->id);
@@ -818,25 +815,8 @@ class AcrSepetController extends Controller
             } else {
                 $parasut_contact_id = $adress_row->parasut_id;
             }
-
-            $user                = $user_model->find($sepet_row->user_id);
-            $user_row            = $user_model->where('id', $sepet_row->user_id)->first();
-            $sepet               = $sepet_model->find($order_id);
-            $sepet->active       = 1;
-            $sepet->order_result = 2;
-            $sepet->save();
             $orders = $ps_model->where('sepet_id', $order_id)->with('product', 'acr_product', 'sepet')->get();
             foreach ($orders as $order) {
-                if ($order->type == 2) {
-                    $user->lisans_durum = 1;
-                    if (strtotime($user_row->lisans_bitis) < time()) {
-                        $lisans_bitis = time();
-                    } else {
-                        $lisans_bitis = strtotime($user_row->lisans_bitis);
-                    }
-                    $user->lisans_bitis = self::son_aktif_tarih($order->lisans_ay, $lisans_bitis);
-                    $user->save();
-                }
                 $parasut_product_data[] = [
                     'product_id'    => $order->acr_product->parasut_id, // the parasut products
                     'quantity'      => $order->adet,
@@ -875,7 +855,6 @@ class AcrSepetController extends Controller
 
             $parasut->paid($invoice->id, $payment_data);
             // $parasut->e_arsiv($invoice->id, $e_arsiv);
-
         }
         return $market_controller->order_result(null, $order_id);
 
