@@ -796,7 +796,7 @@ class AcrSepetController extends Controller
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
         $sepet_row    = $sepet_model->where('id', $order_id)->first();
-
+        $sepet_model->where('id', $order_id)->update(['order_result' => 2]);
         $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
 
 
@@ -868,7 +868,6 @@ class AcrSepetController extends Controller
         $parasut->paid($invoice->id, $payment_data);
         // $parasut->e_arsiv($invoice->id, $e_arsiv);
         $market_controller = new MarketController();
-
         $market_controller->order_result(null, $order_id);
 
     }
@@ -922,7 +921,6 @@ class AcrSepetController extends Controller
                 $user->save();
             }
         }
-        $sepet_model->where('id', $sepet->id)->update(['active' => 0]);
 
     }
 
