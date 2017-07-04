@@ -140,7 +140,7 @@ class iyzicoController extends Controller
         if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
             $sepet_model->where('id', $checkoutForm->getBasketId())->update(['order_result' => 2]);
             $sepetController = new AcrSepetController();
-            $sepetController->orders_active(null, $checkoutForm->getBasketId());
+            return $sepetController->orders_active(null, $checkoutForm->getBasketId());
         }
     }
 }
