@@ -25,6 +25,7 @@ Route::group(['middleware' => ['web']], function () {
 
 
         Route::group(['middleware' => ['auth']], function () {
+            Route::post('/order/active', 'AcrSepetController@orders_active');
             // adress
             Route::get('/card/adress', 'AcrSepetController@adress');
             Route::post('/card/adress/county', 'AcrSepetController@county_row');
@@ -65,7 +66,7 @@ Route::group(['middleware' => ['web']], function () {
 
 
                 Route::get('/admin/orders', 'AcrSepetController@admin_orders');
-                Route::post('/order/active', 'AcrSepetController@orders_active');
+                Route::post('/order/active/admin', 'AcrSepetController@orders_active_admin');
                 Route::post('/order/deactive', 'AcrSepetController@orders_deactive');
 
 

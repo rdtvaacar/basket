@@ -128,8 +128,8 @@ class iyzicoController extends Controller
     function order_result(\Illuminate\Http\Request $request)
     {
         $sepet_model = new Sepet();
-        $token   = $request->token;
-        $request = new \Iyzipay\Request\RetrieveCheckoutFormRequest();
+        $token       = $request->token;
+        $request     = new \Iyzipay\Request\RetrieveCheckoutFormRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);
         $request->setConversationId("123456789");
         $request->setToken($token);
@@ -139,7 +139,8 @@ class iyzicoController extends Controller
         $siparis = $sepet_model->where('id', $checkoutForm->getBasketId())->first();
         if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
             $sepet_model->where('id', $checkoutForm->getBasketId())->update(['order_result' => 2]);
+            $sepetController = new AcrSepetController();
+            $sepetController->orders_active(null, $checkoutForm->getBasketId());
         }
-        return redirect()->to("/order/result?order_id=$siparis->id");
     }
 }
