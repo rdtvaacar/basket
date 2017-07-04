@@ -125,7 +125,7 @@
 
                 $.ajax({
                     type   : 'post',
-                    url    : '/acr/ftr/order/active',
+                    url    : '/acr/ftr/order/active/admin',
                     data   : 'order_id=' + order_id,
                     success: function () {
                     }
