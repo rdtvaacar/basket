@@ -820,7 +820,7 @@ class AcrSepetController extends Controller
                 $parasut_product_data[] = [
                     'product_id'    => $order->acr_product->parasut_id, // the parasut products
                     'quantity'      => $order->adet,
-                    'unit_price'    => round((self::price_set($order) * ((100 - $order->product->kdv) / 100)) / $order->adet, 4),
+                    'unit_price'    => round((self::sepet_total_price($order->id) * ((100 - $order->product->kdv) / 100)) / $order->adet, 4),
                     'discount'      => round($order->product->price * $order->sepet->dis_rate, 4),
                     'vat_rate'      => $order->product->kdv,
                     'discount_type' => 'amount',
