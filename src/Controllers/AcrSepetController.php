@@ -820,7 +820,7 @@ class AcrSepetController extends Controller
                 $parasut_product_data[] = [
                     'product_id'    => $order->acr_product->parasut_id, // the parasut products
                     'quantity'      => $order->adet,
-                    'unit_price'    => round(self::price_set($order) / $order->adet, 4),
+                    'unit_price'    => round((self::price_set($order) * ((100 - $order->product->kdv) / 100)) / $order->adet, 4),
                     'discount'      => round($order->product->price * $order->sepet->dis_rate, 4),
                     'vat_rate'      => $order->product->kdv,
                     'discount_type' => 'amount',
@@ -858,17 +858,6 @@ class AcrSepetController extends Controller
         }
         return $market_controller->order_result(null, $order_id);
 
-    }
-
-    function son_aktif_tarih($ay = null, $lisans_bitis)
-    {
-        $ekle = $lisans_bitis - time();
-
-        if ($ekle < 0) {
-            $ekle = 0;
-        }
-        $odemeZaman = $ekle + mktime(0, 0, 0, date('m') + $ay, date('d'), date('Y'));
-        return date('Y-m-d H:i:s', $odemeZaman);
     }
 
     function invers_son_aktif_tarih($ay = null, $lisans_bitis)
