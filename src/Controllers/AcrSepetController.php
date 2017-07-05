@@ -817,10 +817,11 @@ class AcrSepetController extends Controller
             }
             $orders = $ps_model->where('sepet_id', $order_id)->with('product', 'acr_product', 'sepet')->get();
             foreach ($orders as $order) {
+                $fiyat                  = round((((self::sepet_total_price($order->id) * ((100) / 118))) / $order->adet), 4);
                 $parasut_product_data[] = [
                     'product_id'    => $order->acr_product->parasut_id, // the parasut products
                     'quantity'      => $order->adet,
-                    'unit_price'    => round((self::sepet_total_price($order->id) * ((100 - $order->product->kdv) / 100)) / $order->adet, 4),
+                    'unit_price'    => $fiyat,
                     'discount'      => round($order->product->price * $order->sepet->dis_rate, 4),
                     'vat_rate'      => $order->product->kdv,
                     'discount_type' => 'amount',
