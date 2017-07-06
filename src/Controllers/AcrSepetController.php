@@ -839,22 +839,23 @@ class AcrSepetController extends Controller
                 'details_attributes' => $parasut_product_data,
 
             ];
-            $invoice           = $parasut->sale($parasut_sale_data);
+            $parasut->sale($parasut_sale_data);
             //  dd($invoice_id);
-            $payment_data = [
-                "amount"        => $invoice->net_total,
+            /*$payment_data = [
+                "amount"        => 60,
                 "date"          => date('Y-m-d'),
                 // "description"   => "Açıklama",
                 "account_id"    => $parasut->account_id,
                 "exchange_rate" => "1.0"
-            ];
-            $e_arsiv      = [
+            ];*/
+            /*@$parasut->paid($invoice->id, $payment_data);*/
+
+
+            $e_arsiv = [
                 // "note"                      => "Fatura notu",
                 "to"       => "urn=>mail=>",
                 "scenario" => "commercial"
             ];
-
-            $parasut->paid($invoice->id, $payment_data);
             // $parasut->e_arsiv($invoice->id, $e_arsiv);
         }
         return $market_controller->order_result(null, $order_id);
