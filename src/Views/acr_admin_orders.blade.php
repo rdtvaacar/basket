@@ -33,7 +33,8 @@
                             <tr>
                                 <td>{{$order->id}}</td>
                                 <td>{{$order->user->id}}</td>
-                                <td>{{$order->user->name}}</td>
+                                <td>{{$order->user->name}}<br>
+                                    {{$order->user->email}}</td>
                                 <td><?php echo $payment_type ?></td>
                                 <td>{{$order->price}}</td>
                                 <td>{{$order->created_at}}</td>
