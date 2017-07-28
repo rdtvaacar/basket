@@ -12,7 +12,10 @@
                         <table width="100%" id="data_table" class="table table-striped">
                             <thead>
                             <tr>
+
                                 <th>Sipariş NO:</th>
+                                <th>UserID</th>
+                                <th>Email</th>
                                 <th>Ödeme Türü</th>
                                 <th>Fiyat</th>
                                 <th>Oluşturma Tarihi</th>
@@ -29,6 +32,8 @@
                             ?>
                             <tr>
                                 <td>{{$order->id}}</td>
+                                <td>{{$order->user->id}}</td>
+                                <td>{{$order->user->name}}</td>
                                 <td><?php echo $payment_type ?></td>
                                 <td>{{$order->price}}</td>
                                 <td>{{$order->created_at}}</td>

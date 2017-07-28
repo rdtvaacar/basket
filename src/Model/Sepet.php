@@ -20,6 +20,10 @@ class Sepet extends Model
      * @var string
      */
 
+    function user()
+    {
+        return $this->belongsTo('App\user');
+    }
 
     function create($session_id = null, $product_id)
     {
