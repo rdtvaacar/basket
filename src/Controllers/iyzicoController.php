@@ -62,7 +62,6 @@ class iyzicoController extends Controller
     {
         $acr_user_table_config_model = new Acr_user_table_conf();
         $acr_user_table_config       = $acr_user_table_config_model->first();
-        dd($acr_user_table_config->id);
         $iyzico_model                = new AcrFtrIyzico();
         $iyzico                      = $iyzico_model->first();
         $adress_model                = new AcrFtrAdress();
@@ -71,6 +70,8 @@ class iyzicoController extends Controller
         $adres                       = $adresses->adress;
         $user_name                   = empty(Auth::user()->name) ? Auth::user()->ad : Auth::user()->name;
         $ad                          = $adresses->type == 2 ? $adresses->company : $adresses->invoice_name;
+        $email                       = $acr_user_table_config->email;
+        $contact_name                = $acr_user_table_config->name;
         # create request class
         $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);
@@ -88,7 +89,7 @@ class iyzicoController extends Controller
         $buyer->setName($ad);
         $buyer->setSurname($ad);
         $buyer->setGsmNumber(Auth::user()->tel);
-        $buyer->setEmail(Auth::user()->$acr_user_table_config->email);
+        $buyer->setEmail(Auth::user()->$email);
         $buyer->setIdentityNumber(rand(10000000000, 99999999999));
         $buyer->setLastLoginDate(date('Y-m-d H:i:s', strtotime(Auth::user()->updated_at)));
         $buyer->setRegistrationDate(date('Y-m-d H:i:s', strtotime(Auth::user()->created_at)));
@@ -99,14 +100,14 @@ class iyzicoController extends Controller
         $buyer->setZipCode($adresses->post_code);
         $request->setBuyer($buyer);
         $shippingAddress = new \Iyzipay\Model\Address();
-        $shippingAddress->setContactName(Auth::user()->$acr_user_table_config->name);
+        $shippingAddress->setContactName(Auth::user()->$contact_name);
         $shippingAddress->setCity($sehir);
         $shippingAddress->setCountry("Turkey");
         $shippingAddress->setAddress($adres);
         $shippingAddress->setZipCode("34742");
         $request->setShippingAddress($shippingAddress);
         $billingAddress = new \Iyzipay\Model\Address();
-        $billingAddress->setContactName(Auth::user()->$acr_user_table_config->name);
+        $billingAddress->setContactName(Auth::user()->$contact_name);
         $billingAddress->setCity($sehir);
         $billingAddress->setCountry("Turkey");
         $billingAddress->setAddress($adres);
