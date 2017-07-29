@@ -2,6 +2,7 @@
 
 namespace Acr\Ftr\Controllers;
 
+use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrAdress;
 use Acr\Ftr\Model\Sepet;
 use Auth;
@@ -59,14 +60,16 @@ class iyzicoController extends Controller
 
     function odemeFormIc($price = null, $paidPrice = null, $basketId = null)
     {
-        $iyzico_model = new AcrFtrIyzico();
-        $iyzico       = $iyzico_model->first();
-        $adress_model = new AcrFtrAdress();
-        $adresses     = $adress_model->where('user_id', Auth::user()->id)->where('active', 1)->with('city', 'county')->first();
-        $sehir        = $adresses->city->name;
-        $adres        = $adresses->adress;
-        $user_name    = empty(Auth::user()->name) ? Auth::user()->ad : Auth::user()->name;
-        $ad           = $adresses->type == 2 ? $adresses->company : $adresses->invoice_name;
+        $acr_user_table_config_model = new Acr_user_table_conf();
+        $acr_user_table_config       = $acr_user_table_config_model->first();
+        $iyzico_model                = new AcrFtrIyzico();
+        $iyzico                      = $iyzico_model->first();
+        $adress_model                = new AcrFtrAdress();
+        $adresses                    = $adress_model->where('user_id', Auth::user()->id)->where('active', 1)->with('city', 'county')->first();
+        $sehir                       = $adresses->city->name;
+        $adres                       = $adresses->adress;
+        $user_name                   = empty(Auth::user()->name) ? Auth::user()->ad : Auth::user()->name;
+        $ad                          = $adresses->type == 2 ? $adresses->company : $adresses->invoice_name;
         # create request class
         $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);
@@ -84,7 +87,7 @@ class iyzicoController extends Controller
         $buyer->setName($ad);
         $buyer->setSurname($ad);
         $buyer->setGsmNumber(Auth::user()->tel);
-        $buyer->setEmail(Auth::user()->email);
+        $buyer->setEmail(Auth::user()->$acr_user_table_config->email);
         $buyer->setIdentityNumber(rand(10000000000, 99999999999));
         $buyer->setLastLoginDate(date('Y-m-d H:i:s', strtotime(Auth::user()->updated_at)));
         $buyer->setRegistrationDate(date('Y-m-d H:i:s', strtotime(Auth::user()->created_at)));
@@ -95,14 +98,14 @@ class iyzicoController extends Controller
         $buyer->setZipCode($adresses->post_code);
         $request->setBuyer($buyer);
         $shippingAddress = new \Iyzipay\Model\Address();
-        $shippingAddress->setContactName(Auth::user()->name);
+        $shippingAddress->setContactName(Auth::user()->$acr_user_table_config->name);
         $shippingAddress->setCity($sehir);
         $shippingAddress->setCountry("Turkey");
         $shippingAddress->setAddress($adres);
         $shippingAddress->setZipCode("34742");
         $request->setShippingAddress($shippingAddress);
         $billingAddress = new \Iyzipay\Model\Address();
-        $billingAddress->setContactName(Auth::user()->name);
+        $billingAddress->setContactName(Auth::user()->$acr_user_table_config->name);
         $billingAddress->setCity($sehir);
         $billingAddress->setCountry("Turkey");
         $billingAddress->setAddress($adres);
