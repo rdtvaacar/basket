@@ -62,7 +62,7 @@ class iyzicoController extends Controller
     {
         $acr_user_table_config_model = new Acr_user_table_conf();
         $acr_user_table_config       = $acr_user_table_config_model->first();
-        dd($acr_user_table_config);
+        dd($acr_user_table_config->id);
         $iyzico_model                = new AcrFtrIyzico();
         $iyzico                      = $iyzico_model->first();
         $adress_model                = new AcrFtrAdress();
