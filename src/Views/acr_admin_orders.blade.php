@@ -36,7 +36,7 @@
                                 <td>{{$order->user->id}}</td>
                                 <td>{{$order->user->name}}<br>
                                     {{$order->user->email}}<br>
-                                    {{$order->user->email}}</td>
+                                    {{$order->user->tel}}</td>
                                 <td><?php echo $payment_type ?></td>
                                 <td>
                                     <table class="table">
