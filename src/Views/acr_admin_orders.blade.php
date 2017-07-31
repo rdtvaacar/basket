@@ -38,9 +38,20 @@
                                     {{$order->user->email}}</td>
                                 <td><?php echo $payment_type ?></td>
                                 <td>
-                                    @foreach ($order->Acrproduct as $acr)
-                                        {{dd($acr)}}
-                                    @endforeach
+                                    <table class="table">
+                                        <tr>
+                                            <td>Adet</td>
+                                            <td>Ay</td>
+                                            <td>Ürün</td>
+                                        </tr>
+                                        @foreach ($order->Acrproducts as $acr_product)
+                                            <tr>
+                                                <td>{{$acr_product->pivot->adet}}</td>
+                                                <td>{{$acr_product->pivot->lisans_ay}}</td>
+                                                <td>{{$acr_product->product->product_name}}</td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
                                 </td>
                                 <td>{{$order->price}}</td>
                                 <td>{{$order->created_at}}</td>
