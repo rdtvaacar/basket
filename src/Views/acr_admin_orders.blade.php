@@ -16,6 +16,7 @@
                                 <th>Sipariş NO:</th>
                                 <th>UserID</th>
                                 <th>Email</th>
+                                <th>Ürünler</th>
                                 <th>Ödeme Türü</th>
                                 <th>Fiyat</th>
                                 <th>Oluşturma Tarihi</th>
@@ -36,6 +37,11 @@
                                 <td>{{$order->user->name}}<br>
                                     {{$order->user->email}}</td>
                                 <td><?php echo $payment_type ?></td>
+                                <td>
+                                    @foreach ($order->Acrproduct as $acr)
+                                        {{dd($acr)}}
+                                    @endforeach
+                                </td>
                                 <td>{{$order->price}}</td>
                                 <td>{{$order->created_at}}</td>
                                 <td><?php echo $order_result?></td>

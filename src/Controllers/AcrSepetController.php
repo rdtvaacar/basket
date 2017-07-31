@@ -53,7 +53,7 @@ class AcrSepetController extends Controller
     function admin_orders(Request $request)
     {
         $sepet_model = new Sepet();
-        $orders      = $sepet_model->where('siparis', 1)->with('user')->get();
+        $orders      = $sepet_model->where('siparis', 1)->with(['user', 'Acrproducts'])->get();
         return View('acr_ftr::acr_admin_orders', compact('orders'));
     }
 
