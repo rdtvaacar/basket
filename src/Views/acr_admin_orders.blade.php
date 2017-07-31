@@ -35,8 +35,7 @@
                                 <td>{{$order->id}}</td>
                                 <td>{{$order->user->id}}</td>
                                 <td>{{$order->user->name}}<br>
-                                    {{$order->user->email}}<br>
-                                    {{$order->user->tel}}</td>
+                                    {{$order->user->email}}</td>
                                 <td><?php echo $payment_type ?></td>
                                 <td>
                                     <table class="table">
@@ -45,11 +44,11 @@
                                             <td>Ay</td>
                                             <td>Ürün</td>
                                         </tr>
-                                        @foreach ($order->Acrproducts as $acr_product)
+                                        @foreach ($order->products as $e_product)
                                             <tr>
-                                                <td>{{$acr_product->pivot->adet}}</td>
-                                                <td>{{$acr_product->pivot->lisans_ay}}</td>
-                                                <td>{{$acr_product->product->product_name}}</td>
+                                                <td>{{$e_product->adet}}</td>
+                                                <td>{{$e_product->lisans_ay}}</td>
+                                                <td>{{$e_product->product->product_name}}</td>
                                             </tr>
                                         @endforeach
                                     </table>

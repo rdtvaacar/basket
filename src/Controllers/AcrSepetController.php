@@ -54,7 +54,7 @@ class AcrSepetController extends Controller
     {
         $sepet_model = new Sepet();
         $orders      = $sepet_model->where('siparis', 1)->with([
-            'user', 'Acrproducts' => function ($query) {
+            'user', 'products' => function ($query) {
                 $query->with('product');
             }
         ])->get();

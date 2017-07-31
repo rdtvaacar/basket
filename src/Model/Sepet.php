@@ -52,14 +52,18 @@ class Sepet extends Model
 
     function Acrproducts()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\Acrproduct', 'product_sepet', 'sepet_id', 'product_id')->withPivot('adet', 'lisans_ay');
+        return $this->belongsToMany('Acr\Ftr\Model\Acrproduct', 'product_sepet', 'sepet_id')->withPivot('adet', 'lisans_ay');
+    }
+
+    function products()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_sepet', 'sepet_id', 'id');
     }
 
     function delete()
     {
 
     }
-    
 
     function sepet_birle($session_id)
     {
