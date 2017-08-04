@@ -7,15 +7,12 @@ use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrAdress;
 use Acr\Ftr\Model\Company_conf;
 use Acr\Ftr\Model\County;
-use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\Product_sepet;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\City;
 use App\Http\Controllers\MarketController;
-use App\User;
 use Auth;
 use Illuminate\Http\Request;
-use Acr\Ftr\Model\Acrproduct;
 use Validator;
 use Redirect;
 use Acr\Ftr\Model\Bank;
@@ -297,19 +294,26 @@ class AcrSepetController extends Controller
 
     function card(Request $request)
     {
+        $card_api   = self::card_api($request);
+        $products   = $card_api['products'];
+        $order_id   = $card_api['order_id'];
+        $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;
+        $sepet_nav  = self::sepet_nav($order_id, 1);
+        $sepet_row  = self::sepet_row_detail($products);
+        return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav', 'order_link'));
+    }
+
+    function card_api(Request $request)
+    {
         $sepet_model = new Sepet();
         $product_id  = $request->input('product_id');
         if (!empty($product_id)) {
             self::create($request, $product_id);
         }
-        $session_id = $request->session()->get('session_id');
+        $session_id = session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
-        $sepet_row  = self::sepet_row_detail($products);
         $order_id   = $request->input('order_id');
-        $order_id   = empty($order_id) ? $sepet_model->product_sepet_id($session_id) : $order_id;
-        $sepet_nav  = self::sepet_nav($order_id, 1);
-        $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;
-        return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav', 'order_link'));
+        return ['products' => $products, 'order_id' => $order_id];
     }
 
     function adress(Request $request)

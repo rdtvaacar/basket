@@ -12,15 +12,12 @@ use Acr\Ftr\Model\Company_conf;
 use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\AcrFtrAttribute;
-use Acr\Ftr\Model\Product_u_kat;
 use Acr\Ftr\Model\Sepet;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Acr\Ftr\Model\File_model;
 use Acr\Ftr\Model\File_dosya_model;
 use Auth;
-use Acr\Ftr\Controllers\MailController;
-use Illuminate\View\View;
 
 class AcrFtrController extends Controller
 {
@@ -148,8 +145,8 @@ class AcrFtrController extends Controller
     {
         $controller  = new AcrFtrController();
         $api         = self::my_product_api($request);
-        $products    = $api[0];
-        $sepet_count = $api[1];
+        $products    = $api['products'];
+        $sepet_count = $api['sepet_counts'];
         return View('acr_ftr::products', compact('products', 'controller', 'sepet_count'));
     }
 
@@ -170,15 +167,14 @@ class AcrFtrController extends Controller
                     }
                 ]);
             },
-
         ])->get();
-        $session_id    = $request->session()->get('session_id');
+        $session_id    = session()->get('session_id');
         if (Auth::check() && !empty($session_id)) {
             $sepet_model->sepet_birle($session_id);
-            $request->session()->forget('session_id');
+            session()->forget('session_id');
         }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
-        return [$products, $sepet_count];
+        return ['products' => $products, 'sepet_counts' => $sepet_count];
     }
 
     function attribute_modal(Request $request)
