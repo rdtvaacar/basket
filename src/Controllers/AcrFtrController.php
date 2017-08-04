@@ -146,11 +146,18 @@ class AcrFtrController extends Controller
 
     function my_product(Request $request)
     {
+        $controller  = new AcrFtrController();
+        $api         = self::my_product_api($request);
+        $products    = $api[0];
+        $sepet_count = $api[1];
+        return View('acr_ftr::products', compact('products', 'controller', 'sepet_count'));
+    }
+
+    function my_product_api(Request $request)
+    {
         $product_model = new Acrproduct();
         $sepet_model   = new Sepet();
-        $controller    = new AcrFtrController();
-
-        $products = $product_model->where('yayin', 1)->where('sil', 0)->with([
+        $products      = $product_model->where('yayin', 1)->where('sil', 0)->with([
             'u_kats'  => function ($query) {
                 //  $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
             },
@@ -165,15 +172,13 @@ class AcrFtrController extends Controller
             },
 
         ])->get();
-
-        //dd(Auth::user()->id);
-        $session_id = $request->session()->get('session_id');
+        $session_id    = $request->session()->get('session_id');
         if (Auth::check() && !empty($session_id)) {
             $sepet_model->sepet_birle($session_id);
             $request->session()->forget('session_id');
         }
-        @$sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
-        return View('acr_ftr::products', compact('products', 'controller', 'sepet_count'));
+        $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
+        return [$products, $sepet_count];
     }
 
     function attribute_modal(Request $request)
