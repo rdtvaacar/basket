@@ -73,9 +73,9 @@ class AcrSepetController extends Controller
         } else {
             if (empty($request->session()->get('session_id'))) {
                 $session_id = rand(1000000, 99999999);
-                $request->session()->put('session_id', $session_id);
+                session()->put('session_id', $session_id);
             } else {
-                $session_id = $request->session()->get('session_id');
+                $session_id = session()->get('session_id');
             }
 
             $sepet_id = $sepet_model->product_sepet_id($session_id);
