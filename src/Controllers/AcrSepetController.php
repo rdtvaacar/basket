@@ -429,6 +429,14 @@ class AcrSepetController extends Controller
 
     function paymet_havale_eft(Request $request)
     {
+        $veri            = self::payment_havale_eft_api($request);
+        $sepetController = new AcrSepetController();
+        return View('acr_ftr::card_result_bank', compact($veri['sepet_nav'], $veri['siparis'], $veri['bank'], $veri['ps'], $veri['user_adress'], $veri['company'], 'sepetController'));
+
+    }
+
+    function payment_havale_eft_api(Request $request)
+    {
         $sepet_model   = new Sepet();
         $bank_id       = $request->input('bank_id');
         $bank_model    = new Bank();
@@ -452,15 +460,13 @@ class AcrSepetController extends Controller
         if (empty($sepet_id)) {
             return redirect()->to('/acr/ftr/orders');
         }
-        $bank            = $bank_model->where('id', $bank_id)->first();
-        $sepet_nav       = self::sepet_nav($sepet_id, 4);
-        $adress_model    = new AcrFtrAdress();
-        $user_adress     = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
-        $company_model   = new Company_conf();
-        $company         = $company_model->first();
-        $sepetController = new AcrSepetController();
-        return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank', 'ps', 'user_adress', 'company', 'sepetController'));
-
+        $bank          = $bank_model->where('id', $bank_id)->first();
+        $sepet_nav     = self::sepet_nav($sepet_id, 4);
+        $adress_model  = new AcrFtrAdress();
+        $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
+        $company_model = new Company_conf();
+        $company       = $company_model->first();
+        return ['ps' => $ps, 'bank' => $bank, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis];
     }
 
     function payment_bank_card(Request $request)
