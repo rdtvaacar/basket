@@ -145,8 +145,8 @@ class AcrFtrController extends Controller
     {
         $controller  = new AcrFtrController();
         $api         = self::my_product_api($request);
-        $products    = $api['products'];
-        $sepet_count = $api['sepet_counts'];
+        $products    = $api->orginal['data']['products'];
+        $sepet_count = $api->orginal['data']['sepet_counts'];
         return View('acr_ftr::products', compact('products', 'controller', 'sepet_count'));
     }
 
@@ -174,7 +174,8 @@ class AcrFtrController extends Controller
             session()->forget('session_id');
         }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
-        return ['products' => $products, 'sepet_counts' => $sepet_count];
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sistemdeki ürünler çekiliyor.', 'data' => ['products' => $products, 'sepet_counts' => $sepet_count]]);
+
     }
 
     function attribute_modal(Request $request)
