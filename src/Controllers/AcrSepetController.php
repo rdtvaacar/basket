@@ -294,9 +294,9 @@ class AcrSepetController extends Controller
 
     function card(Request $request)
     {
-        $card_api   = json_decode(self::card_api($request));
-        $products   = $card_api->data['products'];
-        $order_id   = $card_api->data['order_id'];
+        $card_api   = self::card_api($request);
+        $products   = $card_api->original['data']['products'];
+        $order_id   = $card_api->original['data']['order_id'];
         $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;
         $sepet_nav  = self::sepet_nav($order_id, 1);
         $sepet_row  = self::sepet_row_detail($products);
@@ -431,7 +431,13 @@ class AcrSepetController extends Controller
     {
         $veri            = self::payment_havale_eft_api($request);
         $sepetController = new AcrSepetController();
-        return View('acr_ftr::card_result_bank', compact($veri['sepet_nav'], $veri['siparis'], $veri['bank'], $veri['ps'], $veri['user_adress'], $veri['company'], 'sepetController'));
+        $sepet_nav       = $veri->original['data']['sepet_nav'];
+        $siparis         = $veri->original['data']['siparis'];
+        $bank            = $veri->original['data']['bank'];
+        $ps              = $veri->original['data']['ps'];
+        $user_adress     = $veri->original['data']['user_adress'];
+        $company         = $veri->original['data']['company'];
+        return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank', 'ps', 'user_adress', 'company', 'sepetController'));
 
     }
 
@@ -466,7 +472,15 @@ class AcrSepetController extends Controller
         $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
         $company_model = new Company_conf();
         $company       = $company_model->first();
-        return ['ps' => $ps, 'bank' => $bank, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis];
+
+        return response()
+            ->json([
+                'status' => 1,
+                'title'  => 'Bilgi',
+                'msg'    => 'Sepet bilgileri çekiliyor.',
+                'data'   => ['ps' => $ps, 'bank' => $bank, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis]
+            ]);
+
     }
 
     function payment_bank_card(Request $request)
