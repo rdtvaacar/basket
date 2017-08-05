@@ -55,7 +55,10 @@ class AcrSepetController extends Controller
                 $query->with('product');
             }
         ])->get();
-        return View('acr_ftr::acr_admin_orders', compact('orders'));
+        $acr_user_table_config_model = new Acr_user_table_conf();
+        $config       = $acr_user_table_config_model->first();
+        $email = $config->email;
+        return View('acr_ftr::acr_admin_orders', compact('orders','email'));
     }
 
     function create(Request $request, $product_id = null)
