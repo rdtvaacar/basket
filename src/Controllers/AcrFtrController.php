@@ -145,8 +145,8 @@ class AcrFtrController extends Controller
     {
         $controller  = new AcrFtrController();
         $api         = self::my_product_api($request);
-        $products    = $api->orginal['data']['products'];
-        $sepet_count = $api->orginal['data']['sepet_counts'];
+        $products    = $api->original['data']['products'];
+        $sepet_count = $api->original['data']['sepet_counts'];
         return View('acr_ftr::products', compact('products', 'controller', 'sepet_count'));
     }
 
