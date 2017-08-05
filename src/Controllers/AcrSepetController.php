@@ -680,6 +680,15 @@ class AcrSepetController extends Controller
 
     function adress_create(Request $request)
     {
+
+        self::adress_create_api($request);
+        return Redirect()->back();
+
+
+    }
+
+    function adress_create_api(Request $request)
+    {
         $rules   = array(
             'name'      => 'required', // make sure the email is an actual email
             'city'      => 'required', // password can only be alphanumeric and has to be greater than 3 characters
@@ -726,10 +735,9 @@ class AcrSepetController extends Controller
 
             $adress_id = $adress_model->create($adress_id, $data);
             self::parasut_contact_update($adress_id);
+            return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres bilgileri başarıyla eklendi.', 'data' => null]);
 
-            return Redirect()->back();
         }
-
     }
 
     function parasut_contact_update($adress_id)

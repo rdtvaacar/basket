@@ -43,6 +43,8 @@ class Sepet extends Model
         } else {
             Product_sepet::insert(['product_id' => $product_id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
         }
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Ürün başarıyla sepete eklendi.', 'data' => $sepet_id]);
+
     }
 
     function product()
