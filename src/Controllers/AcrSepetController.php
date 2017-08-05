@@ -294,9 +294,9 @@ class AcrSepetController extends Controller
 
     function card(Request $request)
     {
-        $card_api   = self::card_api($request);
-        $products   = $card_api['products'];
-        $order_id   = $card_api['order_id'];
+        $card_api   = json_decode(self::card_api($request));
+        $products   = $card_api->data['products'];
+        $order_id   = $card_api->data['order_id'];
         $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;
         $sepet_nav  = self::sepet_nav($order_id, 1);
         $sepet_row  = self::sepet_row_detail($products);
@@ -313,7 +313,7 @@ class AcrSepetController extends Controller
         $session_id = session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
         $order_id   = $request->input('order_id');
-        return ['products' => $products, 'order_id' => $order_id];
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sepet bilgileri çekiliyor.', 'data' => ['products' => $products, 'order_id' => $order_id]]);
     }
 
     function adress(Request $request)
