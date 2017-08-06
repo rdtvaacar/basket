@@ -370,7 +370,7 @@ class AcrSepetController extends Controller
 
     }
 
-    function adres_secimi_api(Request $request, $adress_id)
+    function adres_secimi_api(Request $request, $adress_id = null)
     {
         $adress_id    = empty($adress_id) ? $request->adress_id : $adress_id;
         $adress_model = new AcrFtrAdress();
