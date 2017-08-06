@@ -505,6 +505,20 @@ class AcrSepetController extends Controller
 
     function payment_bank_card(Request $request)
     {
+        $veri            = self::payment_bank_card_api($request);
+        $sepetController = new AcrSepetController();
+        $sepet_nav       = $veri->original['data']['sepet_nav'];
+        $siparis         = $veri->original['data']['siparis'];
+        $odemeForm       = $veri->original['data']['odemeForm'];
+        $ps              = $veri->original['data']['ps'];
+        $user_adress     = $veri->original['data']['user_adress'];
+        $company         = $veri->original['data']['company'];
+        return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company', 'sepetController'));
+
+    }
+
+    function payment_bank_card_api(Request $request)
+    {
         $sepet_model   = new Sepet();
         $order_id      = $request->input('order_id');
         $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
@@ -530,12 +544,15 @@ class AcrSepetController extends Controller
         $user_adress      = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
         $company_model    = new Company_conf();
         $company          = $company_model->first();
-        $sepetController  = new AcrSepetController();
         $iyzicoController = new iyzicoController();
         $odemeForm        = $iyzicoController->odemeForm(1, $price, $sepet_id);
-
-        return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company', 'sepetController'));
-
+        return response()
+            ->json([
+                'status' => 1,
+                'title'  => 'Bilgi',
+                'msg'    => 'Kredi kartı için ödeme bekleniyor.',
+                'data'   => ['ps' => $ps, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis, 'odemeForm' => $odemeForm]
+            ]);
     }
 
     function sepet_nav($order_id = null, $step)
