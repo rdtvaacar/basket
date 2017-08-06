@@ -49,16 +49,16 @@ class AcrSepetController extends Controller
 
     function admin_orders(Request $request)
     {
-        $sepet_model = new Sepet();
-        $orders      = $sepet_model->where('siparis', 1)->with([
+        $sepet_model                 = new Sepet();
+        $orders                      = $sepet_model->where('siparis', 1)->with([
             'user', 'products' => function ($query) {
                 $query->with('product');
             }
         ])->get();
         $acr_user_table_config_model = new Acr_user_table_conf();
-        $config       = $acr_user_table_config_model->first();
-        $email = $config->email;
-        return View('acr_ftr::acr_admin_orders', compact('orders','email'));
+        $config                      = $acr_user_table_config_model->first();
+        $email                       = $config->email;
+        return View('acr_ftr::acr_admin_orders', compact('orders', 'email'));
     }
 
     function create(Request $request, $product_id = null)
@@ -353,22 +353,31 @@ class AcrSepetController extends Controller
 
     function payment(Request $request)
     {
-        $adress_model = new AcrFtrAdress();
-        $sepet_model  = new Sepet();
-        $bank_model   = new Bank();
-        $order_id     = $request->input('order_id');
-        $order_id     = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
-        $adress_id    = $request->input('adress');
-        if (!empty($adress_id)) {
-            $adress_model->active_adress($adress_id);
-            $sepet_model->where('id', $order_id)->update(['adress_id' => $adress_id]);
-        }
+
+        $sepet_model = new Sepet();
+        $bank_model  = new Bank();
+        $order_id    = $request->input('order_id');
+        $order_id    = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $order_link  = empty($order_id) ? '' : '?order_id=' . $order_id;
+        $adress_id   = $request->input('adress');
+        self::adres_secimi_api($request, $adress_id);
+        $sepet_model->where('id', $order_id)->update(['adress_id' => $adress_id]);
         $order_input = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
         $banks       = $bank_model->where('active', 1)->where('sil', 0)->get();
         $sepet_nav   = self::sepet_nav($order_id, 3);
         return View('acr_ftr::card_payment', compact('sepet_nav', 'banks', 'order_link', 'order_input'));
 
+
+    }
+
+    function adres_secimi_api(Request $request, $adress_id)
+    {
+        $adress_id    = empty($adress_id) ? $request->adress_id : $adress_id;
+        $adress_model = new AcrFtrAdress();
+        if (!empty($adress_id)) {
+            $adress_model->active_adress($adress_id);
+        }
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres seçimi başarıyla yapıldı.', 'data' => null]);
 
     }
 
@@ -480,7 +489,7 @@ class AcrSepetController extends Controller
             ->json([
                 'status' => 1,
                 'title'  => 'Bilgi',
-                'msg'    => 'Sepet bilgileri çekiliyor.',
+                'msg'    => 'Siparişiniz  oluşturuldu ödeme bekleniyor.',
                 'data'   => ['ps' => $ps, 'bank' => $bank, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis]
             ]);
 

@@ -3,11 +3,9 @@
 namespace Acr\Ftr\Model;
 
 use Illuminate\Database\Eloquent\Model;
-use App\User;
 use Auth;
 use DB;
-use Acr\Ftr\Facades\AcrFtr;
-use Acr\Ftr\Model\Acrproduct;
+
 
 class Sepet extends Model
 
