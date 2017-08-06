@@ -377,7 +377,15 @@ class AcrSepetController extends Controller
         if (!empty($adress_id)) {
             $adress_model->active_adress($adress_id);
         }
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres aktif edildiı.', 'data' => null]);
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres aktif edildi.', 'data' => null]);
+
+    }
+
+    function adresses_api()
+    {
+        $adress_model = new AcrFtrAdress();
+        $adresses     = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres bilgileri çekiliyor.', 'data' => $adresses]);
 
     }
 
