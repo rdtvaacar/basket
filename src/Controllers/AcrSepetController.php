@@ -377,7 +377,7 @@ class AcrSepetController extends Controller
         if (!empty($adress_id)) {
             $adress_model->active_adress($adress_id);
         }
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres seçimi başarıyla yapıldı.', 'data' => null]);
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres aktif edildiı.', 'data' => null]);
 
     }
 
