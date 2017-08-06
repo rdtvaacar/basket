@@ -550,7 +550,7 @@ class AcrSepetController extends Controller
                 'status' => 1,
                 'title'  => 'Bilgi',
                 'msg'    => 'Kredi kartı için ödeme bekleniyor.',
-                'data'   => ['ps' => $ps, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis, 'odemeForm' => $odemeForm]
+                'data'   => ['ps' => $ps, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis]
             ]);
     }
 
