@@ -505,14 +505,15 @@ class AcrSepetController extends Controller
 
     function payment_bank_card(Request $request)
     {
-        $veri            = self::payment_bank_card_api($request);
-        $sepetController = new AcrSepetController();
-        $sepet_nav       = $veri->original['data']['sepet_nav'];
-        $siparis         = $veri->original['data']['siparis'];
-        $odemeForm       = $veri->original['data']['odemeForm'];
-        $ps              = $veri->original['data']['ps'];
-        $user_adress     = $veri->original['data']['user_adress'];
-        $company         = $veri->original['data']['company'];
+        $veri             = self::payment_bank_card_api($request);
+        $sepetController  = new AcrSepetController();
+        $sepet_nav        = $veri->original['data']['sepet_nav'];
+        $siparis          = $veri->original['data']['siparis'];
+        $ps               = $veri->original['data']['ps'];
+        $user_adress      = $veri->original['data']['user_adress'];
+        $company          = $veri->original['data']['company'];
+        $iyzicoController = new iyzicoController();
+        $odemeForm        = $iyzicoController->odemeForm(1, $siparis->price, $siparis->id);
         return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company', 'sepetController'));
 
     }
@@ -539,13 +540,11 @@ class AcrSepetController extends Controller
         if (empty($sepet_id)) {
             return redirect()->to('/acr/ftr/orders');
         }
-        $sepet_nav        = self::sepet_nav($sepet_id, 4);
-        $adress_model     = new AcrFtrAdress();
-        $user_adress      = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
-        $company_model    = new Company_conf();
-        $company          = $company_model->first();
-        $iyzicoController = new iyzicoController();
-        $odemeForm        = $iyzicoController->odemeForm(1, $price, $sepet_id);
+        $sepet_nav     = self::sepet_nav($sepet_id, 4);
+        $adress_model  = new AcrFtrAdress();
+        $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
+        $company_model = new Company_conf();
+        $company       = $company_model->first();
         return response()
             ->json([
                 'status' => 1,
