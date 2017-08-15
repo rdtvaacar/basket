@@ -164,6 +164,12 @@ class AcrFtrController extends Controller
                         $query->where('attributes.attribute_id', 0);
                         $query->where('attributes.sil', 0);
 
+                    },
+                    'files'      => function ($query) {
+                        $query->orderBy('id');
+                    },
+                    'file'       => function ($query) {
+                        $query->orderBy('id');
                     }
                 ]);
             },
@@ -175,7 +181,6 @@ class AcrFtrController extends Controller
         }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
         return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sistemdeki ürünler çekiliyor.', 'data' => ['products' => $products, 'sepet_counts' => $sepet_count]]);
-
     }
 
     function attribute_modal(Request $request)
@@ -213,6 +218,58 @@ class AcrFtrController extends Controller
         if (!empty($attribute->link)) {
             $row .= '<a href="' . $attribute->link . '" type="button" class="btn btn-primary">Detaylı İncele</a>';
         }
+        $row .= '</div>';
+        $row .= '</div>';
+        return $row;
+    }
+
+    function image_modal(Request $request)
+    {
+        $product_model = new Acrproduct();
+        $product_id    = $request->product_id;
+        $image_id      = $request->image_id;
+        $product       = $product_model->with([
+            'product' => function ($query) {
+                $query->with([
+                    'files' => function ($query) {
+                        $query->orderBy('id');
+                    }
+                ]);
+
+            }
+        ])->where('product_id', $product_id)->first();
+        $row           = '<div class="modal-header">';
+        $row           .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="/icon/close.png"></span></button>';
+        $row           .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $product->product->product_name . '</h4>';
+        $row           .= '</div>';
+        $row           .= '<div class="modal-body">';
+
+        foreach ($product->product->files as $file) {
+            $file_ids[]        = $file->id;
+            $images[$file->id] = '<img style="margin :2px; width:100%;  cursor:pointer;" class="img-thumbnail" src="http://eticaret.webuldum.com/acr_files/' . $file->acr_file_id . '/' . $file->file_name . '.' . $file->file_type . '">';
+        }
+        if (empty($image_id)) {
+            $row     .= $images[$file_ids[0]];
+            $img_key = 0;
+        } else {
+            $img_key = array_search($image_id, $file_ids);
+            $row     .= $images[$file_ids[$img_key]];
+
+        }
+        if (count($file_ids) > 0) {
+            if (count($file_ids) > $img_key + 1) {
+                $next_id = $file_ids[$img_key + 1];
+                $row     .= '<img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $next_id . ')" src="/icon/right-arrow.png"/>';
+            }
+            if ($img_key > 0) {
+                $pre_id = $file_ids[$img_key - 1];
+                $row    .= '<img style="position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $pre_id . ')" src="/icon/left-arrow.png"/>';
+            }
+        }
+
+        $row .= '</ul>';
+        $row .= '<div class="modal-footer">';
+        $row .= '<button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>';
         $row .= '</div>';
         $row .= '</div>';
         return $row;

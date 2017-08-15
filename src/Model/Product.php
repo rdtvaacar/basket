@@ -31,4 +31,16 @@ class Product extends Model
     {
         return $this->hasOne('Acr\Ftr\Model\Acrproduct');
     }
+
+    function files()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_file', 'acr_file_id', 'acr_file_id');
+
+    }
+
+    function file()
+    {
+        return $this->hasOne('Acr\Ftr\Model\Product_file', 'acr_file_id', 'acr_file_id');
+
+    }
 }

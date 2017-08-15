@@ -275,6 +275,13 @@
                             <div class="col-md-3">
                                 <div class="price-col2">
                                     <div class="title-2"><?php echo $product->product->product_name; ?></div>
+                                    <div class="col-md-12" style="text-align: center;">
+                                        @if(!empty($product->product->file))
+                                            <img class="img-rounded" style="cursor:pointer; margin-top: 10px;" onclick="image_viewer({{$product->product->id,$product->product->file->id}})"
+                                                 src="https://eticaret.webuldum.com/acr_files/{{$product->product->file->acr_file_id}}/thumbnail/{{$product->product->file->file_name}}.{{$product->product->file->file_type}}"/>
+                                            <hr style="padding: 0;">
+                                        @endif
+                                    </div>
                                     <ul class="peice-list">
                                         <?php  //dd($product->attributes);
                                         foreach ($product->product->attributes as $attribute) { ?>
@@ -321,7 +328,13 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div id="imageModal_div"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -409,6 +422,19 @@
                 }
             });
         }
+
+        function image_viewer(product_id, image_id) {
+            $.ajax({
+                type   : 'post',
+                url    : '/acr/ftr/product/image/modal',
+                data   : 'product_id=' + product_id + '&image_id=' + image_id,
+                success: function (veri) {
+                    $('#imageModal').modal('show');
+                    $('#imageModal_div').html(veri);
+                }
+            });
+        }
+
         function sepet_delete_all() {
             $.ajax({
                 type   : 'post',
