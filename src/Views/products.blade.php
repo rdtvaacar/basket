@@ -331,7 +331,7 @@
                         <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                             <div class="modal-dialog modal-lg" role="document">
                                 <div class="modal-content">
-                                    <div id="imageModal_div"></div>
+                                    <div style="text-align: center;" id="imageModal_div"></div>
                                 </div>
                             </div>
                         </div>
