@@ -246,7 +246,7 @@ class AcrFtrController extends Controller
 
         foreach ($product->product->files as $file) {
             $file_ids[]        = $file->id;
-            $images[$file->id] = '<img style="margin :2px; width:100%;  cursor:pointer;" class="img-thumbnail" src="http://eticaret.webuldum.com/acr_files/' . $file->acr_file_id . '/' . $file->file_name . '.' . $file->file_type . '">';
+            $images[$file->id] = '<img style="margin :2px; max-width:100%;  cursor:pointer;" class="img-thumbnail" src="http://eticaret.webuldum.com/acr_files/' . $file->acr_file_id . '/' . $file->file_name . '.' . $file->file_type . '">';
         }
         if (empty($image_id)) {
             $row     .= $images[$file_ids[0]];
