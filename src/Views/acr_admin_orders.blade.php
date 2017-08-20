@@ -12,8 +12,8 @@
                         <table width="100%" id="data_table" class="table table-striped">
                             <thead>
                             <tr>
-
-                                <th>Sipariş NO:</th>
+                                <th>Son Güncelleme</th>
+                                <th>S. NO</th>
                                 <th>UserID</th>
                                 <th>Email</th>
                                 <th>Ürünler</th>
@@ -32,6 +32,7 @@
 ' : '<span style="color:  #357c14;"> ÖDENDİ</span>';
                             ?>
                             <tr>
+                                <td>{{$order->updated_at}}</td>
                                 <td>{{$order->id}}</td>
                                 <td>{{$order->user->id}}</td>
                                 <td>{{$order->user->name}}<br>

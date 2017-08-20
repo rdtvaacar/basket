@@ -28,6 +28,15 @@ class AcrFtrController extends Controller
         return View('acr_ftr::anasayfa');
     }
 
+    function sales_invoices()
+    {
+        $parasut = new ParasutController();
+        $orders  = $parasut->sales_invoices();
+        $orders  = (Object)$orders;
+        return View('acr_ftr::admin_sales_incoices', compact('orders'));
+    }
+
+
     function product_search($search)
     {
         $product_model = new Product();

@@ -4,6 +4,7 @@ namespace Acr\Ftr\Controllers;
 
 use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Controllers\Parasut\Client;
+use Illuminate\Http\Request;
 
 class ParasutController
 {
@@ -27,9 +28,9 @@ class ParasutController
         $parasut->authorize();
         $this->token      = $parasut;
         $this->account_id = self::account_id();
-     /*   if ($parasut_conf->account_id != $parasut_conf->account_id) {
-            $parasut_model->where('id', $parasut_conf->id)->update(['account_id' => $])
-        }*/
+        /*   if ($parasut_conf->account_id != $parasut_conf->account_id) {
+               $parasut_model->where('id', $parasut_conf->id)->update(['account_id' => $])
+           }*/
     }
 
     function contact($data)
@@ -125,4 +126,15 @@ class ParasutController
         $this->token->make('sale')->paid($invoice_id, $data);
     }
 
+    function sales_invoices()
+    {
+        return $this->token->make('sale')->get();
+
+    }
+
+    function sales_invoice_delete(Request $request)
+    {
+        return $this->token->make('sale')->delete($request->id);
+
+    }
 }

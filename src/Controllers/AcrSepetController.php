@@ -720,7 +720,6 @@ class AcrSepetController extends Controller
         self::adress_create_api($request);
         return Redirect()->back();
 
-
     }
 
     function adress_create_api(Request $request)
