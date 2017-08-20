@@ -31,12 +31,15 @@ class Sale extends Bundle
      * @param  string|null $lastSynch
      * @return array
      */
-    public function get($page = 1, $limit = 100, $lastSynch = null)
+    public function get($page = 1, $limit = 100, $lastSynch = '')
     {
+        if (empty($lastSynch)) {
+            $lastSynch = date('Y-m-1');
+        }
         return $this->client->call("sales_invoices", [
             'page'       => $page,
             'per_page'   => $limit,
-            'last_synch' => date('Y-m-1'),
+            'last_synch' => $lastSynch
         ], 'GET');
     }
 

@@ -21,6 +21,7 @@
                                 <th>Fiyat</th>
                                 <th>Oluşturma Tarihi</th>
                                 <th>Ödeme Sonucu</th>
+                                <th>FAT</th>
                                 <th>Sipariş Onayla</th>
                             </tr>
                             </thead>
@@ -58,6 +59,7 @@
                                 <td>{{$order->price}}</td>
                                 <td>{{$order->created_at}}</td>
                                 <td><?php echo $order_result?></td>
+                                <td></td>
                                 <td><input onclick="order_active(<?php echo $order->id; ?>)" id="order_input_{{$order->id}}"
                                            <?php  echo $order->active == 1 ? 'checked' : 0; ?> style="width: 32px; height: 32px; cursor:pointer;"
                                            name="siparis"

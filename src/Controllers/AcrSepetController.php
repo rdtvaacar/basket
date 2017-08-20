@@ -28,9 +28,10 @@ class AcrSepetController extends Controller
 
     function __construct()
     {
-        $conf_table_model  = new Acr_user_table_conf();
-        $conf_table        = $conf_table_model->first();
-        $this->config_name = $conf_table->name;
+        $conf_table_model   = new Acr_user_table_conf();
+        $conf_table         = $conf_table_model->first();
+        $this->config_name  = $conf_table->name;
+        $this->config_email = $conf_table->email;
     }
 
     function index()
@@ -840,6 +841,7 @@ class AcrSepetController extends Controller
             'category_id'               => null,
             'city'                      => $adress_row->city->name,
             'district'                  => $adress_row->county->name,
+            'email'                     => $this->config_email,
             'address_attributes'        => [
                 'address' => $adress_row->adress,
                 'phone'   => $adress_row->tel,
