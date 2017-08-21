@@ -884,7 +884,6 @@ class AcrSepetController extends Controller
                 $parasut_contact_id = $parasut->contact($parasut_contact);
                 $adress->parasut_id = $parasut_contact_id;
                 $adress->save();
-
             } else {
                 $parasut_contact_id = $adress_row->parasut_id;
             }
@@ -910,7 +909,6 @@ class AcrSepetController extends Controller
                 'archived'           => null,
                 'issue_date'         => date('Y-m-d'),
                 'details_attributes' => $parasut_product_data,
-
             ];
             $invoice           = $parasut->sale($parasut_sale_data);
             //  dd($invoice_id);
@@ -922,8 +920,6 @@ class AcrSepetController extends Controller
                 "exchange_rate" => "1.0"
             ];*/
             /*@$parasut->paid($invoice->id, $payment_data);*/
-
-
             $e_arsiv = [
                 // "note"                      => "Fatura notu",
                 "to"       => "urn=>mail=>",
@@ -932,7 +928,6 @@ class AcrSepetController extends Controller
             // $parasut->e_arsiv($invoice->id, $e_arsiv);
         }
         return $market_controller->order_result(null, $order_id);
-
     }
 
     function invers_son_aktif_tarih($ay = null, $lisans_bitis)
