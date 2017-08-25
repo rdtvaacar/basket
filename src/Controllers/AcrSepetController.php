@@ -891,7 +891,7 @@ class AcrSepetController extends Controller
             $orders = $ps_model->where('sepet_id', $order_id)->with('product', 'acr_product', 'sepet')->get();
             foreach ($orders as $order) {
 
-                if (empty($order->product->collective)) {
+                if (empty($order->product->collection)) {
                     $kdv                    = $order->product->kdv;
                     $fiyat                  = round((((self::sepet_total_price($order->id) * ((100) / (100 + $kdv)))) / $order->adet), 4);
                     $parasut_product_data[] = [
@@ -905,8 +905,8 @@ class AcrSepetController extends Controller
                     ];
                     $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
                 } else {
-                    $kdv                    = $order->product->collective_kdv;
-                    $fiyat                  = round(((($order->product->collective * ((100) / (100 + $kdv)))) / $order->adet), 4);
+                    $kdv                    = $order->product->collection_kdv;
+                    $fiyat                  = round(((($order->product->collection * ((100) / (100 + $kdv)))) / $order->adet), 4);
                     $parasut_product_data[] = [
                         'product_id'    => $order->acr_product->parasut_id, // the parasut products
                         'quantity'      => $order->adet,
