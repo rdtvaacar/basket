@@ -866,7 +866,7 @@ class AcrSepetController extends Controller
         self::orders_active(null, $order_id);
     }
 
-    function orders_active(Request $request = null, $order_id = null)
+    function orders_active(Request $request = null, $order_id = null, my $my = null)
     {
         $parasut           = new ParasutController();
         $order_id          = empty($order_id) ? $request->input('order_id') : $order_id;
@@ -946,6 +946,13 @@ class AcrSepetController extends Controller
             ];
             // $parasut->e_arsiv($invoice->id, $e_arsiv);
         }
+        $company_model = new Company_conf();
+        $company       = $company_model->first();
+        $mesaj = 'Ödeme Bilgileri<br>';
+        $mesaj .= $adress_row->invoice_name . '<br>';
+        $mesaj .= $adress_row->tel . '<br>';
+        $mesaj .= $fiyat . '₺';
+        $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'market.odeme', $mesaj);
         return $market_controller->order_result(null, $order_id);
     }
 
