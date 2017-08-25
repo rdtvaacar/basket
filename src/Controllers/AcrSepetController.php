@@ -952,7 +952,7 @@ class AcrSepetController extends Controller
         $mesaj .= $adress_row->invoice_name . '<br>';
         $mesaj .= $adress_row->tel . '<br>';
         $mesaj .= $fiyat . '₺';
-        $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'market.odeme', $mesaj);
+        $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
         return $market_controller->order_result(null, $order_id);
     }
 
