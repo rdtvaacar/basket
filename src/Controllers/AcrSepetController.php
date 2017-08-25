@@ -833,6 +833,7 @@ class AcrSepetController extends Controller
             $invoice_name = $adress_row->company;
             $contact_name = $adress_row->invoice_name;
         }
+        $user_email      = $this->config_email;
         $parasut_contact = [
             'name'                      => $invoice_name,
             'contact_type'              => $contact_type,
@@ -841,7 +842,7 @@ class AcrSepetController extends Controller
             'category_id'               => null,
             'city'                      => $adress_row->city->name,
             'district'                  => $adress_row->county->name,
-            'email'                     => $this->config_email,
+            'email'                     => Auth::user()->$user_email,
             'address_attributes'        => [
                 'address' => $adress_row->adress,
                 'phone'   => $adress_row->tel,
