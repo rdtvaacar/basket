@@ -10,6 +10,7 @@ use Acr\Ftr\Model\County;
 use Acr\Ftr\Model\Product_sepet;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\City;
+use App\Handlers\Commands\my;
 use App\Http\Controllers\MarketController;
 use Auth;
 use Illuminate\Http\Request;
@@ -866,7 +867,7 @@ class AcrSepetController extends Controller
         self::orders_active(null, $order_id);
     }
 
-    function orders_active(Request $request = null, $order_id = null, my $my = null)
+    function orders_active(Request $request = null, $order_id = null)
     {
         $parasut           = new ParasutController();
         $order_id          = empty($order_id) ? $request->input('order_id') : $order_id;
@@ -891,9 +892,11 @@ class AcrSepetController extends Controller
             $orders = $ps_model->where('sepet_id', $order_id)->with('product', 'acr_product', 'sepet')->get();
             foreach ($orders as $order) {
 
+                $urun_names [] = $order->product->product_name;
                 if (empty($order->product->collection)) {
                     $kdv                    = $order->product->kdv;
-                    $fiyat                  = round((((self::sepet_total_price($order->id) * ((100) / (100 + $kdv)))) / $order->adet), 4);
+                    $ps_price               = self::sepet_total_price($order->id);
+                    $fiyat                  = round(((($ps_price * ((100) / (100 + $kdv)))) / $order->adet), 4);
                     $parasut_product_data[] = [
                         'product_id'    => $order->acr_product->parasut_id, // the parasut products
                         'quantity'      => $order->adet,
@@ -920,6 +923,8 @@ class AcrSepetController extends Controller
                 }
 
             }
+
+
             $parasut_sale_data = [
                 'description'        => $adress_row->invoice_name,
                 'item_type'          => 'invoice',
@@ -928,17 +933,18 @@ class AcrSepetController extends Controller
                 'archived'           => null,
                 'issue_date'         => date('Y-m-d'),
                 'details_attributes' => $parasut_product_data,
+                'total_paid'         => $sepet_row->price
             ];
             $invoice           = $parasut->sale($parasut_sale_data);
             //  dd($invoice_id);
-            $payment_data = [
-                "amount"        => $fiyat,
-                "date"          => date('Y-m-d'),
-                // "description"   => "Açıklama",
-                "account_id"    => $parasut->account_id,
-                "exchange_rate" => "1.0"
-            ];
-            @$parasut->paid($invoice->id, $payment_data);
+            /* $payment_data = [
+                 "amount"        => $sepet_row->price - 0.001,
+                 "date"          => date('Y-m-d'),
+                 // "description"   => "Açıklama",
+                 "account_id"    => $parasut->account_id,
+                 "exchange_rate" => "1.0"
+             ];
+             @$parasut->paid($invoice->id, $payment_data);*/
             $e_arsiv = [
                 // "note"                      => "Fatura notu",
                 "to"       => "urn=>mail=>",
@@ -948,10 +954,17 @@ class AcrSepetController extends Controller
         }
         $company_model = new Company_conf();
         $company       = $company_model->first();
-        $mesaj = 'Ödeme Bilgileri<br>';
-        $mesaj .= $adress_row->invoice_name . '<br>';
-        $mesaj .= $adress_row->tel . '<br>';
-        $mesaj .= $fiyat . '₺';
+        $mesaj         = 'Ödeme Bilgileri<br>';
+        $mesaj         .= $adress_row->invoice_name . '<br>';
+        $mesaj         .= $adress_row->tel . '<br>';
+        $mesaj         .= 'Ürünler : ';
+
+        foreach ($urun_names as $urun_name) {
+            $mesaj .= $urun_name . ',';
+        }
+        $mesaj .= '<br>';
+        $mesaj .= $sepet_row->price . '₺';
+        $my    = new my();
         $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
         return $market_controller->order_result(null, $order_id);
     }
