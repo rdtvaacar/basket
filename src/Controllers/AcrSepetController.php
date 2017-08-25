@@ -890,17 +890,35 @@ class AcrSepetController extends Controller
             }
             $orders = $ps_model->where('sepet_id', $order_id)->with('product', 'acr_product', 'sepet')->get();
             foreach ($orders as $order) {
-                $fiyat                  = round((((self::sepet_total_price($order->id) * ((100) / 118))) / $order->adet), 4);
-                $parasut_product_data[] = [
-                    'product_id'    => $order->acr_product->parasut_id, // the parasut products
-                    'quantity'      => $order->adet,
-                    'unit_price'    => $fiyat,
-                    'discount'      => round($order->product->price * $order->sepet->dis_rate, 4),
-                    'vat_rate'      => $order->product->kdv,
-                    'discount_type' => 'amount',
-                    'discount_rate' => $order->sepet->dis_rate,
-                ];
-                $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $order->product->kdv;
+
+                if (empty($order->product->collective)) {
+                    $kdv                    = $order->product->kdv;
+                    $fiyat                  = round((((self::sepet_total_price($order->id) * ((100) / (100 + $kdv)))) / $order->adet), 4);
+                    $parasut_product_data[] = [
+                        'product_id'    => $order->acr_product->parasut_id, // the parasut products
+                        'quantity'      => $order->adet,
+                        'unit_price'    => $fiyat,
+                        'discount'      => round($order->product->price * $order->sepet->dis_rate, 4),
+                        'vat_rate'      => $kdv,
+                        'discount_type' => 'amount',
+                        'discount_rate' => $order->sepet->dis_rate,
+                    ];
+                    $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
+                } else {
+                    $kdv                    = $order->product->collective_kdv;
+                    $fiyat                  = round(((($order->product->collective * ((100) / (100 + $kdv)))) / $order->adet), 4);
+                    $parasut_product_data[] = [
+                        'product_id'    => $order->acr_product->parasut_id, // the parasut products
+                        'quantity'      => $order->adet,
+                        'unit_price'    => $fiyat,
+                        'discount'      => 0,
+                        'vat_rate'      => $kdv,
+                        'discount_type' => 'amount',
+                        'discount_rate' => 0,
+                    ];
+                    $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
+                }
+
             }
             $parasut_sale_data = [
                 'description'        => $adress_row->invoice_name,
@@ -913,14 +931,14 @@ class AcrSepetController extends Controller
             ];
             $invoice           = $parasut->sale($parasut_sale_data);
             //  dd($invoice_id);
-            /*$payment_data = [
-                "amount"        => 60,
+            $payment_data = [
+                "amount"        => $fiyat,
                 "date"          => date('Y-m-d'),
                 // "description"   => "Açıklama",
                 "account_id"    => $parasut->account_id,
                 "exchange_rate" => "1.0"
-            ];*/
-            /*@$parasut->paid($invoice->id, $payment_data);*/
+            ];
+            @$parasut->paid($invoice->id, $payment_data);
             $e_arsiv = [
                 // "note"                      => "Fatura notu",
                 "to"       => "urn=>mail=>",
