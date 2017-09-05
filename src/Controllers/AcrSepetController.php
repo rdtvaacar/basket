@@ -864,10 +864,10 @@ class AcrSepetController extends Controller
         $order_id    = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model = new Sepet();
         $sepet_model->where('id', $order_id)->update(['order_result' => 2]);
-        self::orders_active(null, $order_id);
+        self::orders_active(null, $order_id, 1);
     }
 
-    function orders_active(Request $request = null, $order_id = null)
+    function orders_active(Request $request = null, $order_id = null, $admin = null)
     {
         $parasut           = new ParasutController();
         $order_id          = empty($order_id) ? $request->input('order_id') : $order_id;
@@ -965,7 +965,9 @@ class AcrSepetController extends Controller
         $mesaj .= '<br>';
         $mesaj .= $sepet_row->price . '₺';
         $my    = new my();
-        $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
+        if ($admin != 1) {
+            $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
+        }
         return $market_controller->order_result(null, $order_id);
     }
 
