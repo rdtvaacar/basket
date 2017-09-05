@@ -226,6 +226,8 @@ class AcrSepetController extends Controller
         $veri        = '';
         $total_price = [];
         foreach ($products as $product) {
+            $ay_baz    = 7 < date('n') ? 7 - date('n') : 19 - date('n');
+            $ay_lisans = $product->created_at == $product->updated_at ? $ay_baz : $product->lisans_ay;
             $sepet_id  = $product->sepet_id;
             $price     = $product->product->price * $product->adet * $product->lisans_ay;
             $dis_price = self::price_set($product);
@@ -245,7 +247,7 @@ class AcrSepetController extends Controller
                 $veri .= '<div class="col-md-6 col-xs-12">
 <div class="col-md-6 col-xs-12">Kaç Aylık</div>
                             <div class="col-md-6 col-xs-12">
-                            <input size="3" class="form-control" onchange="sepet_adet_guncelle(' . $product->id . ')"  onkeyup="sepet_lisans_ay_guncelle(' . $product->id . ')"  style="width: 70px;"   id="sepet_lisans_ay_' . $product->id . '" value="' . $product->lisans_ay . '"/> 
+                            <input size="3" class="form-control" onchange="sepet_lisans_ay_guncelle(' . $product->id . ')"  onkeyup="sepet_lisans_ay_guncelle(' . $product->id . ')"  style="width: 70px;"   id="sepet_lisans_ay_' . $product->id . '" value="' . $ay_lisans . '"/> 
                             </div>
                             </div>';
             }
