@@ -226,7 +226,7 @@ class AcrSepetController extends Controller
         $veri        = '';
         $total_price = [];
         foreach ($products as $product) {
-            $ay_baz    = 7 < date('n') ? 7 - date('n') : 19 - date('n');
+            $ay_baz    = 7 > date('n') ? 7 - date('n') : 19 - date('n');
             $ay_lisans = $product->created_at == $product->updated_at ? $ay_baz : $product->lisans_ay;
             $sepet_id  = $product->sepet_id;
             $price     = $product->product->price * $product->adet * $product->lisans_ay;
