@@ -271,8 +271,8 @@
                         <div class="price-table">
                             <?php
                             //  dd($products);
-                            foreach ($products as $product) { ?>
-                            <div class="col-md-3">
+                            foreach ($products as $key =>$product) { ?>
+                            <div class="col-md-4">
                                 <div class="price-col2">
                                     <div class="title-2"><?php echo $product->product->product_name; ?></div>
                                     <div class="col-md-12" style="text-align: center;">
@@ -316,7 +316,9 @@
                                     </ul>
                                 </div>
                             </div>
-
+                            @if(($key+1)%3 == 0)
+                                <div style="clear:both;"></div>
+                            @endif
                             <?php }
 
                             ?>
