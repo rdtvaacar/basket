@@ -895,7 +895,7 @@ class AcrSepetController extends Controller
             foreach ($orders as $order) {
 
                 $urun_names [] = $order->product->product_name;
-                if (empty($order->product->collection)) {
+                if (empty($order->product->collection) || $order->product->collection == '0.00') {
                     $kdv                    = $order->product->kdv;
                     $ps_price               = self::sepet_total_price($order->id);
                     $fiyat                  = round(((($ps_price * ((100) / (100 + $kdv)))) / $order->adet), 4);
