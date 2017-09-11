@@ -53,21 +53,16 @@ Route::group(['middleware' => ['web']], function () {
                 Route::post('/product/delete', 'AcrFtrController@delete_product');
                 Route::get('/config', 'AcrFtrController@config');
                 Route::post('/config/company/conf/update', 'AcrFtrController@company_conf_update');
-
-
                 Route::post('/bank/create', 'AcrFtrController@bank_create');
                 Route::post('/bank/edit', 'AcrFtrController@bank_edit');
                 Route::post('/bank/delete', 'AcrFtrController@bank_delete');
                 Route::post('/bank/active', 'AcrFtrController@active_bank');
                 Route::post('/bank/deactive', 'AcrFtrController@deactive_bank');
-
                 Route::post('/config/user_table_update', 'AcrFtrController@user_table_update');
                 Route::post('/config/parasut/conf/update', 'AcrFtrController@parasut_conf_update');
                 Route::post('/config/iyzico/update', 'AcrFtrController@iyzico_update');
-
                 Route::get('/admin/sales_invoices', 'AcrFtrController@sales_invoices');
                 Route::delete('/admin/sales_invoices', 'ParasutController@sales_invoice_delete');
-
                 Route::get('/admin/orders', 'AcrSepetController@admin_orders');
                 Route::post('/order/active/admin', 'AcrSepetController@orders_active_admin');
                 Route::post('/order/deactive', 'AcrSepetController@orders_deactive');

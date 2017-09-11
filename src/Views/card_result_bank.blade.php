@@ -57,7 +57,7 @@
                     <tr>
                         <th>Sira</th>
                         <th>Product</th>
-                        <th>Ürün No #</th>
+                        <th>Ürün No#</th>
                         <th>Adet</th>
                         <th>Ay</th>
                         <th>Birim Fiyatı</th>
