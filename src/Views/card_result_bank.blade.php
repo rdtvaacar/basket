@@ -20,11 +20,11 @@
             <div class="col-sm-5 invoice-col">
                 Satıcı
                 <address>
-                    <strong>{{$company->name}}</strong><br>
-                    {{$company->adress}}<br>
-                    {{$company->county}} / {{$company->city}}<br>
-                    Phone: {{$company->tel}}<br>
-                    Email: {{$company->email}}
+                    <strong>{{@$company->name}}</strong><br>
+                    {{@$company->adress}}<br>
+                    {{@$company->county}} / {{@$company->city}}<br>
+                    Phone: {{@$company->tel}}<br>
+                    Email: {{@$company->email}}
                 </address>
             </div>
             <!-- /.col -->
@@ -32,9 +32,9 @@
                 Alıcı
                 <address>
                     <strong>{{$user_adress->type ==2 ? @$user_adress->company:@$user_adress->invoice_name}}</strong><br>
-                    {{$user_adress->adress}}<br>
-                    {{$user_adress->county->name}} / {{$user_adress->city->name}}<br>
-                    Telefon: {{$user_adress->tel}}<br>
+                    {{@$user_adress->adress}}<br>
+                    {{@$user_adress->county->name}} / {{@$user_adress->city->name}}<br>
+                    Telefon: {{@$user_adress->tel}}<br>
                     Email: {{Auth::user()->email}}
                 </address>
             </div>
