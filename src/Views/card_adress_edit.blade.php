@@ -10,10 +10,18 @@
                 <?php echo $sepet_nav ?>
                 <div class="box box-warning" style="width: 100%; right:0; top: 60px; position: absolute; z-index: 1; ">
                     <div class="box-header with-border">TESLİMAT BİLGİLERİ
-                        <button style="float: right;" data-toggle="modal" data-target="#myModal" class="btn btn-success">YENİ ADRES EKLE</button>
+                        <button style="float: right;" data-toggle="modal" data-target="#myModal"
+                                class="btn btn-success">YENİ ADRES EKLE
+                        </button>
                     </div>
                     <div class="box-body">
                         <?php echo $adres_form ?>
+                    </div>
+                    <div style="clear: both;"></div>
+                    <br><br>
+                    <div style="font-size:9pt;">
+                        NOT: Vergi usul kanununa göre kişisel bilgileriniz vergilendirme için
+                        kullanılacak olup kesinlikle 3. kişilerle paylaşılmayacaktır.
                     </div>
                 </div>
             </div>
@@ -25,28 +33,29 @@
     <script>
         $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
             checkboxClass: 'icheckbox_minimal-blue',
-            radioClass   : 'iradio_minimal-blue'
+            radioClass: 'iradio_minimal-blue'
         });
         //Red color scheme for iCheck
         $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
             checkboxClass: 'icheckbox_minimal-red',
-            radioClass   : 'iradio_minimal-red'
+            radioClass: 'iradio_minimal-red'
         });
         //Flat red color scheme for iCheck
         $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
             checkboxClass: 'icheckbox_flat-green',
-            radioClass   : 'iradio_flat-green'
+            radioClass: 'iradio_flat-green'
         });
 
         $('#city').change(function () {
             city_id = $(this).val();
             county_get(city_id);
         });
+
         function county_get(city_id) {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/card/adress/county',
-                data   : 'city_id=' + city_id,
+                type: 'post',
+                url: '/acr/ftr/card/adress/county',
+                data: 'city_id=' + city_id,
                 success: function (veri) {
                     $('#county').html(veri);
                 }
