@@ -23,6 +23,7 @@
                         NOT: Vergi usul kanununa göre kişisel bilgileriniz vergilendirme için
                         kullanılacak olup kesinlikle 3. kişilerle paylaşılmayacaktır.
                     </div>
+
                 </div>
             </div>
         </div>
