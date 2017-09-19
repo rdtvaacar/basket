@@ -16,12 +16,7 @@
                     </div>
                     <div class="box-body">
                         <?php echo $adres_form ?>
-                        <div style="clear: both;"></div>
-                        <br><br>
-                        <div style="font-size:10pt; text-align: center;" class="alert alert-info;">
-                            NOT: Vergi usul kanununa göre kişisel bilgileriniz vergilendirme için
-                            kullanılacak olup kesinlikle 3. kişilerle paylaşılmayacaktır.
-                        </div>
+
                     </div>
                 </div>
             </div>
