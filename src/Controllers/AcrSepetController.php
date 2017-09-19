@@ -968,6 +968,7 @@ class AcrSepetController extends Controller
                 'archived'           => null,
                 'issue_date'         => date('Y-m-d'),
                 'details_attributes' => $parasut_product_data,
+                'total_paid'         => $sepet_row->price,
                 'payment_status'     => 'paid'
             ];
             $invoice = $parasut->sale($parasut_sale_data);
