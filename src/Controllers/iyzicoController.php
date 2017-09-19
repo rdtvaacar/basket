@@ -89,7 +89,7 @@ class iyzicoController extends Controller
         $buyer->setName($ad);
         $buyer->setSurname($ad);
         $buyer->setGsmNumber(Auth::user()->tel);
-        $buyer->setEmail(Auth::user()->$email);
+        $buyer->setEmail(trim(Auth::user()->$email));
         $buyer->setIdentityNumber(rand(10000000000, 99999999999));
         $buyer->setLastLoginDate(date('Y-m-d H:i:s', strtotime(Auth::user()->updated_at)));
         $buyer->setRegistrationDate(date('Y-m-d H:i:s', strtotime(Auth::user()->created_at)));
