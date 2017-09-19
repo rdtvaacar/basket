@@ -9,6 +9,7 @@ use Acr\Ftr\Model\AcrFtrIyzico;
 use Acr\Ftr\Model\Acrproduct;
 use Acr\Ftr\Model\Bank;
 use Acr\Ftr\Model\Company_conf;
+use Acr\Ftr\Model\Fatura;
 use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\AcrFtrAttribute;
@@ -21,6 +22,41 @@ use Auth;
 
 class AcrFtrController extends Controller
 {
+
+    function admin_sales_incoices(Request $request, my $my)
+    {
+        $fatura_model = new Fatura();
+        /*
+                $eski_sipas_model = new Eski_faturalar();
+        $eski_siparisler  = $eski_sipas_model->where('fatura_tarihDamga', '>', strtotime('2017-06-31'))->get();
+          foreach ($eski_siparisler as $siparis) {
+              $siparisler[] = [
+                  'tur'       => $siparis->siparis,
+                  'tarih'     => date('Y-09-d', $siparis->fatura_tarihDamga),
+                  'user_id'   => $siparis->uyeID,
+                  'ad'        => $siparis->fatura_ad,
+                  'adres'     => $siparis->fatura_adres,
+                  'tel'       => $siparis->fatura_tel,
+                  'vd'        => $siparis->fatura_vd,
+                  'vn'        => $siparis->fatura_vn,
+                  'dt'        => $siparis->fatura_dt,
+                  'ds'        => $siparis->fatura_ds,
+                  'cinsi'     => $siparis->fatura_cinsi,
+                  'adet'      => $siparis->fatura_urunAdedi,
+                  'fiyat'     => $siparis->fatura_fiyat,
+                  'odeme'     => $siparis->odeme,
+                  'fiyat_yazi' => $siparis->fatura_fiyatYazi
+              ];
+          }
+          $fatura_model->insert($siparisler);
+          exit();*/
+        $orders = $fatura_model->get();
+        dd($orders);
+        return View('admin.acr_admin_invoices', compact('orders', 'my'));
+    }
+
+
+
     function index()
     {
         $user_model = new AcrUser();
@@ -35,7 +71,6 @@ class AcrFtrController extends Controller
         $orders  = (Object)$orders;
         return View('acr_ftr::admin_sales_incoices', compact('orders'));
     }
-
 
     function product_search($search)
     {

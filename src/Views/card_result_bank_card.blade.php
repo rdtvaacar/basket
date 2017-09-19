@@ -39,7 +39,7 @@
                             <div class="col-sm-5 invoice-col">
                                 Alıcı
                                 <address>
-                                    <strong>{{$user_adress->type ==2 ? $user_adress->company:$user_adress->invoice_name}}</strong><br>
+                                    <strong>{{@$user_adress->type ==2 ? $user_adress->company:$user_adress->invoice_name}}</strong><br>
                                     {{@$user_adress->adress}}<br>
                                     {{@$user_adress->county->name}} / {{@$user_adress->city->name}}<br>
                                     Telefon: {{$user_adress->tel}}<br>
@@ -79,7 +79,7 @@
                                     @foreach($ps as $key=> $pss)
                                         <?php
                                         $toplam = $sepetController->price_set($pss);
-                                        $tKdv = $toplam * $pss->product->kdv / 100;
+                                        $tKdv = $toplam / (1 + $pss->product->kdv / 100);
                                         $toplamKdv[] = $tKdv;
                                         $araToplam[] = $toplam - $tKdv;
 
