@@ -14,10 +14,10 @@
                             <tr>
                                 <th>Son Güncelleme</th>
                                 <th>SI. NO</th>
-                                <th>UserID</th>
-                                <th>Email</th>
+                                <th>Fatura İsmi</th>
+                                <th>User_id</th>
+                                <th>User</th>
                                 <th>Ürünler</th>
-
                                 <th>Fiyat</th>
                                 <th>Oluşturma Tarihi</th>
                             </tr>
@@ -25,10 +25,10 @@
 
                             </thead>
                             <tbody id="sepet_tbody">
-                            @foreach ($faturalar as $fatura)
+                            @foreach ($faturalar as $key=> $fatura)
                                 <tr>
                                     <td>{{$fatura->updated_at}}</td>
-                                    <td>{{$fatura->id}}</td>
+                                    <td>{{$key+1}}</td>
                                     <td>{{$fatura->invoice_name}}</td>
                                     <td>{{$fatura->user->id}}</td>
                                     <td>{{$fatura->user->name}}<br>
@@ -57,7 +57,7 @@
                                             {{$fatura->cinsi}}
                                         @endif
                                     </td>
-                                    <td>{{$fatura->price}}</td>
+                                    <td>{{$fatura->fiyat}}</td>
                                     <td>{{$fatura->created_at}}</td>
                                 </tr>
                             @endforeach
