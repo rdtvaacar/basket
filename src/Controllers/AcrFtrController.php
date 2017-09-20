@@ -19,39 +19,62 @@ use Illuminate\Routing\Controller;
 use Acr\Ftr\Model\File_model;
 use Acr\Ftr\Model\File_dosya_model;
 use Auth;
+use App\Eski_faturalar;
 
 class AcrFtrController extends Controller
 {
+    protected $config_name;
+    protected $config_user_name;
+    protected $config_email;
+    protected $config_lisans_durum;
+    protected $config_lisans_baslangic;
+    protected $config_lisans_bitis;
+
+    function __construct()
+    {
+        $conf_table_model = new Acr_user_table_conf();
+        $conf_table = $conf_table_model->first();
+        $this->config_name = $conf_table->name;
+        $this->config_email = $conf_table->email;
+    }
 
     function admin_sales_incoices(Request $request)
     {
         $fatura_model = new Fatura();
-        /*
-                $eski_sipas_model = new Eski_faturalar();
-        $eski_siparisler  = $eski_sipas_model->where('fatura_tarihDamga', '>', strtotime('2017-06-31'))->get();
-          foreach ($eski_siparisler as $siparis) {
-              $siparisler[] = [
-                  'tur'       => $siparis->siparis,
-                  'tarih'     => date('Y-09-d', $siparis->fatura_tarihDamga),
-                  'user_id'   => $siparis->uyeID,
-                  'ad'        => $siparis->fatura_ad,
-                  'adres'     => $siparis->fatura_adres,
-                  'tel'       => $siparis->fatura_tel,
-                  'vd'        => $siparis->fatura_vd,
-                  'vn'        => $siparis->fatura_vn,
-                  'dt'        => $siparis->fatura_dt,
-                  'ds'        => $siparis->fatura_ds,
-                  'cinsi'     => $siparis->fatura_cinsi,
-                  'adet'      => $siparis->fatura_urunAdedi,
-                  'fiyat'     => $siparis->fatura_fiyat,
-                  'odeme'     => $siparis->odeme,
-                  'fiyat_yazi' => $siparis->fatura_fiyatYazi
-              ];
-          }
-          $fatura_model->insert($siparisler);
-          exit();*/
-        $orders = $fatura_model->get();
-        return View('admin.acr_admin_invoices', compact('orders'));
+        /* $eski_sipas_model = new Eski_faturalar();
+         $eski_siparisler = $eski_sipas_model->where('fatura_tarihDamga', '>', strtotime('2017-06-31'))->get(); // hazirandan sonra alanlar
+         // $eski_siparisler = $eski_sipas_model->where('fatura_tarihDamga', '<=', strtotime('2017-06-31'))->get(); // hazirandan önce alanlar
+
+         foreach ($eski_siparisler as $siparis) {
+             $tarih = empty($siparis->fatura_tarihDamga) ? 0 : date('Y-09-d', $siparis->fatura_tarihDamga);
+             if ($tarih != 0) {
+                 $siparisler[] = [
+                     'tur'          => $siparis->siparis,
+                     'tarih'        => $tarih,
+                     'user_id'      => $siparis->uyeID,
+                     'invoice_name' => $siparis->fatura_ad,
+                     'adress'       => $siparis->fatura_adres,
+                     'tel'          => $siparis->fatura_tel,
+                     'tax_office'   => $siparis->fatura_vd,
+                     'tc'           => $siparis->fatura_vn,
+                     'cinsi'        => $siparis->fatura_cinsi,
+                     'guncel'       => 1,
+                     'created_at'   => $tarih,
+                     'adet'         => $siparis->fatura_urunAdedi,
+                     'fiyat'        => $siparis->fatura_fiyat,
+                     'odeme'        => $siparis->odeme,
+                     'fiyat_yazi'   => $siparis->fatura_fiyatYazi
+                 ];
+             }
+         }
+         $fatura_model->insert($siparisler);
+         exit();*/
+        $faturalar = $fatura_model->paginate(100);
+        $ciro = $fatura_model->get()->sum('fiyat');
+        $fiyat = $ciro * 100 / 140;
+        $kdv = $ciro - $fiyat;
+        $email = $this->config_email;
+        return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat'));
     }
 
 

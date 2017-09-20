@@ -1014,7 +1014,7 @@ class AcrSepetController extends Controller
         $sepet_model = new Sepet();
         $ps_model = new Product_sepet();
         $adress_model = new AcrFtrAdress();
-        $sepets = $sepet_model->get();
+        $sepets = $sepet_model->where('active', 1)->where('order_result', 2)->whereNotIn('user_id', [1, 5, 35746])->get();
         $fatura_model = new Fatura();
         foreach ($sepets as $sepet_row) {
             $fatura_count = $fatura_model->where('order_id', $sepet_row->id)->count();
@@ -1061,248 +1061,249 @@ class AcrSepetController extends Controller
                     'fiyat'        => $sepet_row->price,
                     'fiyat_yazi'   => self::paraYazi($sepet_row->price)
                 ];
+                self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
             }
-            self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
-        }
-}
 
-function paraYazi($money = '0.00')
-{
-    $money = explode('.', $money);
-    if (count($money) != 2) return false;
-    $money_left = $money['0'];
-    $money_right = $money['1'];
-    //DOKUZLAR
-    if (strlen($money_left) == 9) {
-        $i = (int)floor($money_left / 100000000);
-        if ($i == 1) $l9 = "YÜZ";
-        if ($i == 2) $l9 = "İKİ YÜZ";
-        if ($i == 3) $l9 = "ÜÇ YÜZ";
-        if ($i == 4) $l9 = "DÖRT YÜZ";
-        if ($i == 5) $l9 = "BEŞ YÜZ";
-        if ($i == 6) $l9 = "ALTI YÜZ";
-        if ($i == 7) $l9 = "YEDİ YÜZ";
-        if ($i == 8) $l9 = "SEKİZ YÜZ";
-        if ($i == 9) $l9 = "DOKUZ YÜZ";
-        if ($i == 0) $l9 = "";
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //SEKİZLER
-    if (strlen($money_left) == 8) {
-        $i = (int)floor($money_left / 10000000);
-        if ($i == 1) $l8 = "ON";
-        if ($i == 2) $l8 = "YİRMİ";
-        if ($i == 3) $l8 = "OTUZ";
-        if ($i == 4) $l8 = "KIRK";
-        if ($i == 5) $l8 = "ELLİ";
-        if ($i == 6) $l8 = "ATMIŞ";
-        if ($i == 7) $l8 = "YETMİŞ";
-        if ($i == 8) $l8 = "SEKSEN";
-        if ($i == 9) $l8 = "DOKSAN";
-        if ($i == 0) $l8 = "";
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //YEDİLER
-    if (strlen($money_left) == 7) {
-        $i = (int)floor($money_left / 1000000);
-        if ($i == 1) {
-            if ($i != "NULL") {
-                $l7 = "BİR MİLYON";
-            } else {
-                $l7 = "MİLYON";
-            }
-        }
-        if ($i == 2) $l7 = "İKİ MİLYON";
-        if ($i == 3) $l7 = "ÜÇ MİLYON";
-        if ($i == 4) $l7 = "DÖRT MİLYON";
-        if ($i == 5) $l7 = "BEŞ MİLYON";
-        if ($i == 6) $l7 = "ALTI MİLYON";
-        if ($i == 7) $l7 = "YEDİ MİLYON";
-        if ($i == 8) $l7 = "SEKİZ MİLYON";
-        if ($i == 9) $l7 = "DOKUZ MİLYON";
-        if ($i == 0) {
-            if ($i != "NULL") {
-                $l7 = "MİLYON";
-            } else {
-                $l7 = "";
-            }
-        }
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //ALTILAR
-    if (strlen($money_left) == 6) {
-        $i = (int)floor($money_left / 100000);
-        if ($i == 1) $l6 = "YÜZ";
-        if ($i == 2) $l6 = "İKİ YÜZ";
-        if ($i == 3) $l6 = "ÜÇ YÜZ";
-        if ($i == 4) $l6 = "DÖRT YÜZ";
-        if ($i == 5) $l6 = "BEŞ YÜZ";
-        if ($i == 6) $l6 = "ALTI YÜZ";
-        if ($i == 7) $l6 = "YEDİ YÜZ";
-        if ($i == 8) $l6 = "SEKİZ YÜZ";
-        if ($i == 9) $l6 = "DOKUZ YÜZ";
-        if ($i == 0) $l6 = "";
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //BEŞLER
-    if (strlen($money_left) == 5) {
-        $i = (int)floor($money_left / 10000);
-        if ($i == 1) $l5 = "ON";
-        if ($i == 2) $l5 = "YİRMİ";
-        if ($i == 3) $l5 = "OTUZ";
-        if ($i == 4) $l5 = "KIRK";
-        if ($i == 5) $l5 = "ELLİ";
-        if ($i == 6) $l5 = "ATMIŞ";
-        if ($i == 7) $l5 = "YETMİŞ";
-        if ($i == 8) $l5 = "SEKSEN";
-        if ($i == 9) $l5 = "DOKSAN";
-        if ($i == 0) $l5 = "";
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //DÖRTLER
-    if (strlen($money_left) == 4) {
-        $i = (int)floor($money_left / 1000);
-        if ($i == 1) {
-            if ($i != "") {
-                $l4 = "BİR BİN";
-            } else {
-                $l4 = "BİN";
-            }
-        }
-        if ($i == 2) $l4 = "İKİ BİN";
-        if ($i == 3) $l4 = "ÜÇ BİN";
-        if ($i == 4) $l4 = "DÖRT BİN";
-        if ($i == 5) $l4 = "BEŞ BİN";
-        if ($i == 6) $l4 = "ALTI BİN";
-        if ($i == 7) $l4 = "YEDİ BİN";
-        if ($i == 8) $l4 = "SEKZ BİN";
-        if ($i == 9) $l4 = "DOKUZ BİN";
-        if ($i == 0) {
-            if ($i != "") {
-                $l4 = "BİN";
-            } else {
-                $l4 = "";
-            }
-        }
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //ÜÇLER
-    if (strlen($money_left) == 3) {
-        $i = (int)floor($money_left / 100);
-        if ($i == 1) $l3 = "YÜZ";
-        if ($i == 2) $l3 = "İKİYÜZ";
-        if ($i == 3) $l3 = "ÜÇYÜZ";
-        if ($i == 4) $l3 = "DÖRTYÜZ";
-        if ($i == 5) $l3 = "BEŞYÜZ";
-        if ($i == 6) $l3 = "ALTIYÜZ";
-        if ($i == 7) $l3 = "YEDİYÜZ";
-        if ($i == 8) $l3 = "SEKİZYÜZ";
-        if ($i == 9) $l3 = "DOKUZYÜZ";
-        if ($i == 0) $l3 = "";
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //İKİLER
-    if (strlen($money_left) == 2) {
-        $i = (int)floor($money_left / 10);
-        if ($i == 1) $l2 = "ON";
-        if ($i == 2) $l2 = "YİRMİ";
-        if ($i == 3) $l2 = "OTUZ";
-        if ($i == 4) $l2 = "KIRK";
-        if ($i == 5) $l2 = "ELLİ";
-        if ($i == 6) $l2 = "ATMIŞ";
-        if ($i == 7) $l2 = "YETMİŞ";
-        if ($i == 8) $l2 = "SEKSEN";
-        if ($i == 9) $l2 = "DOKSAN";
-        if ($i == 0) $l2 = "";
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //BİRLER
-    if (strlen($money_left) == 1) {
-        $i = (int)floor($money_left / 1);
-        if ($i == 1) $l1 = "BİR";
-        if ($i == 2) $l1 = "İKİ";
-        if ($i == 3) $l1 = "ÜÇ";
-        if ($i == 4) $l1 = "DÖRT";
-        if ($i == 5) $l1 = "BEŞ";
-        if ($i == 6) $l1 = "ALTI";
-        if ($i == 7) $l1 = "YEDİ";
-        if ($i == 8) $l1 = "SEKİZ";
-        if ($i == 9) $l1 = "DOKUZ";
-        if ($i == 0) $l1 = "";
-        $money_left = substr($money_left, 1, strlen($money_left) - 1);
-    }
-    //SAĞ İKİ
-    if (strlen($money_right) == 2) {
-        $i = (int)floor($money_right / 10);
-        if ($i == 1) $r2 = "ON";
-        if ($i == 2) $r2 = "YİRMİ";
-        if ($i == 3) $r2 = "OTUZ";
-        if ($i == 4) $r2 = "KIRK";
-        if ($i == 5) $r2 = "ELLİ";
-        if ($i == 6) $r2 = "ALTMIŞ";
-        if ($i == 7) $r2 = "YETMİŞ";
-        if ($i == 8) $r2 = "SEKSEN";
-        if ($i == 9) $r2 = "DOKSAN";
-        if ($i == 0) $r2 = "SIFIR";
-        $money_right = substr($money_right, 1, strlen($money_right) - 1);
-    }
-    //SAĞ BİR
-    if (strlen($money_right) == 1) {
-        $i = (int)floor($money_right / 1);
-        if ($i == 1) $r1 = "BİR";
-        if ($i == 2) $r1 = "İKİ";
-        if ($i == 3) $r1 = "ÜÇ";
-        if ($i == 4) $r1 = "DÖRT";
-        if ($i == 5) $r1 = "BEŞ";
-        if ($i == 6) $r1 = "ALTI";
-        if ($i == 7) $r1 = "YEDİ";
-        if ($i == 8) $r1 = "SEKİZ";
-        if ($i == 9) $r1 = "DOKUZ";
-        if ($i == 0) $r1 = "";
-        $money_right = substr($money_right, 1, strlen($money_right) - 1);
-    }
-    return @$l9 . " " . @$l8 . " " . @$l7 . " " . @$l6 . " " . @$l5 . " " . @$l4 . " " . @$l3 . " " . @$l2 . " " . @$l1 . " TÜRK LİRASI " . @$r2 . " " . @$r1 . " KURUŞ";
-}
-
-function invers_son_aktif_tarih($ay = null, $lisans_bitis)
-{
-    $ekle = $lisans_bitis - time();
-
-    if ($ekle < 0) {
-        $ekle = 0;
-    }
-    $odemeZaman = $ekle - mktime(0, 0, 0, date('m') + $ay, date('d'), date('Y'));
-    return date('Y-m-d H:i:s', $odemeZaman);
-}
-
-function orders_deactive(Request $request, $order_id = null)
-{
-    $order_id = empty($order_id) ? $request->input('order_id') : $order_id;
-    $sepet_model = new Sepet();
-    $ps_model = new Product_sepet();
-    $user_model = new AcrUser();
-    $sepet = $sepet_model->find($order_id);
-    $sepet->active = 0;
-    $sepet->order_result = 1;
-    $sepet->save();
-    $sepet_row = $sepet_model->where('id', $order_id)->first();
-    $orders = $ps_model->where('sepet_id', $order_id)->get();
-    foreach ($orders as $order) {
-
-        if ($order->type == 2) {
-            $user = $user_model->find($sepet_row->user_id);
-            $user_row = $user_model->where('id', $sepet_row->user_id)->first();
-            $user->lisans_durum = 0;
-            if (strtotime($user_row->lisans_bitis) < time()) {
-                $lisans_bitis = time();
-            } else {
-                $lisans_bitis = strtotime($user_row->lisans_bitis);
-            }
-            $user->lisans_bitis = self::invers_son_aktif_tarih($order->lisans_ay, $lisans_bitis);
-            $user->save();
         }
     }
 
-}
+    function paraYazi($money = '0.00')
+    {
+        $money = explode('.', $money);
+        if (count($money) != 2) return false;
+        $money_left = $money['0'];
+        $money_right = $money['1'];
+        //DOKUZLAR
+        if (strlen($money_left) == 9) {
+            $i = (int)floor($money_left / 100000000);
+            if ($i == 1) $l9 = "YÜZ";
+            if ($i == 2) $l9 = "İKİ YÜZ";
+            if ($i == 3) $l9 = "ÜÇ YÜZ";
+            if ($i == 4) $l9 = "DÖRT YÜZ";
+            if ($i == 5) $l9 = "BEŞ YÜZ";
+            if ($i == 6) $l9 = "ALTI YÜZ";
+            if ($i == 7) $l9 = "YEDİ YÜZ";
+            if ($i == 8) $l9 = "SEKİZ YÜZ";
+            if ($i == 9) $l9 = "DOKUZ YÜZ";
+            if ($i == 0) $l9 = "";
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //SEKİZLER
+        if (strlen($money_left) == 8) {
+            $i = (int)floor($money_left / 10000000);
+            if ($i == 1) $l8 = "ON";
+            if ($i == 2) $l8 = "YİRMİ";
+            if ($i == 3) $l8 = "OTUZ";
+            if ($i == 4) $l8 = "KIRK";
+            if ($i == 5) $l8 = "ELLİ";
+            if ($i == 6) $l8 = "ATMIŞ";
+            if ($i == 7) $l8 = "YETMİŞ";
+            if ($i == 8) $l8 = "SEKSEN";
+            if ($i == 9) $l8 = "DOKSAN";
+            if ($i == 0) $l8 = "";
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //YEDİLER
+        if (strlen($money_left) == 7) {
+            $i = (int)floor($money_left / 1000000);
+            if ($i == 1) {
+                if ($i != "NULL") {
+                    $l7 = "BİR MİLYON";
+                } else {
+                    $l7 = "MİLYON";
+                }
+            }
+            if ($i == 2) $l7 = "İKİ MİLYON";
+            if ($i == 3) $l7 = "ÜÇ MİLYON";
+            if ($i == 4) $l7 = "DÖRT MİLYON";
+            if ($i == 5) $l7 = "BEŞ MİLYON";
+            if ($i == 6) $l7 = "ALTI MİLYON";
+            if ($i == 7) $l7 = "YEDİ MİLYON";
+            if ($i == 8) $l7 = "SEKİZ MİLYON";
+            if ($i == 9) $l7 = "DOKUZ MİLYON";
+            if ($i == 0) {
+                if ($i != "NULL") {
+                    $l7 = "MİLYON";
+                } else {
+                    $l7 = "";
+                }
+            }
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //ALTILAR
+        if (strlen($money_left) == 6) {
+            $i = (int)floor($money_left / 100000);
+            if ($i == 1) $l6 = "YÜZ";
+            if ($i == 2) $l6 = "İKİ YÜZ";
+            if ($i == 3) $l6 = "ÜÇ YÜZ";
+            if ($i == 4) $l6 = "DÖRT YÜZ";
+            if ($i == 5) $l6 = "BEŞ YÜZ";
+            if ($i == 6) $l6 = "ALTI YÜZ";
+            if ($i == 7) $l6 = "YEDİ YÜZ";
+            if ($i == 8) $l6 = "SEKİZ YÜZ";
+            if ($i == 9) $l6 = "DOKUZ YÜZ";
+            if ($i == 0) $l6 = "";
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //BEŞLER
+        if (strlen($money_left) == 5) {
+            $i = (int)floor($money_left / 10000);
+            if ($i == 1) $l5 = "ON";
+            if ($i == 2) $l5 = "YİRMİ";
+            if ($i == 3) $l5 = "OTUZ";
+            if ($i == 4) $l5 = "KIRK";
+            if ($i == 5) $l5 = "ELLİ";
+            if ($i == 6) $l5 = "ATMIŞ";
+            if ($i == 7) $l5 = "YETMİŞ";
+            if ($i == 8) $l5 = "SEKSEN";
+            if ($i == 9) $l5 = "DOKSAN";
+            if ($i == 0) $l5 = "";
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //DÖRTLER
+        if (strlen($money_left) == 4) {
+            $i = (int)floor($money_left / 1000);
+            if ($i == 1) {
+                if ($i != "") {
+                    $l4 = "BİR BİN";
+                } else {
+                    $l4 = "BİN";
+                }
+            }
+            if ($i == 2) $l4 = "İKİ BİN";
+            if ($i == 3) $l4 = "ÜÇ BİN";
+            if ($i == 4) $l4 = "DÖRT BİN";
+            if ($i == 5) $l4 = "BEŞ BİN";
+            if ($i == 6) $l4 = "ALTI BİN";
+            if ($i == 7) $l4 = "YEDİ BİN";
+            if ($i == 8) $l4 = "SEKZ BİN";
+            if ($i == 9) $l4 = "DOKUZ BİN";
+            if ($i == 0) {
+                if ($i != "") {
+                    $l4 = "BİN";
+                } else {
+                    $l4 = "";
+                }
+            }
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //ÜÇLER
+        if (strlen($money_left) == 3) {
+            $i = (int)floor($money_left / 100);
+            if ($i == 1) $l3 = "YÜZ";
+            if ($i == 2) $l3 = "İKİYÜZ";
+            if ($i == 3) $l3 = "ÜÇYÜZ";
+            if ($i == 4) $l3 = "DÖRTYÜZ";
+            if ($i == 5) $l3 = "BEŞYÜZ";
+            if ($i == 6) $l3 = "ALTIYÜZ";
+            if ($i == 7) $l3 = "YEDİYÜZ";
+            if ($i == 8) $l3 = "SEKİZYÜZ";
+            if ($i == 9) $l3 = "DOKUZYÜZ";
+            if ($i == 0) $l3 = "";
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //İKİLER
+        if (strlen($money_left) == 2) {
+            $i = (int)floor($money_left / 10);
+            if ($i == 1) $l2 = "ON";
+            if ($i == 2) $l2 = "YİRMİ";
+            if ($i == 3) $l2 = "OTUZ";
+            if ($i == 4) $l2 = "KIRK";
+            if ($i == 5) $l2 = "ELLİ";
+            if ($i == 6) $l2 = "ATMIŞ";
+            if ($i == 7) $l2 = "YETMİŞ";
+            if ($i == 8) $l2 = "SEKSEN";
+            if ($i == 9) $l2 = "DOKSAN";
+            if ($i == 0) $l2 = "";
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //BİRLER
+        if (strlen($money_left) == 1) {
+            $i = (int)floor($money_left / 1);
+            if ($i == 1) $l1 = "BİR";
+            if ($i == 2) $l1 = "İKİ";
+            if ($i == 3) $l1 = "ÜÇ";
+            if ($i == 4) $l1 = "DÖRT";
+            if ($i == 5) $l1 = "BEŞ";
+            if ($i == 6) $l1 = "ALTI";
+            if ($i == 7) $l1 = "YEDİ";
+            if ($i == 8) $l1 = "SEKİZ";
+            if ($i == 9) $l1 = "DOKUZ";
+            if ($i == 0) $l1 = "";
+            $money_left = substr($money_left, 1, strlen($money_left) - 1);
+        }
+        //SAĞ İKİ
+        if (strlen($money_right) == 2) {
+            $i = (int)floor($money_right / 10);
+            if ($i == 1) $r2 = "ON";
+            if ($i == 2) $r2 = "YİRMİ";
+            if ($i == 3) $r2 = "OTUZ";
+            if ($i == 4) $r2 = "KIRK";
+            if ($i == 5) $r2 = "ELLİ";
+            if ($i == 6) $r2 = "ALTMIŞ";
+            if ($i == 7) $r2 = "YETMİŞ";
+            if ($i == 8) $r2 = "SEKSEN";
+            if ($i == 9) $r2 = "DOKSAN";
+            if ($i == 0) $r2 = "SIFIR";
+            $money_right = substr($money_right, 1, strlen($money_right) - 1);
+        }
+        //SAĞ BİR
+        if (strlen($money_right) == 1) {
+            $i = (int)floor($money_right / 1);
+            if ($i == 1) $r1 = "BİR";
+            if ($i == 2) $r1 = "İKİ";
+            if ($i == 3) $r1 = "ÜÇ";
+            if ($i == 4) $r1 = "DÖRT";
+            if ($i == 5) $r1 = "BEŞ";
+            if ($i == 6) $r1 = "ALTI";
+            if ($i == 7) $r1 = "YEDİ";
+            if ($i == 8) $r1 = "SEKİZ";
+            if ($i == 9) $r1 = "DOKUZ";
+            if ($i == 0) $r1 = "";
+            $money_right = substr($money_right, 1, strlen($money_right) - 1);
+        }
+        return @$l9 . " " . @$l8 . " " . @$l7 . " " . @$l6 . " " . @$l5 . " " . @$l4 . " " . @$l3 . " " . @$l2 . " " . @$l1 . " TÜRK LİRASI " . @$r2 . " " . @$r1 . " KURUŞ";
+    }
+
+    function invers_son_aktif_tarih($ay = null, $lisans_bitis)
+    {
+        $ekle = $lisans_bitis - time();
+
+        if ($ekle < 0) {
+            $ekle = 0;
+        }
+        $odemeZaman = $ekle - mktime(0, 0, 0, date('m') + $ay, date('d'), date('Y'));
+        return date('Y-m-d H:i:s', $odemeZaman);
+    }
+
+    function orders_deactive(Request $request, $order_id = null)
+    {
+        $order_id = empty($order_id) ? $request->input('order_id') : $order_id;
+        $sepet_model = new Sepet();
+        $ps_model = new Product_sepet();
+        $user_model = new AcrUser();
+        $sepet = $sepet_model->find($order_id);
+        $sepet->active = 0;
+        $sepet->order_result = 1;
+        $sepet->save();
+        $sepet_row = $sepet_model->where('id', $order_id)->first();
+        $orders = $ps_model->where('sepet_id', $order_id)->get();
+        foreach ($orders as $order) {
+
+            if ($order->type == 2) {
+                $user = $user_model->find($sepet_row->user_id);
+                $user_row = $user_model->where('id', $sepet_row->user_id)->first();
+                $user->lisans_durum = 0;
+                if (strtotime($user_row->lisans_bitis) < time()) {
+                    $lisans_bitis = time();
+                } else {
+                    $lisans_bitis = strtotime($user_row->lisans_bitis);
+                }
+                $user->lisans_bitis = self::invers_son_aktif_tarih($order->lisans_ay, $lisans_bitis);
+                $user->save();
+            }
+        }
+
+    }
 
 }
