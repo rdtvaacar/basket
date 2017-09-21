@@ -71,6 +71,9 @@ Route::group(['middleware' => ['web']], function () {
                 Route::get('/admin/siparis/to/fatura', 'AcrSepetController@admin_sales_to_incoices');
                 Route::get('/admin/fatura/yazdir', 'AcrFtrController@admin_fatura_yazdir');
                 Route::get('/admin/e_arsive/create', 'AcrSepetController@admin_e_arsive_create');
+                Route::get('/admin/e_arsive/basarili', function () {
+                    return View::make('acr_ftr::basarili_fatura');
+                });
             });
         });
 

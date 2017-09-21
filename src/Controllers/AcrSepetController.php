@@ -1048,7 +1048,7 @@ class AcrSepetController extends Controller
             $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
         }
         if ($e_arsive_create == 1) {
-            return redirect()->back()->with('msg', '<div class="alert alert-success">Fatura Başarıyla Oluşturuldu</div>');
+            return redirect()->to('/admin/e_arsive/basarili');
         }
         return $market_controller->order_result(null, $order_id);
     }
