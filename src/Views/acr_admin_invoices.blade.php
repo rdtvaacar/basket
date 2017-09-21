@@ -33,6 +33,7 @@
                                 <th>User_id</th>
                                 <th>User</th>
                                 <th>Ürünler</th>
+                                <th>E-Fat Gönder</th>
                                 <th>Fiyat</th>
                                 <th>Oluşturma Tarihi</th>
                             </tr>
@@ -49,6 +50,11 @@
                                     <td>{{$fatura->user->name}}<br>
                                         {{$fatura->user->$email}}<br>
                                         {{$fatura->user->tel}}</td>
+                                    <td>
+                                        <a class="btn btn-warning btn-xs"
+                                           href="/acr/ftr/admin/e_arsive/create?fatura_id={{$fatura->id}}">
+                                            E-Fat Gönder</a>
+                                    </td>
                                     <td>
                                         @if(empty($fatura->cinsi))
                                             <table class="table">
