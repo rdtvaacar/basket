@@ -21,7 +21,8 @@
                             </div>
                             <button type="submit" style="float: left;" class="btn btn-primary btn-sm">FİLTRELE</button>
                         </form>
-                        <div onclick="popup('/acr/ftr/admin/fatura/yazdir?tarih_ilk={{$tarih_ilk}}&tarih_son={{$tarih_son}}')">
+                        <div class="btn btn-info btn-sm"
+                             onclick="popup('/acr/ftr/admin/fatura/yazdir?tarih_ilk={{$tarih_ilk}}&tarih_son={{$tarih_son}}')">
                             Fatura Yazdır
                         </div>
                         <div style="clear:both;"></div>
