@@ -67,6 +67,7 @@ Route::group(['middleware' => ['web']], function () {
                 Route::post('/order/active/admin', 'AcrSepetController@orders_active_admin');
                 Route::post('/order/deactive', 'AcrSepetController@orders_deactive');
                 Route::get('/admin/siparis/faturalar', 'AcrFtrController@admin_sales_incoices');
+                Route::post('/admin/siparis/faturalar', 'AcrFtrController@admin_sales_incoices');
                 Route::get('/admin/siparis/to/fatura', 'AcrSepetController@admin_sales_to_incoices');
 
             });

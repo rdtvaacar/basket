@@ -1,6 +1,7 @@
 @extends('acr_ftr.index')
 @section('header')
     <link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
+    <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
 @stop
 @section('acr_ftr')
     <section class="content">
@@ -9,10 +10,21 @@
                 <div class="box box-warning">
                     <div class="box-header with-border">Siparişler</div>
                     <div class="box-body">
+                        <form action="/acr/ftr/admin/siparis/faturalar" method="post">
+                            {{csrf_field()}}
+                            <div style="width: 600px; float: left;" class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input name="tarih" type="text" class="form-control pull-right" id="reservation">
+                            </div>
+                            <button type="submit" style="float: left;" class="btn btn-primary btn-sm">FİLTRELE</button>
+                        </form>
+                        <div style="clear:both;"></div>
                         <table width="100%" id="data_table" class="table table-striped">
                             <thead>
                             <tr>
-                                <th>Son Güncelleme</th>
+                                <th>Tarih</th>
                                 <th>SI. NO</th>
                                 <th>Fatura İsmi</th>
                                 <th>User_id</th>
@@ -27,14 +39,13 @@
                             <tbody id="sepet_tbody">
                             @foreach ($faturalar as $key=> $fatura)
                                 <tr>
-                                    <td>{{$fatura->updated_at}}</td>
+                                    <td>{{$fatura->tarih}}</td>
                                     <td>{{$key+1}}</td>
                                     <td>{{$fatura->invoice_name}}</td>
                                     <td>{{$fatura->user->id}}</td>
                                     <td>{{$fatura->user->name}}<br>
                                         {{$fatura->user->$email}}<br>
                                         {{$fatura->user->tel}}</td>
-
                                     <td>
                                         @if(empty($fatura->cinsi))
                                             <table class="table">
@@ -63,6 +74,18 @@
                             @endforeach
                             </tbody>
                         </table>
+                        <table class="table">
+                            <tr>
+                                <td>Fiyat</td>
+                                <td>KDV</td>
+                                <td>TOPLAM</td>
+                            </tr>
+                            <tr>
+                                <td>{{round($fiyat,2)}}</td>
+                                <td>{{round($kdv,2)}}</td>
+                                <td>{{round($ciro,2)}}</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -70,6 +93,11 @@
     </section>
 @stop
 @section('footer')
+    <script src="/plugins/datepicker/bootstrap-datepicker.js"></script>
+    <script src="/plugins/datepicker/locales/bootstrap-datepicker.tr.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+    <script src="/plugins/daterangepicker/daterangepicker.js"></script>
+    <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="/plugins/datatables/dataTables.bootstrap.min.js"></script>
     <script>
@@ -94,6 +122,11 @@
                     "sNext": "Sonraki",
                     "sLast": "Son"
                 }
+            }
+        });
+        $('#reservation').daterangepicker({
+            locale: {
+                format: 'DD/MM/YYYY'
             }
         });
 

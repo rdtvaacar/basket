@@ -69,9 +69,49 @@ class AcrFtrController extends Controller
          }
          $fatura_model->insert($siparisler);
          exit();*/
-        $faturalar = $fatura_model->paginate(100);
-        $ciro = $fatura_model->get()->sum('fiyat');
-        $fiyat = $ciro * 100 / 140;
+        /* $faturalar = $fatura_model->where('tarih', '>=', '2017-09-19')->where('guncel', 1)->get();
+       dd($faturalar);
+         $tarih = "2017-09-" . rand(1, 18);
+         foreach ($faturalar as $fatura) {
+             $sil_id[] = $fatura->id;
+             $siparisler[] = [
+                 'tur'          => $fatura->tur,
+                 'tarih'        => $tarih,
+                 'user_id'      => $fatura->user_id,
+                 'invoice_name' => $fatura->invoice_name,
+                 'adress'       => $fatura->adress,
+                 'tel'          => $fatura->tel,
+                 'tax_office'   => $fatura->tax_office,
+                 'tc'           => $fatura->tc,
+                 'cinsi'        => $fatura->cinsi,
+                 'guncel'       => $fatura->guncel,
+                 'created_at'   => $fatura->created_at,
+                 'adet'         => $fatura->adet,
+                 'fiyat'        => $fatura->fiyat,
+                 'odeme'        => $fatura->odeme,
+                 'fiyat_yazi'   => $fatura->fiyat_yazi,
+                 'order_id'     => $fatura->order_id
+             ];
+         }
+         $fatura_model->insert($siparisler);
+         $fatura_model->whereIn('id', $sil_id)->delete();
+         exit();*/
+        $tarih = explode('-', $request->tarih);
+        if (empty($tarih)) {
+            $faturalar = $fatura_model->orderBy('tarih', 'desc')->paginate(100);
+            $ciro = $fatura_model->get()->sum('fiyat');
+        } else {
+
+            $tarih_1 = str_replace([' ', '/'], ['', '-'], $tarih[0]);
+            $tarih_2 = str_replace([' ', '/'], ['', '-'], $tarih[1]);
+            $tarih_ilk = date('Y-m-d', strtotime($tarih_1));
+            $tarih_son = date('Y-m-d', strtotime($tarih_2));
+            //   dd($tarih_son);
+            // dd($tarih_ilk . '-' . $tarih_son);
+            $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
+            $ciro = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
+        }
+        $fiyat = $ciro * (100 / 140);
         $kdv = $ciro - $fiyat;
         $email = $this->config_email;
         return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat'));
