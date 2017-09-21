@@ -69,7 +69,7 @@ Route::group(['middleware' => ['web']], function () {
                 Route::get('/admin/siparis/faturalar', 'AcrFtrController@admin_sales_incoices');
                 Route::post('/admin/siparis/faturalar', 'AcrFtrController@admin_sales_incoices');
                 Route::get('/admin/siparis/to/fatura', 'AcrSepetController@admin_sales_to_incoices');
-
+                Route::get('/admin/fatura/yazdir', 'AcrFtrController@admin_fatura_yazdir');
             });
         });
 

@@ -20,6 +20,9 @@
                             </div>
                             <button type="submit" style="float: left;" class="btn btn-primary btn-sm">FİLTRELE</button>
                         </form>
+                        <div onclick="popup('/acr/ftr/admin/fatura/yazdir?tarih_ilk={{$tarih_ilk}}&tarih_son={{$tarih_son}}')">
+                            Fatura Yazdır
+                        </div>
                         <div style="clear:both;"></div>
                         <table width="100%" id="data_table" class="table table-striped">
                             <thead>
@@ -199,5 +202,10 @@
                 });
             }
         }
+
+        function popup(url) {
+            window.open(url, "popupwindowname", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no, width=1050,height=750,left=200 ,top=200");
+        }
+
     </script>
 @stop

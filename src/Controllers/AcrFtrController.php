@@ -38,6 +38,18 @@ class AcrFtrController extends Controller
         $this->config_email = $conf_table->email;
     }
 
+    function admin_fatura_yazdir(Request $request)
+    {
+        $fatura_model = new Fatura();
+
+        $tarih_ilk = $request->tarih_ilk;
+        $tarih_son = $request->tarih_son;
+        $faturalar = $fatura_model->orderBy('tarih')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
+
+        return View('acr_ftr::admin_fatura_yazdir', compact('faturalar'));
+
+    }
+
     function admin_sales_incoices(Request $request)
     {
         $fatura_model = new Fatura();
@@ -96,12 +108,12 @@ class AcrFtrController extends Controller
          $fatura_model->insert($siparisler);
          $fatura_model->whereIn('id', $sil_id)->delete();
          exit();*/
+
         $tarih = explode('-', $request->tarih);
         if (empty($tarih)) {
             $faturalar = $fatura_model->orderBy('tarih', 'desc')->paginate(100);
             $ciro = $fatura_model->get()->sum('fiyat');
         } else {
-
             $tarih_1 = str_replace([' ', '/'], ['', '-'], $tarih[0]);
             $tarih_2 = str_replace([' ', '/'], ['', '-'], $tarih[1]);
             $tarih_ilk = date('Y-m-d', strtotime($tarih_1));
@@ -114,7 +126,7 @@ class AcrFtrController extends Controller
         $fiyat = $ciro * (100 / 140);
         $kdv = $ciro - $fiyat;
         $email = $this->config_email;
-        return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat'));
+        return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat', 'tarih_ilk', 'tarih_son'));
     }
 
 

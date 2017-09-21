@@ -886,6 +886,8 @@ class AcrSepetController extends Controller
         $sepet_model = new Sepet();
         $ps_model = new Product_sepet();
         $market_controller = new MarketController();
+        $company_model = new Company_conf();
+        $company = $company_model->first();
         /*$parasut_conf     = new Parasut_conf();
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
@@ -956,6 +958,7 @@ class AcrSepetController extends Controller
                 'tel'          => $adress_row->tel,
                 'post_code'    => $adress_row->post_code,
                 'type'         => $adress_row->type,
+                'odeme'        => $sepet_row->payment_type,
                 'guncel'       => 1, // '0 eski 1 güncel,
                 'fiyat'        => $sepet_row->price,
                 'fiyat_yazi'   => self::paraYazi($sepet_row->price)
@@ -965,7 +968,8 @@ class AcrSepetController extends Controller
                 'description'        => $adress_row->invoice_name,
                 'item_type'          => 'invoice',
                 'contact_id'         => $parasut_contact_id,
-                'gross_total'        => $sepet_row->price,
+                'gross_total'        => round(($sepet_row->price * (100 / 118)), 2),
+                'net_total'          => $sepet_row->price,
                 'archived'           => null,
                 'issue_date'         => date('Y-m-d'),
                 'details_attributes' => $parasut_product_data,
@@ -975,22 +979,29 @@ class AcrSepetController extends Controller
             $invoice = $parasut->sale($parasut_sale_data);
             //  dd($invoice_id);
             /* $payment_data = [
-                 "amount"        => $sepet_row->price - 0.001,
+                 "amount"        => $sepet_row->price,
                  "date"          => date('Y-m-d'),
                  // "description"   => "Açıklama",
                  "account_id"    => $parasut->account_id,
                  "exchange_rate" => "1.0"
              ];
-             @$parasut->paid($invoice->id, $payment_data);*/
+             $parasut->paid($invoice->id, $payment_data);*/
+            $email_user_conf = $this->config_email;
+            $odeme_type = $sepet_row->payment_type == 1 ? 'KREDIKARTI/BANKAKARTI' : 'EFT/HAVALE';
+
             $e_arsiv = [
-                // "note"                      => "Fatura notu",
-                "to"       => "urn=>mail=>$this->config_email",
-                "scenario" => "commercial"
+                "note"          => "Bu fatura $company->url aracılığıyla oluşturulmuştur.",
+                "to"            => "urn=>mail=>$sepet_row->$email_user_conf",
+                'internet_sale' => [
+                    'url'              => $company->url,
+                    'payment_type'     => $odeme_type,
+                    'payment_platform' => '-',
+                    'payment_date'     => date('Y-m-d')
+                ]
             ];
-            // $parasut->e_arsiv($invoice->id, $e_arsiv);
+            $parasut->e_arsiv($invoice->id, $e_arsiv);
         }
-        $company_model = new Company_conf();
-        $company = $company_model->first();
+
         $mesaj = 'Ödeme Bilgileri<br>';
         $mesaj .= $adress_row->invoice_name . '<br>';
         $mesaj .= $adress_row->tel . '<br>';
