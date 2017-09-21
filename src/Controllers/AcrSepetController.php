@@ -875,7 +875,8 @@ class AcrSepetController extends Controller
         $sepet_model = new Sepet();
         $fatura_id = $request->fatura_id;
         $fatura = $fatura_model->where('id', $fatura_id)->first();
-        $user_email = $fatura->user->$this->config_email;
+        $user_mail_conf = $this->config_email;
+        $user_email = $fatura->user->$user_mail_conf;
         $fatura_model->where('id', $fatura_id)->update(
             ['tarih' => date('Y-m-d')]
         );
@@ -919,7 +920,7 @@ class AcrSepetController extends Controller
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
         $sepet_row = $sepet_model->where('id', $order_id)->first();
-        if ($sepet_row->order_result == 2 && $sepet_row->active == 0) {
+        if ($sepet_row->order_result == 2 && $sepet_row->active == 0 || $e_arsive_create == 1) {
             $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
             if (empty($adress_row->parasut_id)) {
                 $adress = $adress_model->find($adress_row->id);
@@ -1030,6 +1031,7 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
+            echo $sepet_row->payment_type . '-' . $user_email . '-' . $invoice->id;
             self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
         }
         $mesaj = 'Ödeme Bilgileri<br>';
@@ -1046,7 +1048,7 @@ class AcrSepetController extends Controller
             $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
         }
         if ($e_arsive_create == 1) {
-            return redirect()->back()->msg('msg', '<div class="alert alert-success">Fatura Başarıyla Oluşturuldu</div>');
+            return redirect()->back()->with('msg', '<div class="alert alert-success">Fatura Başarıyla Oluşturuldu</div>');
         }
         return $market_controller->order_result(null, $order_id);
     }

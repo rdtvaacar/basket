@@ -53,7 +53,7 @@
                                         {{$fatura->user->$email}}<br>
                                         {{$fatura->user->tel}}</td>
                                     <td>
-                                        <a class="btn btn-warning btn-xs"
+                                        <a target="_blank" class="btn btn-warning btn-xs"
                                            href="/acr/ftr/admin/e_arsive/create?fatura_id={{$fatura->id}}">
                                             E-Fat Gönder</a>
                                     </td>
