@@ -109,27 +109,26 @@ class AcrFtrController extends Controller
          $fatura_model->whereIn('id', $sil_id)->delete();
          exit();*/
         if (empty($request->tarih)) {
-            $tarih = '';
+            $tarih_veri = date('01/m/Y') . "-" . date('d/m/Y');
+            $tarih = explode('-', $tarih_veri);
         } else {
             $tarih = explode('-', $request->tarih);
         }
-        if (empty($tarih)) {
-            $faturalar = $fatura_model->orderBy('tarih', 'desc')->paginate(100);
-            $ciro = $fatura_model->get()->sum('fiyat');
-        } else {
-            $tarih_1 = str_replace([' ', '/'], ['', '-'], $tarih[0]);
-            $tarih_2 = str_replace([' ', '/'], ['', '-'], $tarih[1]);
-            $tarih_ilk = date('Y-m-d', strtotime($tarih_1));
-            $tarih_son = date('Y-m-d', strtotime($tarih_2));
-            //   dd($tarih_son);
-            // dd($tarih_ilk . '-' . $tarih_son);
-            $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
-            $ciro = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
-        }
+
+
+        $tarih_1 = str_replace([' ', '/'], ['', '-'], $tarih[0]);
+        $tarih_2 = str_replace([' ', '/'], ['', '-'], $tarih[1]);
+        $tarih_ilk = date('Y-m-d', strtotime($tarih_1));
+        $tarih_son = date('Y-m-d', strtotime($tarih_2));
+        //dd($tarih_son);
+        //  dd($tarih_ilk . '-' . $tarih_son);
+        $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
+        $ciro = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
+
         $fiyat = $ciro * (100 / 140);
         $kdv = $ciro - $fiyat;
         $email = $this->config_email;
-        return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat', 'tarih_ilk', 'tarih_son'));
+        return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat', 'tarih_ilk', 'tarih_son','tarih_veri'));
     }
 
 

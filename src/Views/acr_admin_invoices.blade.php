@@ -16,7 +16,8 @@
                                 <div class="input-group-addon">
                                     <i class="fa fa-calendar"></i>
                                 </div>
-                                <input name="tarih" type="text" class="form-control pull-right" id="reservation">
+                                <input value="{{$tarih_veri}}" name="tarih" type="text" class="form-control pull-right"
+                                       id="reservation">
                             </div>
                             <button type="submit" style="float: left;" class="btn btn-primary btn-sm">FİLTRELE</button>
                         </form>
