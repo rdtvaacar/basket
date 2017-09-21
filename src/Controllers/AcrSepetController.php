@@ -863,6 +863,19 @@ class AcrSepetController extends Controller
         return $parasut_contact;
     }
 
+    function admin_e_arsive_create(Request $request)
+    {
+        $fatura_model = new Fatura();
+        $fatura = $fatura_model->where('id', $request->fatura_id)->first();
+        $user_email = $fatura->user->$this->config_email;
+        if (empty($fatura->parasut_invoice_id)) {
+            return self::orders_active(null, $fatura->order_id, 1, 1);
+
+        } else {
+            return self::e_arsiv_create($fatura->payment_type, $user_email, $fatura->parasut_invoice_id);
+        }
+    }
+
     function orders_active_admin(Request $request = null, $order_id = null)
     {
         $order_id = empty($order_id) ? $request->input('order_id') : $order_id;
@@ -879,7 +892,7 @@ class AcrSepetController extends Controller
         $fatura_product_model->insert($data_product);
     }
 
-    function orders_active(Request $request = null, $order_id = null, $admin = null)
+    function orders_active(Request $request = null, $order_id = null, $admin = null, $e_arsive_create = null)
     {
         $parasut = new ParasutController();
         $order_id = empty($order_id) ? $request->input('order_id') : $order_id;
@@ -946,24 +959,7 @@ class AcrSepetController extends Controller
                     'adet'         => $order->adet,
                 ];
             }
-            $fatura_data = [
-                'order_id'     => $order_id,
-                'invoice_name' => $adress_row->invoice_name,
-                'adress'       => $adress_row->adress . ' ' . $adress_row->county->name . '/' . $adress_row->city->name,
-                'tax_office'   => $adress_row->tax_office,
-                'tax_number'   => $adress_row->tax_number,
-                'tc'           => $adress_row->tc,
-                'tarih'        => $adress_row->updated_at,
-                'user_id'      => $adress_row->user_id,
-                'tel'          => $adress_row->tel,
-                'post_code'    => $adress_row->post_code,
-                'type'         => $adress_row->type,
-                'odeme'        => $sepet_row->payment_type,
-                'guncel'       => 1, // '0 eski 1 güncel,
-                'fiyat'        => $sepet_row->price,
-                'fiyat_yazi'   => self::paraYazi($sepet_row->price)
-            ];
-            self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
+
             $parasut_sale_data = [
                 'description'        => $adress_row->invoice_name,
                 'item_type'          => 'invoice',
@@ -974,9 +970,40 @@ class AcrSepetController extends Controller
                 'issue_date'         => date('Y-m-d'),
                 'details_attributes' => $parasut_product_data,
                 'total_paid'         => $sepet_row->price,
-                'payment_status'     => 'paid'
+                'payment_status'     => 'paid',
+                'payments'           => [
+                    "id"           => 1,
+                    "payable_id"   => 1,
+                    "payable_type" => "SalesInvoice",
+                    "amount"       => $sepet_row->price,
+                    "notes"        => null,
+                    "flow"         => "in",
+                    "is_overdue"   => false,
+                    "is_paid"      => true,
+                ]
             ];
             $invoice = $parasut->sale($parasut_sale_data);
+            $fatura_data = [
+                'order_id'           => $order_id,
+                'parasut_invoice_id' => $invoice->id,
+                'invoice_name'       => $adress_row->invoice_name,
+                'adress'             => $adress_row->adress . ' ' . $adress_row->county->name . '/' . $adress_row->city->name,
+                'tax_office'         => $adress_row->tax_office,
+                'tax_number'         => $adress_row->tax_number,
+                'tc'                 => $adress_row->tc,
+                'tarih'              => $adress_row->updated_at,
+                'user_id'            => $adress_row->user_id,
+                'tel'                => $adress_row->tel,
+                'post_code'          => $adress_row->post_code,
+                'type'               => $adress_row->type,
+                'payment_type'       => $sepet_row->payment_type,
+                'guncel'             => 1, // '0 eski 1 güncel,
+                'fiyat'              => $sepet_row->price,
+                'fiyat_yazi'         => self::paraYazi($sepet_row->price)
+            ];
+            if ($e_arsive_create != 1) {
+                self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
+            }
             //  dd($invoice_id);
             /* $payment_data = [
                  "amount"        => $sepet_row->price,
@@ -987,26 +1014,15 @@ class AcrSepetController extends Controller
              ];
              $parasut->paid($invoice->id, $payment_data);*/
             $email_user_conf = $this->config_email;
-            $odeme_type = $sepet_row->payment_type == 1 ? 'KREDIKARTI/BANKAKARTI' : 'EFT/HAVALE';
 
-            $e_arsiv = [
-                "note"          => "Bu fatura $company->url aracılığıyla oluşturulmuştur.",
-                "to"            => "urn=>mail=>$sepet_row->$email_user_conf",
-                'internet_sale' => [
-                    'url'              => $company->url,
-                    'payment_type'     => $odeme_type,
-                    'payment_platform' => '-',
-                    'payment_date'     => date('Y-m-d')
-                ]
-            ];
-            $parasut->e_arsiv($invoice->id, $e_arsiv);
+            $user_email = $sepet_row->user->$email_user_conf;
+            echo $sepet_row->payment_type . '-' . $user_email . '-' . $invoice->id;
+            self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
         }
-
         $mesaj = 'Ödeme Bilgileri<br>';
         $mesaj .= $adress_row->invoice_name . '<br>';
         $mesaj .= $adress_row->tel . '<br>';
         $mesaj .= 'Ürünler : ';
-
         foreach ($urun_names as $urun_name) {
             $mesaj .= $urun_name . ',';
         }
@@ -1016,7 +1032,29 @@ class AcrSepetController extends Controller
         if ($admin != 1) {
             $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
         }
+        if ($e_arsive_create == 1) {
+            return redirect()->back()->msg('msg', '<div class="alert alert-success">Fatura Başarıyla Oluşturuldu</div>');
+        }
         return $market_controller->order_result(null, $order_id);
+    }
+
+    function e_arsiv_create($payment_type, $user_email, $invoice_id)
+    {
+        $parasut = new ParasutController();
+        $company_model = new Company_conf();
+        $company = $company_model->first();
+        $payment = $payment_type == 1 ? 'KREDIKARTI/BANKAKARTI' : 'EFT/HAVALE';
+        $e_arsiv = [
+            "note"          => "Bu fatura $company->url aracılığıyla oluşturulmuştur.",
+            "to"            => "urn=>mail=>$user_email",
+            'internet_sale' => [
+                'url'              => $company->url,
+                'payment_type'     => $payment,
+                'payment_platform' => '-',
+                'payment_date'     => date('Y-m-d')
+            ]
+        ];
+        $parasut->e_arsiv($invoice_id, $e_arsiv);
     }
 
     function admin_sales_to_incoices()

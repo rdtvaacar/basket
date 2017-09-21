@@ -474,7 +474,8 @@ class AcrFtrController extends Controller
             'county'  => $request->input('county'),
             'adress'  => $request->input('adress'),
             'tel'     => $request->input('tel'),
-            'email'   => $request->input('email')
+            'email'   => $request->input('email'),
+            'url'     => $request->input('url')
 
         ];
         if ($company_model->count() > 0) {
