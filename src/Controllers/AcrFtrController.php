@@ -113,6 +113,7 @@ class AcrFtrController extends Controller
             $tarih = explode('-', $tarih_veri);
         } else {
             $tarih = explode('-', $request->tarih);
+            $tarih_veri = $request->tarih;
         }
 
 
@@ -128,7 +129,7 @@ class AcrFtrController extends Controller
         $fiyat = $ciro * (100 / 140);
         $kdv = $ciro - $fiyat;
         $email = $this->config_email;
-        return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat', 'tarih_ilk', 'tarih_son','tarih_veri'));
+        return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat', 'tarih_ilk', 'tarih_son', 'tarih_veri'));
     }
 
 
