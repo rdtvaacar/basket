@@ -597,11 +597,11 @@ class AcrSepetController extends Controller
         $row .= csrf_field();
         $row .= '<div class="form-group">';
         $row .= '<label>Adres İsmi</label>';
-        $row .= '<input required name="name" id="name" class="form-control" placeholder="Adres İsmi" value="' . @$adress->name . '">';
+        $row .= '<input required name="name" id="name" class="form-control" placeholder="Adres İsmi, Örn: Ev adresim, Kurum Adresim" value="' . @$adress->name . '">';
         $row .= '</div>';
         $row .= '<div class="form-group">';
-        $row .= '<label>Alıcı İsmi</label>';
-        $row .= '<input required name="invoice_name" id="invoice_name" class="form-control" placeholder="İsminiz" value="' . @$adress->invoice_name . '">';
+        $row .= '<label>Alıcı İsmi (Ad Soyad şeklinde giriniz aksi halde sistem hata verir.)</label> ';
+        $row .= '<input required name="invoice_name" id="invoice_name" class="form-control" placeholder="Adınız Soyadınız" value="' . @$adress->invoice_name . '">';
         $row .= '</div>';
         $row .= '<div class="form-group">';
         $row .= '<label>T.C. Kimlik No </label>';
@@ -754,10 +754,16 @@ class AcrSepetController extends Controller
         } else {
             $e_fatura = empty($request->input('e_fatura')) ? 1 : $request->input('e_fatura');
             $adress_model = new AcrFtrAdress();
+            $invoice_name_exp = explode(' ', $request->input('invoice_name'));
+            if (count($invoice_name_exp) < 2) {
+                $invoice_name = $request->invoice_name . ' ' . invoice_name;
+            } else {
+                $invoice_name = $request->invoice_name;
+            }
             $data = [
                 'user_id'      => Auth::user()->id,
                 'name'         => $request->input('name'),
-                'invoice_name' => $request->input('invoice_name'),
+                'invoice_name' => $invoice_name,
                 'tc'           => $request->input('tc'),
                 'adress'       => $request->input('adress'),
                 'city_id'      => $request->input('city'),
