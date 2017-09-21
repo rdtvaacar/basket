@@ -108,8 +108,11 @@ class AcrFtrController extends Controller
          $fatura_model->insert($siparisler);
          $fatura_model->whereIn('id', $sil_id)->delete();
          exit();*/
-
-        $tarih = explode('-', $request->tarih);
+        if (empty($request->tarih)) {
+            $tarih = '';
+        } else {
+            $tarih = explode('-', $request->tarih);
+        }
         if (empty($tarih)) {
             $faturalar = $fatura_model->orderBy('tarih', 'desc')->paginate(100);
             $ciro = $fatura_model->get()->sum('fiyat');

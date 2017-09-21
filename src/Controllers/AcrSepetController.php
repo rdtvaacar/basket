@@ -866,8 +866,16 @@ class AcrSepetController extends Controller
     function admin_e_arsive_create(Request $request)
     {
         $fatura_model = new Fatura();
-        $fatura = $fatura_model->where('id', $request->fatura_id)->first();
+        $sepet_model = new Sepet();
+        $fatura_id = $request->fatura_id;
+        $fatura = $fatura_model->where('id', $fatura_id)->first();
         $user_email = $fatura->user->$this->config_email;
+        $fatura_model->where('id', $fatura_id)->update(
+            ['tarih' => date('Y-m-d')]
+        );
+        $sepet_model->where('id', $fatura_id)->update(
+            ['updated_at' => date('Y-m-d')]
+        );
         if (empty($fatura->parasut_invoice_id)) {
             return self::orders_active(null, $fatura->order_id, 1, 1);
 
