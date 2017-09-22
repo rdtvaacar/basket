@@ -604,8 +604,8 @@ class AcrSepetController extends Controller
         $row .= '<input required name="invoice_name" id="invoice_name" class="form-control" placeholder="Adınız Soyadınız" value="' . @$adress->invoice_name . '">';
         $row .= '</div>';
         $row .= '<div class="form-group">';
-        $row .= '<label>T.C. Kimlik No </label>';
-        $row .= '<input  required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranız" value="' . @$adress->tc . '">';
+        $row .= '<label>T.C. Kimlik No (11 Hane olmalıdır.) </label>';
+        $row .= '<input  required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranızı " value="' . @$adress->tc . '">';
         $row .= '</div>';
         // citys
         $row .= '<div class="form-group">';
@@ -760,11 +760,12 @@ class AcrSepetController extends Controller
             } else {
                 $invoice_name = $request->invoice_name;
             }
+            $tc = strlen($request->input('tc')) < 11 ? '11111111111' : $request->input('tc');
             $data = [
                 'user_id'      => Auth::user()->id,
                 'name'         => $request->input('name'),
                 'invoice_name' => $invoice_name,
-                'tc'           => $request->input('tc'),
+                'tc'           => $tc,
                 'adress'       => $request->input('adress'),
                 'city_id'      => $request->input('city'),
                 'county_id'    => $request->input('county'),
@@ -1031,7 +1032,6 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            echo $sepet_row->payment_type . '-' . $user_email . '-' . $invoice->id;
             self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
         }
         $mesaj = 'Ödeme Bilgileri<br>';
