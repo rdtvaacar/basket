@@ -1063,12 +1063,15 @@ class AcrSepetController extends Controller
 
     function admin_sales_to_incoices()
     {
-
         $sepet_model = new Sepet();
         $ps_model = new Product_sepet();
         $adress_model = new AcrFtrAdress();
-        $sepets = $sepet_model->where('active', 1)->where('order_result', 2)->whereNotIn('user_id', [1, 5, 35746])->get();
+        $fatura_product_model = new Fatura_product();
+        $sepets = $sepet_model->where('active', 1)->where('order_result', 2)->whereNotIn('user_id', [1, 5, 35746])->where('sil', 0)->get();
         $fatura_model = new Fatura();
+        /*$fatura_model->where('guncel', 0)->orWhereNull('cinsi', null)->delete();
+        $fatura_product_model->where('id', '!=', 0)->delete();
+        exit();*/
         foreach ($sepets as $sepet_row) {
             $fatura_count = $fatura_model->where('order_id', $sepet_row->id)->count();
             if ($fatura_count < 1) {
@@ -1116,7 +1119,6 @@ class AcrSepetController extends Controller
                 ];
                 self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
             }
-
         }
     }
 

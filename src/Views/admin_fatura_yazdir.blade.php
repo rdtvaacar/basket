@@ -34,6 +34,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             } else {
                 echo date('d/m/Y', strtotime($fatura->tarih));
+                //  echo '16/09/2017';
             }
             ?><br>
             <?php
@@ -41,6 +42,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             } else {
                 echo date('d/m/Y', strtotime($fatura->tarih));
+                // echo '16/09/2017';
             }
             ?>
         </div>

@@ -123,7 +123,6 @@ class AcrFtrController extends Controller
         //  dd($tarih_ilk . '-' . $tarih_son);
         $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
         $ciro = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
-
         $fiyat = $ciro * (100 / 118);
         $kdv = $ciro - $fiyat;
         $email = $this->config_email;
