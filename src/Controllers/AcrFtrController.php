@@ -115,8 +115,6 @@ class AcrFtrController extends Controller
             $tarih = explode('-', $request->tarih);
             $tarih_veri = $request->tarih;
         }
-
-
         $tarih_1 = str_replace([' ', '/'], ['', '-'], $tarih[0]);
         $tarih_2 = str_replace([' ', '/'], ['', '-'], $tarih[1]);
         $tarih_ilk = date('Y-m-d', strtotime($tarih_1));

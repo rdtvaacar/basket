@@ -565,7 +565,7 @@ class AcrSepetController extends Controller
         $sepet_link = empty($order_id) ? '' : '?order_id=' . $order_id;
         $navs = [
             1 => ['sepet', 'SEPET', 11],
-            ['adress', 'TESLİMAT BİLGİLERİ', 10],
+            ['adress', 'ADRES/FATURA', 10],
             ['payment', 'ÖDEME YÖNETİ', 9],
             ['result', ' ÖDEME', 8]
         ];
@@ -590,9 +590,7 @@ class AcrSepetController extends Controller
     function adress_form(Request $request, $adress = null)
     {
         $city_model = new City();
-
         $cities = $city_model->get();
-
         $row = '<form method="post" action="/acr/ftr/card/adress/create">';
         $row .= csrf_field();
         $row .= '<div class="form-group">';
@@ -621,7 +619,6 @@ class AcrSepetController extends Controller
         $row .= '</select>';
         $row .= '</div>';
         $row .= '<div id="county">';
-
         if (!empty($adress->city_id)) {
             $row .= self::county_row($request, $adress->city_id, @$adress);
         }
@@ -638,7 +635,6 @@ class AcrSepetController extends Controller
         $row .= '<label>Telefon</label>';
         $row .= '<input required name="tel"  class="form-control" placeholder="Telefon" value="' . @$adress->tel . '">';
         $row .= '</div>';
-
         // kurumsal
         if (@$adress->type == 1 || empty($adress->type)) {
             $type_c_1 = 'checked';
@@ -654,24 +650,19 @@ class AcrSepetController extends Controller
         $row .= '</label>';
         $row .= '<label  style="margin-left: 30px;"  class="type_k">';
         $row .= '<input  type="radio" name="type" value="2" class="flat-red" ' . $type_c_2 . ' style="position: absolute; opacity: 0;">';
-
         $row .= '<div  style="margin-left: 10px; font-size: 14pt; float: right;">Kurumsal </div>';
         $row .= '</label>';
         $row .= '</div>';
-
         // kurumsal fatura Bilgileri
         $display = @$adress->type == 1 || empty(@$adress->type) ? 'none' : 'normal';
-
         $row .= '<div id="kurumsal" style="display: ' . $display . '">';
         $row .= '<div class="form-group">';
         $row .= '<label>Kurum İsmi</label>';
         $row .= '<input name="company"  class="form-control" placeholder="Kurum İsmi" value="' . @$adress->company . '">';
-
         $row .= '</div>';
         $row .= '<div class="form-group">';
         $row .= '<label>Kurum Vergi No</label>';
         $row .= '<input name="tax_number"  class="form-control" placeholder="Kurum Vergi No" value="' . @$adress->tax_number . '">';
-
         $row .= '</div>';
         $row .= '<div class="form-group">';
         $row .= '<label>Kurum Vergi Dairesi</label>';
@@ -685,11 +676,9 @@ class AcrSepetController extends Controller
         }
         $row .= '<label for="e_fatura" class="">';
         $row .= '<input name="e_fatura" id="e_fatura" type="checkbox" ' . $e_fatura_check . ' class="minimal-red" value="2"  style="position: absolute; opacity: 0;">';
-
         $row .= '<div style="margin-left: 10px; font-size: 14pt; float: right;">E-Fatura Mükellefiyim</div>';
         $row .= '</label>';
         $row .= '</div>';
-
         $row .= '<input type="hidden" name="adress_id"  value="' . @$adress->id . '">';
         $row .= '<button type="submit" class="btn btn-primary">ADRES KAYDET <span class="fa fa-angle-double-right"></span> </button>';
         $row .= '</form>';
@@ -1032,7 +1021,7 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
+            // self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
         }
         $mesaj = 'Ödeme Bilgileri<br>';
         $mesaj .= $adress_row->invoice_name . '<br>';

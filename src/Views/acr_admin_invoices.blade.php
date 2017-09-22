@@ -29,8 +29,9 @@
                         <table width="100%" id="data_table" class="table table-striped">
                             <thead>
                             <tr>
-                                <th>Tarih</th>
                                 <th>SI. NO</th>
+                                <th>ID</th>
+                                <th>Tarih</th>
                                 <th>Fatura İsmi</th>
                                 <th>User_id</th>
                                 <th>User</th>
@@ -45,8 +46,9 @@
                             <tbody id="sepet_tbody">
                             @foreach ($faturalar as $key=> $fatura)
                                 <tr>
-                                    <td>{{$fatura->tarih}}</td>
                                     <td>{{$key+1}}</td>
+                                    <td>{{$fatura->id}}</td>
+                                    <td>{{$fatura->tarih}}</td>
                                     <td>{{$fatura->invoice_name}}</td>
                                     <td>{{$fatura->user->id}}</td>
                                     <td>{{$fatura->user->name}}<br>
@@ -210,10 +212,8 @@
                 });
             }
         }
-
         function popup(url) {
             window.open(url, "popupwindowname", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no, width=1050,height=750,left=200 ,top=200");
         }
-
     </script>
 @stop
