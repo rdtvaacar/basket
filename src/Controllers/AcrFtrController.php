@@ -126,7 +126,7 @@ class AcrFtrController extends Controller
         $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
         $ciro = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
 
-        $fiyat = $ciro * (100 / 140);
+        $fiyat = $ciro * (100 / 118);
         $kdv = $ciro - $fiyat;
         $email = $this->config_email;
         return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat', 'tarih_ilk', 'tarih_son', 'tarih_veri'));
