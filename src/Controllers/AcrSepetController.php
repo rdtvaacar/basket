@@ -964,7 +964,8 @@ class AcrSepetController extends Controller
                     'adet'         => $order->adet,
                 ];
             }
-
+            $payment_add_contact = ['balance' => $sepet_row->price];
+            $parasut->contact($parasut_contact_id, $payment_add_contact);
             $parasut_sale_data = [
                 'description'        => $adress_row->invoice_name,
                 'item_type'          => 'invoice',
@@ -988,6 +989,7 @@ class AcrSepetController extends Controller
                 ]
             ];
             $invoice = $parasut->sale($parasut_sale_data);
+
             $fatura_data = [
                 'order_id'           => $order_id,
                 'parasut_invoice_id' => $invoice->id,
@@ -1010,18 +1012,18 @@ class AcrSepetController extends Controller
                 self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
             }
             //  dd($invoice_id);
-            /* $payment_data = [
-                 "amount"        => $sepet_row->price,
-                 "date"          => date('Y-m-d'),
-                 // "description"   => "Açıklama",
-                 "account_id"    => $parasut->account_id,
-                 "exchange_rate" => "1.0"
-             ];
-             $parasut->paid($invoice->id, $payment_data);*/
+            $payment_data = [
+                "amount"        => $sepet_row->price,
+                "date"          => date('Y-m-d'),
+                // "description"   => "Açıklama",
+                "account_id"    => $parasut->account_id,
+                "exchange_rate" => "1.0"
+            ];
+            $parasut->paid($invoice->id, $payment_data);
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            // self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
+            self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
         }
         $mesaj = 'Ödeme Bilgileri<br>';
         $mesaj .= $adress_row->invoice_name . '<br>';
