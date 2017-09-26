@@ -873,12 +873,7 @@ class AcrSepetController extends Controller
         $sepet_model->where('id', $fatura_id)->update(
             ['updated_at' => date('Y-m-d')]
         );
-        if (empty($fatura->parasut_invoice_id)) {
-            return self::orders_active(null, $fatura->order_id, 1, 1);
-
-        } else {
-            return self::e_arsiv_create($fatura->payment_type, $user_email, $fatura->parasut_invoice_id);
-        }
+        return self::orders_active(null, $fatura->order_id, 1, 1);
     }
 
     function orders_active_admin(Request $request = null, $order_id = null)
@@ -965,7 +960,7 @@ class AcrSepetController extends Controller
                 ];
             }
             $payment_add_contact = ['balance' => $sepet_row->price];
-            $parasut->contact($parasut_contact_id, $payment_add_contact);
+            $parasut->contact_update($parasut_contact_id, $payment_add_contact);
             $parasut_sale_data = [
                 'description'        => $adress_row->invoice_name,
                 'item_type'          => 'invoice',
@@ -1012,14 +1007,14 @@ class AcrSepetController extends Controller
                 self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
             }
             //  dd($invoice_id);
-            $payment_data = [
+            /*$payment_data = [
                 "amount"        => $sepet_row->price,
                 "date"          => date('Y-m-d'),
                 // "description"   => "Açıklama",
                 "account_id"    => $parasut->account_id,
                 "exchange_rate" => "1.0"
             ];
-            $parasut->paid($invoice->id, $payment_data);
+            $parasut->paid($invoice->id, $payment_data);*/
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
