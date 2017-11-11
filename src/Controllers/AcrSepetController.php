@@ -1027,7 +1027,7 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            if ($sepet_row->product->fatura_bas == 1) {
+            if (!empty($sepet_row->product->fatura_bas) && $sepet_row->product->fatura_bas == 1) {
                 self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
             }
         }
