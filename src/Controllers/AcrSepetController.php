@@ -913,7 +913,7 @@ class AcrSepetController extends Controller
         /*$parasut_conf     = new Parasut_conf();
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
-        $sepet_row    = $sepet_model->where('id', $order_id)->first();
+        $sepet_row    = $sepet_model->where('id', $order_id)->with('product')->first();
         if ($sepet_row->order_result == 2 && $sepet_row->active == 0 || $e_arsive_create == 1) {
             $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
             if (empty($adress_row->parasut_id)) {
@@ -1027,7 +1027,7 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            if ($orders->product->fatura_bas == 1) {
+            if ($sepet_row->product->fatura_bas == 1) {
                 self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
             }
         }
