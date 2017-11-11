@@ -1012,7 +1012,7 @@ class AcrSepetController extends Controller
                 'fiyat' => $sepet_row->price,
                 'fiyat_yazi' => self::paraYazi($sepet_row->price)
             ];
-            if ($e_arsive_create != 1) {
+            if ($e_arsive_create != 1 && $sepet_row->product->fatura_bas == 1) {
                 self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
             }
             //  dd($invoice_id);
@@ -1027,7 +1027,7 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            if (!empty($sepet_row->product->fatura_bas) && $sepet_row->product->fatura_bas == 1) {
+            if ($sepet_row->product->fatura_bas == 1) {
                 self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
             }
         }
