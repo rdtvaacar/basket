@@ -1035,23 +1035,25 @@ class AcrSepetController extends Controller
                 self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
             }
         }
-        $mesaj = 'Ödeme Bilgileri<br>';
-        $mesaj .= $adress_row->invoice_name . '<br>';
-        $mesaj .= $adress_row->tel . '<br>';
-        $mesaj .= 'Ürünler : ';
-        foreach ($urun_names as $urun_name) {
-            $mesaj .= $urun_name . ',';
+        if ($fatura_bas == 1) {
+            $mesaj = 'Ödeme Bilgileri<br>';
+            $mesaj .= $adress_row->invoice_name . '<br>';
+            $mesaj .= $adress_row->tel . '<br>';
+            $mesaj .= 'Ürünler : ';
+            foreach ($urun_names as $urun_name) {
+                $mesaj .= $urun_name . ',';
+            }
+            $mesaj .= '<br>';
+            $mesaj .= $sepet_row->price . '₺';
+            $my    = new my();
+            if ($admin != 1) {
+                $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
+            }
+            if ($e_arsive_create == 1) {
+                return redirect()->to('/admin/e_arsive/basarili');
+            }
+            return $market_controller->order_result(null, $order_id);
         }
-        $mesaj .= '<br>';
-        $mesaj .= $sepet_row->price . '₺';
-        $my    = new my();
-        if ($admin != 1) {
-            $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
-        }
-        if ($e_arsive_create == 1) {
-            return redirect()->to('/admin/e_arsive/basarili');
-        }
-        return $market_controller->order_result(null, $order_id);
     }
 
     function e_arsiv_create($payment_type, $user_email, $invoice_id)
