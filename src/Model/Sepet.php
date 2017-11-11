@@ -45,10 +45,6 @@ class Sepet extends Model
 
     }
 
-    function product()
-    {
-        return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
-    }
 
     function Acrproducts()
     {

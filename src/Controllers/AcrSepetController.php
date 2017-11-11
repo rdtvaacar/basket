@@ -913,7 +913,7 @@ class AcrSepetController extends Controller
         /*$parasut_conf     = new Parasut_conf();
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
-        $sepet_row    = $sepet_model->where('id', $order_id)->with('product')->first();
+        $sepet_row    = $sepet_model->where('id', $order_id)->first();
         if ($sepet_row->order_result == 2 && $sepet_row->active == 0 || $e_arsive_create == 1) {
             $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
             if (empty($adress_row->parasut_id)) {
@@ -925,49 +925,56 @@ class AcrSepetController extends Controller
             } else {
                 $parasut_contact_id = $adress_row->parasut_id;
             }
-            $orders = $ps_model->where('sepet_id', $order_id)->with('product', 'acr_product', 'sepet')->get();
+            $orders = $ps_model->where('sepet_id', $order_id)->with(['product', 'acr_product', 'sepet'])->get();
 
             foreach ($orders as $order) {
+                if ($order->product->fatura_bas == 1) {
 
-                $urun_names [] = $order->product->product_name;
-                if (empty($order->product->collection) || $order->product->collection == '0.00') {
-                    $kdv                    = $order->product->kdv;
-                    $ps_price               = self::sepet_total_price($order->id);
-                    $fiyat                  = round(((($ps_price * ((100) / (100 + $kdv)))) / $order->adet), 4);
-                    $parasut_product_data[] = [
-                        'product_id' => $order->acr_product->parasut_id, // the parasut products
-                        'quantity' => $order->adet,
-                        'unit_price' => $fiyat,
-                        'discount' => round($order->product->price * $order->sepet->dis_rate, 4),
-                        'vat_rate' => $kdv,
-                        'discount_type' => 'amount',
-                        'discount_rate' => $order->sepet->dis_rate,
+
+                    $urun_names [] = $order->product->product_name;
+                    if (empty($order->product->collection) || $order->product->collection == '0.00') {
+                        $kdv                    = $order->product->kdv;
+                        $ps_price               = self::sepet_total_price($order->id);
+                        $fiyat                  = round(((($ps_price * ((100) / (100 + $kdv)))) / $order->adet), 4);
+                        $parasut_product_data[] = [
+                            'product_id' => $order->acr_product->parasut_id, // the parasut products
+                            'quantity' => $order->adet,
+                            'unit_price' => $fiyat,
+                            'discount' => round($order->product->price * $order->sepet->dis_rate, 4),
+                            'vat_rate' => $kdv,
+                            'discount_type' => 'amount',
+                            'discount_rate' => $order->sepet->dis_rate,
+                        ];
+                        $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
+
+                    } else {
+                        $kdv                    = $order->product->collection_kdv;
+                        $fiyat                  = round(((($order->product->collection * ((100) / (100 + $kdv)))) / $order->adet), 4);
+                        $parasut_product_data[] = [
+                            'product_id' => $order->acr_product->parasut_id, // the parasut products
+                            'quantity' => $order->adet,
+                            'unit_price' => $fiyat,
+                            'discount' => 0,
+                            'vat_rate' => $kdv,
+                            'discount_type' => 'amount',
+                            'discount_rate' => 0,
+                        ];
+                        $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
+                    }
+                    $acr_fatura_product[] = [
+                        'order_id' => $order_id,
+                        'name' => $order->product->product_name,
+                        'kdv' => $order->adet * (0.18 * $fiyat),
+                        'fiyat' => $order->adet * $fiyat,
+                        'toplam_fiyat' => $order->adet * ($fiyat + (0.18 * $fiyat)),
+                        'adet' => $order->adet,
                     ];
-                    $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
-
+                    $fatura_bas           = 2;
                 } else {
-                    $kdv                    = $order->product->collection_kdv;
-                    $fiyat                  = round(((($order->product->collection * ((100) / (100 + $kdv)))) / $order->adet), 4);
-                    $parasut_product_data[] = [
-                        'product_id' => $order->acr_product->parasut_id, // the parasut products
-                        'quantity' => $order->adet,
-                        'unit_price' => $fiyat,
-                        'discount' => 0,
-                        'vat_rate' => $kdv,
-                        'discount_type' => 'amount',
-                        'discount_rate' => 0,
-                    ];
-                    $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
+                    $fatura_bas = 1;
                 }
-                $acr_fatura_product[] = [
-                    'order_id' => $order_id,
-                    'name' => $order->product->product_name,
-                    'kdv' => $order->adet * (0.18 * $fiyat),
-                    'fiyat' => $order->adet * $fiyat,
-                    'toplam_fiyat' => $order->adet * ($fiyat + (0.18 * $fiyat)),
-                    'adet' => $order->adet,
-                ];
             }
+
             $payment_add_contact = ['balance' => $sepet_row->price];
             $parasut->contact_update($parasut_contact_id, $payment_add_contact);
             $parasut_sale_data = [
@@ -1012,7 +1019,7 @@ class AcrSepetController extends Controller
                 'fiyat' => $sepet_row->price,
                 'fiyat_yazi' => self::paraYazi($sepet_row->price)
             ];
-            if ($e_arsive_create != 1 && $sepet_row->product->fatura_bas == 1) {
+            if ($e_arsive_create != 1 && $fatura_bas == 1) {
                 self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
             }
             //  dd($invoice_id);
@@ -1027,9 +1034,7 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            if ($sepet_row->product->fatura_bas == 1) {
-                self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
-            }
+            self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
         }
         $mesaj = 'Ödeme Bilgileri<br>';
         $mesaj .= $adress_row->invoice_name . '<br>';
@@ -1044,7 +1049,7 @@ class AcrSepetController extends Controller
         if ($admin != 1) {
             $my->mail($company->email, 'Okul Öncesi Evrak', 'Ödeme', 'mail.odeme', $mesaj);
         }
-        if ($e_arsive_create == 1) {
+        if ($e_arsive_create == 1 && $fatura_bas == 1) {
             return redirect()->to('/admin/e_arsive/basarili');
         }
         return $market_controller->order_result(null, $order_id);
