@@ -929,8 +929,6 @@ class AcrSepetController extends Controller
 
             foreach ($orders as $order) {
                 if ($order->product->fatura_bas == 1) {
-
-
                     $urun_names [] = $order->product->product_name;
                     if (empty($order->product->collection) || $order->product->collection == '0.00') {
                         $kdv                    = $order->product->kdv;
@@ -969,9 +967,9 @@ class AcrSepetController extends Controller
                         'toplam_fiyat' => $order->adet * ($fiyat + (0.18 * $fiyat)),
                         'adet' => $order->adet,
                     ];
-                    $fatura_bas           = 2;
+                    $fatura_bas           = 1;
                 } else {
-                    $fatura_bas = 1;
+                    $fatura_bas = 2;
                 }
             }
             if ($fatura_bas == 1) {
