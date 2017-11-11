@@ -122,7 +122,6 @@ class iyzicoController extends Controller
         $firstBasketItem->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
         $firstBasketItem->setPrice("1");
         $basketItems[0] = $firstBasketItem;
-
         $request->setBasketItems($basketItems);
 # make request
         $checkoutFormInitialize = \Iyzipay\Model\CheckoutFormInitialize::create($request, Self::option());

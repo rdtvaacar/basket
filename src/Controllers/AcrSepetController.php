@@ -309,7 +309,8 @@ class AcrSepetController extends Controller
         $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;
         $sepet_nav  = self::sepet_nav($order_id, 1);
         $sepet_row  = self::sepet_row_detail($products);
-        return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav', 'order_link'));
+        $msg = $request->session()->get('msg');
+        return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav', 'order_link', 'msg'));
     }
 
     function card_api(Request $request)
@@ -336,12 +337,12 @@ class AcrSepetController extends Controller
         }
         $order_id = $request->input('order_id');
         $order_id = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
-        $sepet    = $adress_model->where('id', $order_id)->with(['products' => function ($query) {
-            $query->where('product');
-        }])->firt();
+        $sepet    = $sepet_model->where('id', $order_id)->with(['products' => function ($query) {
+            $query->with('product');
+        }])->first();
         foreach ($sepet->products as $product) {
             if ($product->adet < $product->product->min_adet) {
-                return redirect()->to('/acr/ftr/card/sepet')->with('msg', '<div style="text-align: center; margin-right: auto; margin-left: auto;" class="alert alert-danger">' . $product->name . ' bu ürünü en az ' . $product->product->min_adet . ' adet sipariş verebilirsiniz. </div>');
+                return redirect()->to('/acr/ftr/card/sepet')->with('msg', '<div style="text-align: center; margin-right: auto; margin-left: auto;" class="alert alert-danger">' . $product->product->product_name  . ' ürününü en az ' . $product->product->min_adet . ' adet sipariş verebilirsiniz. </div>');
             }
         }
         $sepet_nav   = self::sepet_nav($order_id, 2);
