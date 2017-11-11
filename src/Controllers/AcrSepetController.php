@@ -309,7 +309,7 @@ class AcrSepetController extends Controller
         $order_link = empty($order_id) ? '' : '?order_id=' . $order_id;
         $sepet_nav  = self::sepet_nav($order_id, 1);
         $sepet_row  = self::sepet_row_detail($products);
-        $msg = $request->session()->get('msg');
+        $msg        = $request->session()->get('msg');
         return View('acr_ftr::card_sepet', compact('sepet_row', 'sepet_nav', 'order_link', 'msg'));
     }
 
@@ -342,7 +342,7 @@ class AcrSepetController extends Controller
         }])->first();
         foreach ($sepet->products as $product) {
             if ($product->adet < $product->product->min_adet) {
-                return redirect()->to('/acr/ftr/card/sepet')->with('msg', '<div style="text-align: center; margin-right: auto; margin-left: auto;" class="alert alert-danger">' . $product->product->product_name  . ' ürününü en az ' . $product->product->min_adet . ' adet sipariş verebilirsiniz. </div>');
+                return redirect()->to('/acr/ftr/card/sepet')->with('msg', '<div style="text-align: center; margin-right: auto; margin-left: auto;" class="alert alert-danger">' . $product->product->product_name . ' ürününü en az ' . $product->product->min_adet . ' adet sipariş verebilirsiniz. </div>');
             }
         }
         $sepet_nav   = self::sepet_nav($order_id, 2);
@@ -1027,7 +1027,9 @@ class AcrSepetController extends Controller
             $email_user_conf = $this->config_email;
 
             $user_email = $sepet_row->user->$email_user_conf;
-            self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
+            if ($sepet_row->fatura_bas == 1) {
+                self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
+            }
         }
         $mesaj = 'Ödeme Bilgileri<br>';
         $mesaj .= $adress_row->invoice_name . '<br>';
