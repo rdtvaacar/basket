@@ -22,7 +22,7 @@ class Acrproduct extends Model
 
     function u_kats()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\U_kat', 'product_u_kat', 'u_kat_id', 'product_id');
+        return $this->belongsToMany('Acr\Ftr\Model\U_kat', 'product_u_kat',  'product_id','u_kat_id');
     }
 
     function product()

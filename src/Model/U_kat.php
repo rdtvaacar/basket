@@ -13,8 +13,12 @@ class U_kat extends Model
         return $this->belongsToMany('App\Product');
     }
 
+    function u_kat()
+    {
+        return $this->belongsTo('Acr\Ftr\Model\U_kat', 'parent_id', 'id');
+    }
     function u_kats()
     {
-        return $this->hasMany('App\U_kat', 'parent_id');
+        return $this->hasMany('Acr\Ftr\Model\U_kat', 'parent_id', 'id');
     }
 }

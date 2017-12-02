@@ -14,6 +14,7 @@ use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\AcrFtrAttribute;
 use Acr\Ftr\Model\Sepet;
+use Acr\Ftr\Model\U_kat;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Acr\Ftr\Model\File_model;
@@ -32,10 +33,10 @@ class AcrFtrController extends Controller
 
     function __construct()
     {
-        $conf_table_model = new Acr_user_table_conf();
-        $conf_table = $conf_table_model->first();
-        $this->config_name = $conf_table->name;
-        $this->config_email = $conf_table->email;
+        $conf_table_model   = new Acr_user_table_conf();
+        $conf_table         = $conf_table_model->first();
+        $this->config_name  = @$conf_table->name;
+        $this->config_email = @$conf_table->email;
     }
 
     function admin_fatura_yazdir(Request $request)
@@ -110,22 +111,22 @@ class AcrFtrController extends Controller
          exit();*/
         if (empty($request->tarih)) {
             $tarih_veri = date('01/m/Y') . "-" . date('d/m/Y');
-            $tarih = explode('-', $tarih_veri);
+            $tarih      = explode('-', $tarih_veri);
         } else {
-            $tarih = explode('-', $request->tarih);
+            $tarih      = explode('-', $request->tarih);
             $tarih_veri = $request->tarih;
         }
-        $tarih_1 = str_replace([' ', '/'], ['', '-'], $tarih[0]);
-        $tarih_2 = str_replace([' ', '/'], ['', '-'], $tarih[1]);
+        $tarih_1   = str_replace([' ', '/'], ['', '-'], $tarih[0]);
+        $tarih_2   = str_replace([' ', '/'], ['', '-'], $tarih[1]);
         $tarih_ilk = date('Y-m-d', strtotime($tarih_1));
         $tarih_son = date('Y-m-d', strtotime($tarih_2));
         //dd($tarih_son);
         //  dd($tarih_ilk . '-' . $tarih_son);
         $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
-        $ciro = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
-        $fiyat = $ciro * (100 / 118);
-        $kdv = $ciro - $fiyat;
-        $email = $this->config_email;
+        $ciro      = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
+        $fiyat     = $ciro * (100 / 118);
+        $kdv       = $ciro - $fiyat;
+        $email     = $this->config_email;
         return View('acr_ftr::acr_admin_invoices', compact('faturalar', 'email', 'ciro', 'kdv', 'fiyat', 'tarih_ilk', 'tarih_son', 'tarih_veri'));
     }
 
@@ -133,30 +134,30 @@ class AcrFtrController extends Controller
     function index()
     {
         $user_model = new AcrUser();
-        $products = $user_model->find(Auth::user()->id)->products()->get();
+        $products   = $user_model->find(Auth::user()->id)->products()->get();
         return View('acr_ftr::anasayfa');
     }
 
     function sales_invoices()
     {
         $parasut = new ParasutController();
-        $orders = $parasut->sales_invoices();
-        $orders = (Object)$orders;
+        $orders  = $parasut->sales_invoices();
+        $orders  = (Object)$orders;
         return View('acr_ftr::admin_sales_incoices', compact('orders'));
     }
 
     function product_search($search)
     {
         $product_model = new Product();
-        $products = $product_model->where('product_name', 'like', "%$search%")->where('yayin', 1)->where('sil', 0)->get();
+        $products      = $product_model->where('product_name', 'like', "%$search%")->where('yayin', 1)->where('sil', 0)->get();
         return $products;
     }
 
     function product_search_row(Request $request)
     {
-        $search = $request->input('search');
+        $search   = $request->input('search');
         $products = self::product_search($search);
-        $row = '';
+        $row      = '';
         foreach ($products as $product) {
             $row .= self::product_row($product);
         }
@@ -198,8 +199,8 @@ class AcrFtrController extends Controller
     function new_product()
     {
         $product_model = new Product();
-        $controller = new AcrFtrController();
-        $products = $product_model->where('yayin', 1)->where('sil', 0)->with([
+        $controller    = new AcrFtrController();
+        $products      = $product_model->where('yayin', 1)->where('sil', 0)->with([
             'u_kats', 'my_product' => function ($q) {
                 $q->where('sil', 0);
             }
@@ -211,26 +212,26 @@ class AcrFtrController extends Controller
     function add_product(Request $request)
     {
         $acr_product_model = new Acrproduct();
-        $parasut = new ParasutController();
-        $product_model = new Product();
-        $id = $request->input('id');
+        $parasut           = new ParasutController();
+        $product_model     = new Product();
+        $id                = $request->input('id');
 
         $product_row = $product_model->where('id', $id)->first();
-        $data = [
-            'name'       => $product_row->product_name,
-            'quantity'   => 1,
+        $data        = [
+            'name' => $product_row->product_name,
+            'quantity' => 1,
             'unit_price' => $product_row->price,
-            'vat_rate'   => $product_row->kdv
+            'vat_rate' => $product_row->kdv
         ];
-        $product_id = $parasut->product($data);
+        $product_id  = $parasut->product($data);
         if ($acr_product_model->where('product_id', $id)->count() > 0) {
             $acr_product_model->where('product_id', $id)->update(['sil' => 0]);
             $product_id = $id;
         } else {
-            $data = [
+            $data       = [
                 'product_id' => $id,
                 'parasut_id' => $product_id,
-                'user_id'    => Auth::user()->id
+                'user_id' => Auth::user()->id
             ];
             $product_id = $acr_product_model->insertGetId($data);
         }
@@ -240,8 +241,8 @@ class AcrFtrController extends Controller
     function delete_product(Request $request)
     {
         $acr_product_model = new Acrproduct();
-        $id = $request->input('id');
-        $data = [
+        $id                = $request->input('id');
+        $data              = [
             'sil' => 1
         ];
         $acr_product_model->where('product_id', $id)->update($data);
@@ -260,20 +261,29 @@ class AcrFtrController extends Controller
 
     function my_product(Request $request)
     {
-        $controller = new AcrFtrController();
-        $api = self::my_product_api($request);
-        $products = $api->original['data']['products'];
+        $controller  = new AcrFtrController();
+        $api         = self::my_product_api($request);
+        $products    = $api->original['data']['products'];
         $sepet_count = $api->original['data']['sepet_counts'];
-        return View('acr_ftr::products', compact('products', 'controller', 'sepet_count'));
+        foreach ($products as $product) {
+            foreach ($product->u_kats as $u_kat) {
+                // dd($product->u_kats);
+                $ukats[] = $u_kat->id;
+            }
+        }
+        $ukats       = array_unique($ukats);
+        $p_kat_model = new U_kat();
+        $p_kats      = $p_kat_model->whereIn('id', $ukats)->where('parent_id', 0)->with('u_kats')->get();
+        return View('acr_ftr::products', compact('products', 'controller', 'sepet_count', 'p_kats'));
     }
 
     function my_product_api(Request $request)
     {
         $product_model = new Acrproduct();
-        $sepet_model = new Sepet();
-        $products = $product_model->where('yayin', 1)->where('sil', 0)->with([
-            'u_kats'  => function ($query) {
-                //  $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
+        $sepet_model   = new Sepet();
+        $products      = $product_model->where('yayin', 1)->where('sil', 0)->with([
+            'u_kats' => function ($query) {
+                $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
             },
             'product' => function ($query) {
                 $query->with([
@@ -282,16 +292,16 @@ class AcrFtrController extends Controller
                         $query->where('attributes.sil', 0);
 
                     },
-                    'files'      => function ($query) {
+                    'files' => function ($query) {
                         $query->orderBy('id');
                     },
-                    'file'       => function ($query) {
+                    'file' => function ($query) {
                         $query->orderBy('id');
                     }
                 ]);
             },
         ])->get();
-        $session_id = session()->get('session_id');
+        $session_id    = session()->get('session_id');
         if (Auth::check() && !empty($session_id)) {
             $sepet_model->sepet_birle($session_id);
             session()->forget('session_id');
@@ -302,12 +312,12 @@ class AcrFtrController extends Controller
 
     function attribute_modal(Request $request)
     {
-        $att_model = new AcrFtrAttribute();
+        $att_model     = new AcrFtrAttribute();
         $product_model = new Acrproduct();
-        $att_id = $request->input('att_id');
-        $product_id = $request->product_id;
-        $attribute = $att_model->where('id', $att_id)->first();
-        $product = $product_model->with([
+        $att_id        = $request->input('att_id');
+        $product_id    = $request->product_id;
+        $attribute     = $att_model->where('id', $att_id)->first();
+        $product       = $product_model->with([
             'product' => function ($query) use ($att_id) {
                 $query->with([
                     'attributes' => function ($query) use ($att_id) {
@@ -318,13 +328,13 @@ class AcrFtrController extends Controller
 
             }
         ])->where('id', $product_id)->first();
-        $row = '<div class="modal-header">';
-        $row .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>';
-        $row .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $attribute->att_name . '</h4>';
-        $row .= '</div>';
-        $row .= '<div class="modal-body">';
-        $row .= '<h4>Bu seçeneğin özellikleri</h4>';
-        $row .= '<ul style="list-style-image: url(/icon/16Tik.png); font-size: 14pt;">';
+        $row           = '<div class="modal-header">';
+        $row           .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>';
+        $row           .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $attribute->att_name . '</h4>';
+        $row           .= '</div>';
+        $row           .= '<div class="modal-body">';
+        $row           .= '<h4>Bu seçeneğin özellikleri</h4>';
+        $row           .= '<ul style="list-style-image: url(/icon/16Tik.png); font-size: 14pt;">';
         foreach ($product->product->attributes as $att) {
             $row .= '<li>' . $att->att_name . '</li>';
         }
@@ -343,9 +353,9 @@ class AcrFtrController extends Controller
     function image_modal(Request $request)
     {
         $product_model = new Acrproduct();
-        $product_id = $request->product_id;
-        $image_id = $request->image_id;
-        $product = $product_model->with([
+        $product_id    = $request->product_id;
+        $image_id      = $request->image_id;
+        $product       = $product_model->with([
             'product' => function ($query) {
                 $query->with([
                     'files' => function ($query) {
@@ -355,32 +365,32 @@ class AcrFtrController extends Controller
 
             }
         ])->where('product_id', $product_id)->first();
-        $row = '<div class="modal-header">';
-        $row .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="/icon/close.png"></span></button>';
-        $row .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $product->product->product_name . '</h4>';
-        $row .= '</div>';
-        $row .= '<div class="modal-body">';
+        $row           = '<div class="modal-header">';
+        $row           .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="/icon/close.png"></span></button>';
+        $row           .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $product->product->product_name . '</h4>';
+        $row           .= '</div>';
+        $row           .= '<div class="modal-body">';
 
         foreach ($product->product->files as $file) {
-            $file_ids[] = $file->id;
+            $file_ids[]        = $file->id;
             $images[$file->id] = '<img style="margin :2px; max-width:100%;  cursor:pointer;" class="img-thumbnail" src="http://eticaret.webuldum.com/acr_files/' . $file->acr_file_id . '/' . $file->file_name . '.' . $file->file_type . '">';
         }
         if (empty($image_id)) {
-            $row .= $images[$file_ids[0]];
+            $row     .= $images[$file_ids[0]];
             $img_key = 0;
         } else {
             $img_key = array_search($image_id, $file_ids);
-            $row .= $images[$file_ids[$img_key]];
+            $row     .= $images[$file_ids[$img_key]];
 
         }
         if (count($file_ids) > 0) {
             if (count($file_ids) > $img_key + 1) {
                 $next_id = $file_ids[$img_key + 1];
-                $row .= '<img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $next_id . ')" src="/icon/right-arrow.png"/>';
+                $row     .= '<img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $next_id . ')" src="/icon/right-arrow.png"/>';
             }
             if ($img_key > 0) {
                 $pre_id = $file_ids[$img_key - 1];
-                $row .= '<img style="position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $pre_id . ')" src="/icon/left-arrow.png"/>';
+                $row    .= '<img style="position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $pre_id . ')" src="/icon/left-arrow.png"/>';
             }
         }
 
@@ -394,27 +404,27 @@ class AcrFtrController extends Controller
 
     function config(Request $request)
     {
-        $bank_model = new Bank();
-        $user_conf_model = new Acr_user_table_conf();
-        $parasut_model = new Parasut_conf();
-        $company_conf_model = new Company_conf();
+        $bank_model            = new Bank();
+        $user_conf_model       = new Acr_user_table_conf();
+        $parasut_model         = new Parasut_conf();
+        $company_conf_model    = new Company_conf();
         $user_table_conf_sorgu = $user_conf_model;
-        $user_table_conf_sayi = $user_table_conf_sorgu->count();
+        $user_table_conf_sayi  = $user_table_conf_sorgu->count();
 
         if ($user_table_conf_sayi == 0) {
             $user_conf_model->insert(['user_id' => 1]);
         }
         $parasut_conf_sorgu = $parasut_model;
-        $parasut_conf_sayi = $parasut_conf_sorgu->count();
+        $parasut_conf_sayi  = $parasut_conf_sorgu->count();
         if ($parasut_conf_sayi == 0) {
             $parasut_model->insert(['user_id' => 1]);
         }
-        $user_table = $user_table_conf_sorgu->first();
-        $iyzi_model = new AcrFtrIyzico();
-        $banks = $bank_model->where('sil', 0)->get();
+        $user_table   = $user_table_conf_sorgu->first();
+        $iyzi_model   = new AcrFtrIyzico();
+        $banks        = $bank_model->where('sil', 0)->get();
         $company_conf = $company_conf_model->first();
-        $bank_form = self::bank_form($request);
-        $iyzico = $iyzi_model->first();
+        $bank_form    = self::bank_form($request);
+        $iyzico       = $iyzi_model->first();
         $parasut_conf = $parasut_model->first();
         return View('acr_ftr::config', compact('banks', 'bank_form', 'iyzico', 'user_table', 'parasut_conf', 'company_conf'));
     }
@@ -422,14 +432,14 @@ class AcrFtrController extends Controller
     function user_table_update(Request $request)
     {
         $user_conf_model = new Acr_user_table_conf();
-        $data = [
-            'user_id'          => Auth::user()->id,
-            'name'             => $request->input('name'),
-            'user_name'        => $request->input('user_name'),
-            'email'            => $request->input('email'),
-            'lisans_durum'     => $request->input('lisans_durum'),
+        $data            = [
+            'user_id' => Auth::user()->id,
+            'name' => $request->input('name'),
+            'user_name' => $request->input('user_name'),
+            'email' => $request->input('email'),
+            'lisans_durum' => $request->input('lisans_durum'),
             'lisans_baslangic' => $request->input('lisans_baslangic'),
-            'lisans_bitis'     => $request->input('lisans_bitis')
+            'lisans_bitis' => $request->input('lisans_bitis')
         ];
         if ($user_conf_model->count() > 0) {
             $user_conf_model->where('id', $request->id)->update($data);
@@ -444,12 +454,12 @@ class AcrFtrController extends Controller
         $parasut_conf = new Parasut_conf();
 
         $data = [
-            'user_id'       => Auth::user()->id,
-            'client_id'     => $request->input('client_id'),
+            'user_id' => Auth::user()->id,
+            'client_id' => $request->input('client_id'),
             'client_secret' => $request->input('client_secret'),
-            'username'      => $request->input('username'),
-            'password'      => $request->input('password'),
-            'company_id'    => $request->input('company_id')
+            'username' => $request->input('username'),
+            'password' => $request->input('password'),
+            'company_id' => $request->input('company_id')
 
         ];
         if ($parasut_conf->count() > 0) {
@@ -457,7 +467,7 @@ class AcrFtrController extends Controller
         } else {
             $parasut_conf->insert($data);
         }
-        $parasut = new ParasutController();
+        $parasut    = new ParasutController();
         $account_id = $parasut->account_id();
         $parasut_conf->where('id', $request->id)->update(['account_id' => $account_id]);
         return redirect()->back();
@@ -469,13 +479,13 @@ class AcrFtrController extends Controller
 
         $data = [
             'user_id' => Auth::user()->id,
-            'name'    => $request->input('name'),
-            'city'    => $request->input('city'),
-            'county'  => $request->input('county'),
-            'adress'  => $request->input('adress'),
-            'tel'     => $request->input('tel'),
-            'email'   => $request->input('email'),
-            'url'     => $request->input('url')
+            'name' => $request->input('name'),
+            'city' => $request->input('city'),
+            'county' => $request->input('county'),
+            'adress' => $request->input('adress'),
+            'tel' => $request->input('tel'),
+            'email' => $request->input('email'),
+            'url' => $request->input('url')
 
         ];
         if ($company_model->count() > 0) {
@@ -489,11 +499,11 @@ class AcrFtrController extends Controller
     function iyzico_update(Request $request)
     {
         $iyzi_model = new AcrFtrIyzico();
-        $data = [
-            'user_id'        => Auth::user()->id,
-            'setApiKey'      => $request->input('setApiKey'),
-            'setSecretKey'   => $request->input('setSecretKey'),
-            'setBaseUrl'     => $request->input('setBaseUrl'),
+        $data       = [
+            'user_id' => Auth::user()->id,
+            'setApiKey' => $request->input('setApiKey'),
+            'setSecretKey' => $request->input('setSecretKey'),
+            'setBaseUrl' => $request->input('setBaseUrl'),
             'setCallbackUrl' => $request->input('setCallbackUrl'),
         ];
 
@@ -521,15 +531,15 @@ class AcrFtrController extends Controller
     function bank_edit(Request $request)
     {
         $bank_model = new Bank();
-        $bank_id = $request->input('bank_id');
-        $bank = $bank_model->where('id', $bank_id)->first();
+        $bank_id    = $request->input('bank_id');
+        $bank       = $bank_model->where('id', $bank_id)->first();
         return self::bank_form($request, $bank);
     }
 
     function bank_delete(Request $request)
     {
         $bank_model = new Bank();
-        $bank_id = $request->input('bank_id');
+        $bank_id    = $request->input('bank_id');
         $bank_model->where('id', $bank_id)->update(['sil' => 1]);
 
     }
@@ -537,17 +547,17 @@ class AcrFtrController extends Controller
     function bank_create(Request $request)
     {
         $bank_model = new Bank();
-        $data = [
-            'user_id'     => Auth::user()->id,
-            'name'        => $request->input('name'),
-            'bank_name'   => $request->input('bank_name'),
-            'user_name'   => $request->input('user_name'),
-            'iban'        => $request->input('iban'),
+        $data       = [
+            'user_id' => Auth::user()->id,
+            'name' => $request->input('name'),
+            'bank_name' => $request->input('bank_name'),
+            'user_name' => $request->input('user_name'),
+            'iban' => $request->input('iban'),
             'bank_number' => $request->input('bank_number'),
-            'active'      => $request->input('active'),
+            'active' => $request->input('active'),
 
         ];
-        $bank_id = empty($request->input('bank_id')) ? 0 : $request->input('bank_id');
+        $bank_id    = empty($request->input('bank_id')) ? 0 : $request->input('bank_id');
         $bank_model->create($bank_id, $data);
         return redirect()->back();
     }
@@ -580,10 +590,10 @@ class AcrFtrController extends Controller
         $row .= '</div>';
         $row .= '<div class="form-group">';
         if (@$bank->active == 1 || empty(@$bank->active)) {
-            $aktif = 'checked';
+            $aktif   = 'checked';
             $deaktif = '';
         } else {
-            $aktif = '';
+            $aktif   = '';
             $deaktif = 'checked';
         }
         $row .= '<label>';

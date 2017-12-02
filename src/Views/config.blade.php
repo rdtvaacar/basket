@@ -72,8 +72,6 @@
                                     <div style="font-size: 14pt; float: left; width: 80%; "><?php echo $bank->name ?> -
                                         <span style="font-weight: 200;"><?php echo $bank->bank_name . '/' . $bank->user_name ?></span>
                                     </div>
-
-
                                 </div>
                             </label>
                             <div style="font-size: 16pt; float: right; width: 15%; ">
@@ -83,7 +81,6 @@
                                       onclick="bank_delete(<?php echo $bank->id ?>)" class="fa fa-trash"></span>
                             </div>
                         </div>
-
                         <?php }?>
                     </div>
                     <div style="clear:both;"></div>
@@ -193,7 +190,6 @@
             </div>
         </div>
     </section>
-
     <div id="myModal" class="modal">
         <div class="modal-dialog">
             <div class="modal-content">
