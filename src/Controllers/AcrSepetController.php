@@ -68,9 +68,6 @@ class AcrSepetController extends Controller
 
     function product_sepet_ekle(Request $request)
     {
-        if (empty($request->yaka_id)) {
-            return 'asdsadasd';
-        }
         self::create($request);
         return redirect()->to('/acr/ftr/card/sepet')->with('msg', 'Başarılı');
     }
@@ -83,7 +80,7 @@ class AcrSepetController extends Controller
             $product_id = $request->input('product_id');
         }
         $notes = $request->notes;
-        $data = [
+        $data  = [
             'yaka_id' => $request->yaka_id,
             'kol_id' => $request->kol_id,
             'size_id' => $request->size_id
@@ -365,7 +362,6 @@ class AcrSepetController extends Controller
         $session_id = session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
         $order_id   = $request->input('order_id');
-        dd($products);
         return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sepet bilgileri çekiliyor.', 'data' => ['products' => $products, 'order_id' => $order_id]]);
     }
 
@@ -763,10 +759,8 @@ class AcrSepetController extends Controller
 
     function adress_create(Request $request)
     {
-
         self::adress_create_api($request);
         return Redirect()->back();
-
     }
 
     function adress_create_api(Request $request)

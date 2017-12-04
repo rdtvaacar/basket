@@ -317,10 +317,12 @@
                                             } ?>
                                         </li>
 
-                                        <li>
-                                            <p><a href="/acr/ftr/card/sepet?product_id=<?php echo $product->product->id ?> " class="btn btn-success  ">SATIN AL</a>
+                                        <li style="text-align: center">
+                                            <a href="/acr/ftr/product/detail?product_id=<?php echo $product->product->id ?> " class="btn btn-success  ">DETAYLI İNCELE</a>
+                                        <!--<p><a href="/acr/ftr/card/sepet?product_id=<?php echo $product->product->id ?> " class="btn btn-success  ">SATIN AL</a>
                                                 <button onclick="sepete_ekle(<?php echo $product->product->id ?>)" class="btn bg-orange margin">SEPETE EKLE</button>
-                                            </p>
+                                            </p>-->
+                                            <hr>
                                             <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
                                         </li>
                                     </ul>
