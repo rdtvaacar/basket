@@ -230,18 +230,16 @@
     <section class="content">
         <div class="row">
             <div class=" col-md-12">
-                @foreach($p_kats as $kat)
-                    <div style="float: left;">
-                        <label> {{@$kat->kat_isim}}</label>
-                        <select name="" class="form-control">
-                            @if(!empty($kat->u_kats))
-                                @foreach(@$kat->u_kats as $p_kat)
-                                    <option>{{@$p_kat->kat_isim}}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-                @endforeach
+                <form action="/acr/ftr/product" method="post"></form>
+                <select class="form-control" id="kat_1" style="float: left; width:280px;">
+                    <option value="">Seçiniz</option>
+                    @foreach($p_kats as $kat)
+                        <option value="{{$kat->id}}"><b>{{@$kat->kat_isim}}</b></option>
+                    @endforeach
+                </select>
+                <div id="categories_1"></div>
+                <div id="categories_2"></div>
+                <div id="categories_3"></div>
                 <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative;">
                     <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
                         <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
@@ -281,8 +279,9 @@
                         <div class="price-table">
                             <?php
                             //  dd($products);
-                            foreach ($products as $key =>$product) { ?>
-                            <div class="col-md-4">
+                            foreach ($products as $key =>$product) {
+                            ?>
+                            <div style="min-height:760px;" class="col-md-4 all_categories @foreach($product->u_kats as $u_kat) kat_{{$u_kat->id }} @endforeach">
                                 <div class="price-col2">
                                     <div class="title-2"><?php echo $product->product->product_name; ?></div>
                                     <div class="col-md-12" style="text-align: center;">
@@ -328,9 +327,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            @if(($key+1)%3 == 0)
-                                <div style="clear:both;"></div>
-                            @endif
+
                             <?php }
 
                             ?>
@@ -357,6 +354,23 @@
 @stop
 @section('footer')
     <script>
+        $('#kat_1').change(function () {
+            var kat_id = $(this).val();
+            categories(1, kat_id);
+        })
+        function categories(kat, kat_id) {
+            $.ajax({
+                type: 'post',
+                url: '/acr/ftr/product/categories',
+                data: 'kat_id=' + kat_id + '&kat=' + kat,
+                success: function (veri) {
+                    $('#categories_' + kat).html(veri)
+                    $('.all_categories').fadeOut()
+                    $('.kat_' + kat_id).fadeIn()
+
+                }
+            });
+        }
         function urunGoster(att_id, product_id) {
             $.ajax({
                 type: 'post',

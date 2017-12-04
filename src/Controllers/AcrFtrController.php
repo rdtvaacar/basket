@@ -41,6 +41,23 @@ class AcrFtrController extends Controller
         $this->config_email = @$conf_table->email;
     }
 
+    function categories(Request $request)
+    {
+        $api      = self::my_product_api($request);
+        $products = $api->original['data']['products'];
+        foreach ($products as $product) {
+            foreach ($product->u_kats as $u_kat) {
+                $ukats[] = $u_kat->id;
+            }
+        }
+        $ukats     = array_unique($ukats);
+        $kat_model = new U_kat();
+        $kat_id    = $request->kat_id;
+        $kat_div   = $request->kat + 1;
+        $p_kats    = $kat_model->where('parent_id', $kat_id)->whereIn('id', $ukats)->get();
+        return view('acr_ftr::categories_select', compact('p_kats', 'kat_div'))->render();
+    }
+
     function product_img(Request $request)
     {
         $product_id    = $request->product_id;
@@ -50,12 +67,34 @@ class AcrFtrController extends Controller
         $product = $product_model->where('id', $product_id)->with([
             'file' => function ($query) use ($img_id) {
                 @$query->where('id', $img_id);
+            },
+            'files' => function ($query) {
+                $query->orderBy('id');
             }
         ])->first();
+        $row     = '';
+        foreach ($product->files as $file) {
+            $file_ids[] = $file->id;
+        }
+        if (empty($img_id)) {
+            $img_key = 0;
+        } else {
+            $img_key = array_search($img_id, $file_ids);
+        }
+        if (count($file_ids) > 0) {
+            if (count($file_ids) > $img_key + 1) {
+                $next_id = $file_ids[$img_key + 1];
+                $row     .= '<img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="product_image(' . $product->id . ',' . $next_id . ')" src="/icon/right-arrow.png"/>';
+            }
+            if ($img_key > 0) {
+                $pre_id = $file_ids[$img_key - 1];
+                $row    .= '<img style="position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="product_image(' . $product->id . ',' . $pre_id . ')" src="/icon/left-arrow.png"/>';
+            }
+        }
 
-        return '<img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/' . $product->file->acr_file_id . '/medium/' . $product->file->file_name . '.' . $product->file->file_type . '"
+        $row .= '<img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/' . $product->file->acr_file_id . '/medium/' . $product->file->file_name . '.' . $product->file->file_type . '"
                              alt="' . $product->file->org_file_name . '"/>';
-
+        return $row;
     }
 
     function product_detail(Request $request)
@@ -93,7 +132,7 @@ class AcrFtrController extends Controller
         }
         if (Auth::check()) {
             $sepet = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 0)->first();
-            $ps    = $ps_model->where('user_id', Auth::user()->id)->where('product_id', $product_id)->where('sepet_id', $sepet->id)->with(['product_notes'])->first();
+            $ps    = $ps_model->where('user_id', Auth::user()->id)->where('product_id', $product_id)->where('sepet_id', @$sepet->id)->with(['product_notes'])->first();
         } else {
             $sepet = $sepet_model->where('session_id', session()->session_id)->first();
             $ps    = $ps_model->where('sepet_id', $sepet->id)->where('product_id', $product_id)->first();

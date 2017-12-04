@@ -10,7 +10,6 @@ use Acr\Ftr\Model\County;
 use Acr\Ftr\Model\Fatura;
 use Acr\Ftr\Model\Fatura_product;
 use Acr\Ftr\Model\Product_sepet;
-use Acr\Ftr\Model\Product_sepet_notes;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\City;
 use App\Handlers\Commands\my;
@@ -69,7 +68,7 @@ class AcrSepetController extends Controller
     function product_sepet_ekle(Request $request)
     {
         self::create($request);
-        return redirect()->to('/acr/ftr/card/sepet')->with('msg', 'Başarılı');
+        return redirect()->to('/acr/ftr/card/sepet')->with('msg', $this->basarili());
     }
 
     function create(Request $request, $product_id = null)

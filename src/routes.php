@@ -4,6 +4,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('/', 'AcrFtrController@index');
         Route::get('/product/detail', 'AcrFtrController@product_detail');
         Route::get('/product', 'AcrFtrController@my_product');
+        Route::post('/product', 'AcrFtrController@my_product');
         Route::post('/product/attribute/modal', 'AcrFtrController@attribute_modal');
         Route::post('/product/sepet/create', 'AcrSepetController@create');
         Route::post('/product/sepet/products', 'AcrSepetController@products');
@@ -18,6 +19,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::post('/product/image/modal', 'AcrFtrController@image_modal');
         Route::post('/product/img', 'AcrFtrController@product_img');
         Route::post('/product/sepet/ekle', 'AcrSepetController@product_sepet_ekle');
+        Route::post('/product/categories', 'AcrFtrController@categories');
 
 
         // paraşüt

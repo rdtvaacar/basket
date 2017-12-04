@@ -226,7 +226,6 @@
             vertical-align: baseline;
             position: relative;
         }
-
         @media only screen and (min-width: 720px) and (max-width: 959px) {
             .peice-list .pack-price span {
                 font-size: 33px;
@@ -246,28 +245,37 @@
     <section class="content">
         <div class="row">
             {!! $msg !!}
-            <div class=" col-md-8">
+            <div class=" col-md-7">
                 <div class="box box-primary">
                     <div class="box-body">
                         <div class=" col-md-10">
                             <div id="product_img">
                                 <img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$product->file->acr_file_id}}/medium/{{$product->file->file_name}}.{{$product->file->file_type}}"
                                      alt="{{$product->file->org_file_name}}"/>
+                                @if(count($product->files)>1)
+                                    <img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="next_image()" src="/icon/right-arrow.png"/>
+                                @endif
                             </div>
                         </div>
                         <div class=" col-md-2">
                             <div style="overflow: auto; height:700px;" class="scroll">
                                 @foreach($product->files as $file)
+                                    <?php $file_ids[] = $file->id ?>
                                     <div onclick="product_image({{$product->id}},{{$file->id}})" style="float: left; cursor:pointer;">
                                         <img class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$file->acr_file_id}}/thumbnail/{{$file->file_name}}.{{$file->file_type}}" alt="{{$file->org_file_name}}"/>
                                     </div>
                                 @endforeach
+                                <?php if (count($file_ids) > 1) {
+                                    $next_id = $file_ids[1];
+                                } else {
+                                    $next_id = 0;
+                                }?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class=" col-md-4">
+            <div class=" col-md-5">
                 <form method="post" action="/acr/ftr/product/sepet/ekle">
                     {{csrf_field()}}
                     <div class="box box-primary">
@@ -283,34 +291,31 @@
                                 <select required class="form-control" name="yaka_id">
                                     <option value="">SEÇİNİZ</option>
                                     @foreach($product->product_yakas as $yaka)
-                                        <option {{$ps->yaka_id==$yaka->yaka->id?'selected':''}} value="{{$yaka->yaka->id}}">{{$yaka->yaka->name}}</option>
+                                        <option {{@$ps->yaka_id==$yaka->yaka->id?'selected':''}} value="{{$yaka->yaka->id}}">{{$yaka->yaka->name}}</option>
                                     @endforeach
                                 </select>
                                 <hr>
                             @endif
-
                             @if(count($product->product_sizes)>0)
                                 <label>Beden Seçiniz</label>
                                 <select required class="form-control" name="size_id">
                                     <option value="">SEÇİNİZ</option>
                                     @foreach($product->product_sizes as $size)
-                                        <option {{$ps->size_id==$size->size->id?'selected':''}} value="{{$size->size->id}}">{{$size->size->name}}</option>
+                                        <option {{@$ps->size_id==$size->size->id?'selected':''}} value="{{$size->size->id}}">{{$size->size->name}}</option>
                                     @endforeach
                                 </select>
                                 <hr>
                             @endif
-
                             @if(count($product->product_kols)>0)
                                 <label>Kol Boyu Seçiniz</label>
                                 <select required class="form-control" name="kol_id">
                                     <option value="">SEÇİNİZ</option>
                                     @foreach($product->product_kols as $kol)
-                                        <option {{$ps->kol_id==$kol->kol->id?'selected':''}} value="{{$kol->kol->id}}">{{$kol->kol->name}}</option>
+                                        <option {{@$ps->kol_id==$kol->kol->id?'selected':''}} value="{{$kol->kol->id}}">{{$kol->kol->name}}</option>
                                     @endforeach
                                 </select>
                                 <hr>
                             @endif
-
                             @if(count($product->product_notes)>0)
                                 @foreach($product->product_notes as $note)
                                     <div></div> <label>{{$note->name}}</label>
@@ -319,7 +324,7 @@
                                     <hr>
                                 @endforeach
                             @endif
-                            <button type="submit" style="float: right" class="btn bg-orange ">SEPETE EKLE</button>
+                            <button type="submit" style="float: right" class="btn bg-orange btn-lg btn-block">SEPETE EKLE</button>
                             <input type="hidden" name="product_id" value="{{$product->id}}">
                         </div>
                         <div class="box-footer">
@@ -368,6 +373,9 @@
                     $('#product_img').html(veri);
                 }
             });
+        }
+        function next_image() {
+            product_image({{$product->id}},{{$next_id}})
         }
         function urunGoster(att_id, product_id) {
             $.ajax({
