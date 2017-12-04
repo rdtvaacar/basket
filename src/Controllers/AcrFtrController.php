@@ -39,6 +39,55 @@ class AcrFtrController extends Controller
         $this->config_email = @$conf_table->email;
     }
 
+    function product_img(Request $request)
+    {
+        $product_id    = $request->product_id;
+        $img_id        = $request->img_id;
+        $product_model = new Product();
+
+        $product = $product_model->where('id', $product_id)->with([
+            'file' => function ($query) use ($img_id) {
+                @$query->where('id', $img_id);
+            }
+        ])->first();
+
+        return '<img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/' . $product->file->acr_file_id . '/medium/' . $product->file->file_name . '.' . $product->file->file_type . '"
+                             alt="' . $product->file->org_file_name . '"/>';
+
+    }
+
+    function product_detail(Request $request)
+    {
+        $product_id    = $request->product_id;
+        $product_model = new Product();
+        $product       = $product_model->where('id', $product_id)->with([
+            'attributes' => function ($query) {
+                $query->where('attributes.attribute_id', 0);
+                $query->where('attributes.sil', 0);
+
+            },
+            'files' => function ($query) {
+                $query->orderBy('id');
+            },
+            'file' => function ($query) {
+                $query->orderBy('id');
+            },
+            'product_yakas',
+            'product_sizes' => function ($query) {
+                $query->orderBy('id');
+            }
+        ])->first();
+        $sepet_model   = new Sepet();
+        $session_id    = session()->get('session_id');
+        if (Auth::check() && !empty($session_id)) {
+            $sepet_model->sepet_birle($session_id);
+            session()->forget('session_id');
+        }
+        $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
+        return View('acr_ftr::product', compact('product', 'sepet_count'));
+
+    }
+
     function admin_fatura_yazdir(Request $request)
     {
         $fatura_model = new Fatura();

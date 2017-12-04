@@ -43,4 +43,13 @@ class Product extends Model
         return $this->hasOne('Acr\Ftr\Model\Product_file', 'acr_file_id', 'acr_file_id');
 
     }
+
+    function product_yakas()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_yakas');
+    }
+    function product_sizes()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_Sizes');
+    }
 }

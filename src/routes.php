@@ -2,6 +2,7 @@
 Route::group(['middleware' => ['web']], function () {
     Route::group(['namespace' => 'Acr\Ftr\Controllers', 'prefix' => 'acr/ftr'], function () {
         Route::get('/', 'AcrFtrController@index');
+        Route::get('/product/detail', 'AcrFtrController@product_detail');
         Route::get('/product', 'AcrFtrController@my_product');
         Route::post('/product/attribute/modal', 'AcrFtrController@attribute_modal');
         Route::post('/product/sepet/create', 'AcrSepetController@create');
@@ -15,6 +16,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::post('/product/sepet/delete_all', 'AcrSepetController@delete_all');
         Route::get('/card/sepet', 'AcrSepetController@card');
         Route::post('/product/image/modal', 'AcrFtrController@image_modal');
+        Route::post('/product/img', 'AcrFtrController@product_img');
 
         // paraşüt
 
