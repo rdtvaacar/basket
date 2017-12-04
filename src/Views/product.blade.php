@@ -1,16 +1,16 @@
 @extends('acr_ftr.index')
 @section('header')
     <style>
-        ::-webkit-scrollbar {
-            width: 12px;
+        .scroll::-webkit-scrollbar {
+            width: 5px;
         }
 
-        ::-webkit-scrollbar-track {
+        .scroll::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
+            border-radius: 5px;
         }
 
-        ::-webkit-scrollbar-thumb {
+        .scroll::-webkit-scrollbar-thumb {
             border-radius: 10px;
             -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
         }
@@ -245,6 +245,7 @@
 @section('acr_ftr')
     <section class="content">
         <div class="row">
+            {!! $msg !!}
             <div class=" col-md-8">
                 <div class="box box-primary">
                     <div class="box-body">
@@ -255,7 +256,7 @@
                             </div>
                         </div>
                         <div class=" col-md-2">
-                            <div style="overflow: auto; height:700px;" class="webkit-scrollbar-thumb">
+                            <div style="overflow: auto; height:700px;" class="scroll">
                                 @foreach($product->files as $file)
                                     <div onclick="product_image({{$product->id}},{{$file->id}})" style="float: left; cursor:pointer;">
                                         <img class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$file->acr_file_id}}/thumbnail/{{$file->file_name}}.{{$file->file_type}}" alt="{{$file->org_file_name}}"/>
@@ -264,47 +265,68 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
             <div class=" col-md-4">
-                <div class="box box-primary">
-                    <div class="box-header">
-                        <strong>{{$product->product_name}}</strong>
-                        <hr>
-                    </div>
-                    <div class="box-body">
-                        <div class="text-green " style=" font-size: 3em; text-align: center"><strong>{{$product->price}}₺</strong></div>
-                        <hr>
-                        @if(count($product->product_yakas)>0)
-                            <label>Yaka Seçiniz</label>
-                            <select class="form-control" name="yaka">
-                                <option value="">SEÇİNİZ</option>
-                                @foreach($product->product_yakas as $yaka)
-                                    <option value="{{$yaka->yaka->id}}">{{$yaka->yaka->name}}</option>
-                                @endforeach
-                            </select>
-                        @endif
-                        <hr>
-                        @if(count($product->product_sizes)>0)
-                            <label>Beden Seçiniz</label>
-                            <select class="form-control" name="yaka">
-                                <option value="">SEÇİNİZ</option>
-                                @foreach($product->product_sizes as $size)
-                                    <option value="{{$size->size->id}}">{{$size->size->name}}</option>
-                                @endforeach
-                            </select>
-                        @endif
-                        <hr>
+                <form method="post" action="/acr/ftr/product/sepet/ekle">
+                    {{csrf_field()}}
+                    <div class="box box-primary">
+                        <div class="box-header">
+                            <strong>{{$product->product_name}}</strong>
+                            <hr>
+                        </div>
+                        <div class="box-body">
+                            <div class="text-green" style="font-size: 3em; text-align: center"><strong>{{$product->price}}₺</strong></div>
+                            <hr>
+                            @if(count($product->product_yakas)>0)
+                                <label>Yaka Seçiniz</label>
+                                <select required class="form-control" name="yaka_id">
+                                    <option value="">SEÇİNİZ</option>
+                                    @foreach($product->product_yakas as $yaka)
+                                        <option {{$ps->yaka_id==$yaka->yaka->id?'selected':''}} value="{{$yaka->yaka->id}}">{{$yaka->yaka->name}}</option>
+                                    @endforeach
+                                </select>
+                                <hr>
+                            @endif
 
-                        <hr>
-                        <a style="float: left" href="/acr/ftr/card/sepet?product_id=<?php echo $product->id ?> " class="btn btn-success  ">SATIN AL</a>
-                        <button style="float: right" onclick="sepete_ekle(<?php echo $product->id ?>)" class="btn bg-orange ">SEPETE EKLE</button>
+                            @if(count($product->product_sizes)>0)
+                                <label>Beden Seçiniz</label>
+                                <select required class="form-control" name="size_id">
+                                    <option value="">SEÇİNİZ</option>
+                                    @foreach($product->product_sizes as $size)
+                                        <option {{$ps->size_id==$size->size->id?'selected':''}} value="{{$size->size->id}}">{{$size->size->name}}</option>
+                                    @endforeach
+                                </select>
+                                <hr>
+                            @endif
+
+                            @if(count($product->product_kols)>0)
+                                <label>Kol Boyu Seçiniz</label>
+                                <select required class="form-control" name="kol_id">
+                                    <option value="">SEÇİNİZ</option>
+                                    @foreach($product->product_kols as $kol)
+                                        <option {{$ps->kol_id==$kol->kol->id?'selected':''}} value="{{$kol->kol->id}}">{{$kol->kol->name}}</option>
+                                    @endforeach
+                                </select>
+                                <hr>
+                            @endif
+
+                            @if(count($product->product_notes)>0)
+                                @foreach($product->product_notes as $note)
+                                    <div></div> <label>{{$note->name}}</label>
+                                    <input required class="form-control" name="notes[]">
+                                    <input type="hidden" value="{{$note->id}}" name="note_ids[]">
+                                    <hr>
+                                @endforeach
+                            @endif
+                            <button type="submit" style="float: right" class="btn bg-orange ">SEPETE EKLE</button>
+                            <input type="hidden" name="product_id" value="{{$product->id}}">
+                        </div>
+                        <div class="box-footer">
+                            <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
+                        </div>
                     </div>
-                    <div class="box-footer">
-                        <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
-                    </div>
-                </div>
+                </form>
             </div>
             <div class=" col-md-12">
                 <div class="box box-primary">

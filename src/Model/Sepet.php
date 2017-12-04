@@ -23,7 +23,7 @@ class Sepet extends Model
         return $this->belongsTo('App\user');
     }
 
-    function create($session_id = null, $product_id)
+    function create($session_id = null, $product_id, $data = null, $data_notes = null)
     {
         $sepet_id      = self::product_sepet_id($session_id);
         $product_model = new Product();
@@ -36,10 +36,17 @@ class Sepet extends Model
             }
         }
         if (Auth::check()) {
-            Product_sepet::insert(['product_id' => $product_id, 'user_id' => Auth::user()->id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
-
+            $data_1     = ['product_id' => $product_id, 'user_id' => Auth::user()->id, 'sepet_id' => $sepet_id, 'type' => $product->type];
+            $data_merge = array_merge($data_1, $data);
         } else {
-            Product_sepet::insert(['product_id' => $product_id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
+            $data_1     = ['product_id' => $product_id, 'sepet_id' => $sepet_id, 'type' => $product->type];
+            $data_merge = array_merge($data_1, $data);
+        }
+        $ps_id = Product_sepet::insert($data_merge);
+        if (!empty($data_notes)) {
+            $ps_notes = new Product_sepet_notes();
+            $ps_notes->where('product_id', $product_id)->where('sepet_id', $sepet_id)->delete();
+            $ps_notes->insert($data_notes);
         }
         return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Ürün başarıyla sepete eklendi.', 'data' => $sepet_id]);
 

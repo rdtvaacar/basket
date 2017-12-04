@@ -13,6 +13,7 @@ use Acr\Ftr\Model\Fatura;
 use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\AcrFtrAttribute;
+use Acr\Ftr\Model\Product_sepet;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\U_kat;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ use Acr\Ftr\Model\File_model;
 use Acr\Ftr\Model\File_dosya_model;
 use Auth;
 use App\Eski_faturalar;
+use Session;
 
 class AcrFtrController extends Controller
 {
@@ -60,6 +62,7 @@ class AcrFtrController extends Controller
     {
         $product_id    = $request->product_id;
         $product_model = new Product();
+        $ps_model      = new Product_sepet();
         $product       = $product_model->where('id', $product_id)->with([
             'attributes' => function ($query) {
                 $query->where('attributes.attribute_id', 0);
@@ -73,9 +76,14 @@ class AcrFtrController extends Controller
                 $query->orderBy('id');
             },
             'product_yakas',
+            'product_kols',
             'product_sizes' => function ($query) {
                 $query->orderBy('id');
+            },
+            'product_notes' => function ($query) {
+                $query->orderBy('id');
             }
+
         ])->first();
         $sepet_model   = new Sepet();
         $session_id    = session()->get('session_id');
@@ -83,8 +91,20 @@ class AcrFtrController extends Controller
             $sepet_model->sepet_birle($session_id);
             session()->forget('session_id');
         }
+        if (Auth::check()) {
+            $ps = $ps_model->where('user_id', Auth::user()->id)->where('product_id', $product_id)->with(['product_notes'])->first();
+        } else {
+            $sepet = $sepet_model->where('session_id', session()->session_id)->first();
+            $ps    = $ps_model->where('sepet_id', $sepet)->where('product_id', $product_id)->first();
+
+        }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
-        return View('acr_ftr::product', compact('product', 'sepet_count'));
+        if (Session::get('msg')) {
+            $msg = Session::get('msg');
+        } else {
+            $msg = '';
+        }
+        return View('acr_ftr::product', compact('product', 'sepet_count', 'msg', 'ps'));
 
     }
 

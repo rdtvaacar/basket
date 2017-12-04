@@ -44,12 +44,23 @@ class Product extends Model
 
     }
 
+    function product_kols()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_kols');
+    }
+
     function product_yakas()
     {
         return $this->hasMany('Acr\Ftr\Model\Product_yakas');
     }
+
     function product_sizes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_Sizes');
+        return $this->hasMany('Acr\Ftr\Model\Product_sizes');
+    }
+
+    function product_notes()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_note');
     }
 }

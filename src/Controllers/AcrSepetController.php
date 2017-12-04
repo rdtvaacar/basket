@@ -10,6 +10,7 @@ use Acr\Ftr\Model\County;
 use Acr\Ftr\Model\Fatura;
 use Acr\Ftr\Model\Fatura_product;
 use Acr\Ftr\Model\Product_sepet;
+use Acr\Ftr\Model\Product_sepet_notes;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\City;
 use App\Handlers\Commands\my;
@@ -65,6 +66,15 @@ class AcrSepetController extends Controller
         return View('acr_ftr::acr_admin_orders', compact('orders', 'email'));
     }
 
+    function product_sepet_ekle(Request $request)
+    {
+        if (empty($request->yaka_id)) {
+            return 'asdsadasd';
+        }
+        self::create($request);
+        return redirect()->to('/acr/ftr/card/sepet')->with('msg', 'Başarılı');
+    }
+
     function create(Request $request, $product_id = null)
     {
         $sepet_model = new Sepet();
@@ -72,11 +82,31 @@ class AcrSepetController extends Controller
         if (empty($product_id)) {
             $product_id = $request->input('product_id');
         }
+        $notes = $request->notes;
+        $data = [
+            'yaka_id' => $request->yaka_id,
+            'kol_id' => $request->kol_id,
+            'size_id' => $request->size_id
+        ];
+
         if (Auth::check()) {
-            $sepet_id = $sepet_model->product_sepet_id();;
-            if ($ps_model->where('sepet_id', $sepet_id)->where('product_id', $product_id)->count() > 0) {
-                return $ps_model->use_plus($product_id, $sepet_id);
+            $sepet_id = $sepet_model->product_sepet_id();
+            if (!empty($notes)) {
+                foreach ($notes as $key => $note) {
+                    $data_notes[] = [
+                        'sepet_id' => $sepet_id,
+                        'product_id' => $product_id,
+                        'note_id' => $request->note_ids[$key],
+                        'name' => $request->notes[$key]
+                    ];
+                }
+            } else {
+                $data_notes = [];
             }
+            if ($ps_model->where('sepet_id', $sepet_id)->where('product_id', $product_id)->count() > 0) {
+                return $ps_model->use_plus($product_id, $sepet_id, $data, $data_notes);
+            }
+
         } else {
             if (empty($request->session()->get('session_id'))) {
                 $session_id = rand(1000000, 99999999);
@@ -84,14 +114,26 @@ class AcrSepetController extends Controller
             } else {
                 $session_id = session()->get('session_id');
             }
-
             $sepet_id = $sepet_model->product_sepet_id($session_id);
+            if (!empty($notes)) {
+                foreach ($notes as $key => $note) {
+                    $data_notes[] = [
+                        'sepet_id' => $sepet_id,
+                        'product_id' => $product_id,
+                        'note_id' => $request->note_ids[$key],
+                        'name' => $request->notes[$key]
+                    ];
+                }
+            } else {
+                $data_notes = [];
+            }
             if ($ps_model->where('product_id', $product_id)->where('sepet_id', $sepet_id)->count() > 0) {
-                return $ps_model->use_plus($product_id, $sepet_id);
+                return $ps_model->use_plus($product_id, $sepet_id, $data, $data_notes);
             }
         }
+
         $session_id = empty($session_id) ? null : $session_id;
-        return $sepet_model->create($session_id, $product_id);
+        return $sepet_model->create($session_id, $product_id, $data, $data_notes);
     }
 
     function delete(Request $request)
@@ -323,6 +365,7 @@ class AcrSepetController extends Controller
         $session_id = session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
         $order_id   = $request->input('order_id');
+        dd($products);
         return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sepet bilgileri çekiliyor.', 'data' => ['products' => $products, 'order_id' => $order_id]]);
     }
 
@@ -1054,7 +1097,7 @@ class AcrSepetController extends Controller
             }
         }
         return $market_controller->order_result(null, $order_id);
-        }
+    }
 
     function e_arsiv_create($payment_type, $user_email, $invoice_id)
     {
