@@ -20,16 +20,11 @@ Route::group(['middleware' => ['web']], function () {
         Route::post('/product/img', 'AcrFtrController@product_img');
         Route::post('/product/sepet/ekle', 'AcrSepetController@product_sepet_ekle');
         Route::post('/product/categories', 'AcrFtrController@categories');
-
-
         // paraşüt
-
         Route::get('/parasut', 'ParasutController@index');
         Route::get('/fit', 'FitBulutController@getUserLists'); // fit client akif bağlantı
-
         Route::get('/soap', 'AcrSoapController@show');
         Route::get('/acrFit', 'FitController@connect');
-
 
         Route::group(['middleware' => ['auth']], function () {
             Route::post('/order/active', 'AcrSepetController@orders_active');

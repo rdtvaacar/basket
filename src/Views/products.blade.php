@@ -286,8 +286,10 @@
                                     <div class="title-2"><?php echo $product->product->product_name; ?></div>
                                     <div class="col-md-12" style="text-align: center;">
                                         @if(!empty($product->product->file))
-                                            <img class="img-rounded" style="cursor:pointer; margin-top: 10px;" onclick="image_viewer({{$product->product->id,$product->product->file->id}})"
-                                                 src="https://eticaret.webuldum.com/acr_files/{{$product->product->file->acr_file_id}}/thumbnail/{{$product->product->file->file_name}}.{{$product->product->file->file_type}}"/>
+                                            <a href="/acr/ftr/product/detail?product_id={{$product->product->id}}"> <img class="img-rounded"
+                                                                                                                         style="cursor:pointer; margin-top: 10px;"
+                                                                                                                         src="https://eticaret.webuldum.com/acr_files/{{$product->product->file->acr_file_id}}/thumbnail/{{$product->product->file->file_name}}.{{$product->product->file->file_type}}"/>
+                                            </a>
                                             <hr style="padding: 0;">
                                         @endif
                                     </div>
@@ -327,9 +329,7 @@
                                     </ul>
                                 </div>
                             </div>
-
                             <?php }
-
                             ?>
                         </div>
                         <div class="modal fade" id="sepetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
