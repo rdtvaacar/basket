@@ -134,7 +134,7 @@ class AcrFtrController extends Controller
             $sepet = $sepet_model->where('user_id', Auth::user()->id)->where('siparis', 0)->first();
             $ps    = $ps_model->where('user_id', Auth::user()->id)->where('product_id', $product_id)->where('sepet_id', @$sepet->id)->with(['product_notes'])->first();
         } else {
-            $sepet = $sepet_model->where('session_id', session()->session_id)->first();
+            $sepet = $sepet_model->where('session_id', $request->session()->session_id)->first();
             $ps    = $ps_model->where('sepet_id', $sepet->id)->where('product_id', $product_id)->first();
         }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
