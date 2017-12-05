@@ -374,14 +374,14 @@ class AcrFtrController extends Controller
         $products    = $api->original['data']['products'];
         $sepet_count = $api->original['data']['sepet_counts'];
         foreach ($products as $product) {
-            foreach ($product->u_kats as $u_kat) {
+            foreach ($product->product->u_kats as $u_kat) {
                 // dd($product->u_kats);
                 $ukats[] = $u_kat->id;
             }
         }
         $ukats       = array_unique($ukats);
         $p_kat_model = new U_kat();
-        $p_kats      = $p_kat_model->whereIn('id', $ukats)->where('parent_id', 0)->with('u_kats')->get();
+        $p_kats      = $p_kat_model->whereIn('id', $ukats)->where('parent_id', 0)->with(['u_kats'])->get();
         return View('acr_ftr::products', compact('products', 'controller', 'sepet_count', 'p_kats'));
     }
 
@@ -390,9 +390,6 @@ class AcrFtrController extends Controller
         $product_model = new Acrproduct();
         $sepet_model   = new Sepet();
         $products      = $product_model->where('yayin', 1)->where('sil', 0)->with([
-            'u_kats' => function ($query) {
-                $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
-            },
             'product' => function ($query) {
                 $query->with([
                     'attributes' => function ($query) {
@@ -405,7 +402,10 @@ class AcrFtrController extends Controller
                     },
                     'file' => function ($query) {
                         $query->orderBy('id');
-                    }
+                    },
+                    'u_kats' => function ($query) {
+                        $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
+                    },
                 ]);
             },
         ])->get();

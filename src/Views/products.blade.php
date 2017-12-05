@@ -282,8 +282,8 @@
                             foreach ($products as $key =>$product) {
                             ?>
                             <div style="min-height:760px;" class="col-md-4 all_categories
-                            @foreach($product->u_kats as $u_kat)
-                                    kat_{{$u_kat->id }}
+                            @foreach($product->product->u_kats as $u_kat)
+                                    kat_{{@$u_kat->id }}
                             @foreach($u_kat->u_kats as $uu_kat)
                                     kat_{{$uu_kat->id }}
                             @endforeach

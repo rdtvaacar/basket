@@ -15,7 +15,7 @@ class U_kat extends Model
 
     function u_kat()
     {
-        return $this->belongsTo('Acr\Ftr\Model\U_kat', 'parent_id', 'id');
+        return $this->belongsToMany('Acr\Ftr\Model\U_kat', 'parent_id', 'id');
     }
     function u_kats()
     {
