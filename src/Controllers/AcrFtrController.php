@@ -46,7 +46,7 @@ class AcrFtrController extends Controller
         $api      = self::my_product_api($request);
         $products = $api->original['data']['products'];
         foreach ($products as $product) {
-            foreach ($product->u_kats as $u_kat) {
+            foreach ($product->product->u_kats as $u_kat) {
                 $ukats[] = $u_kat->id;
             }
         }

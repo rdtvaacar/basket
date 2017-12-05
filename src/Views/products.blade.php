@@ -232,7 +232,7 @@
             <div class=" col-md-12">
                 <form action="/acr/ftr/product" method="post"></form>
                 <select class="form-control" id="kat_1" style="float: left; width:280px;">
-                    <option value="">Seçiniz</option>
+                    <option value="all_categories">Seçiniz</option>
                     @foreach($p_kats as $kat)
                         <option value="{{$kat->id}}"><b>{{@$kat->kat_isim}}</b></option>
                     @endforeach
@@ -371,12 +371,20 @@
                 url: '/acr/ftr/product/categories',
                 data: 'kat_id=' + kat_id + '&kat=' + kat,
                 success: function (veri) {
-                    $('#categories_' + kat).html(veri)
-                    $('.all_categories').fadeOut()
-                    $('.kat_' + kat_id).fadeIn()
+                    if (kat_id == "all_categories") {
+                        $('#categories_' + kat).hide()
+                        $('.all_categories').fadeIn()
+                    } else {
+                        $('.all_categories').fadeOut()
+                        $('.kat_' + kat_id).fadeIn()
+                        $('#categories_' + kat).show()
+                        $('#categories_' + kat).html(veri)
+                    }
 
                 }
             });
+
+
         }
         function urunGoster(att_id, product_id) {
             $.ajax({
