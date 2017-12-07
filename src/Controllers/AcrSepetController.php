@@ -949,7 +949,16 @@ class AcrSepetController extends Controller
         /*$parasut_conf     = new Parasut_conf();
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
-        $sepet_row    = $sepet_model->where('id', $order_id)->first();
+        $sepet_row    = $sepet_model->where('id', $order_id)
+            ->with(['products' => function ($query) {
+                $query->with(['product' => function ($query) {
+                    $query->with['user'];
+                }]);
+            },
+                    'adress' => function ($query) {
+                        $query->where('active', 1);
+                        $query->with(['city', 'county']);
+                    }])->first();
         if ($sepet_row->order_result == 2 && $sepet_row->active == 0 || $e_arsive_create == 1) {
             $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
             if (empty($adress_row->parasut_id)) {
@@ -1088,6 +1097,88 @@ class AcrSepetController extends Controller
             if ($e_arsive_create == 1) {
                 return redirect()->to('/admin/e_arsive/basarili');
             }
+        }
+        foreach ($sepet_row->products as $product) {
+            $view = '';
+            $view .= '<table class="table table-bordered">';
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Ürün';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->product_name;
+            $view .= '</td>';
+            $view .= '</tr>';
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'İsim';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->name;
+            $view .= '</td>';
+            $view .= '</tr>';
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'T.C.';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->tc;
+            $view .= '</td>';
+            $view .= '</tr>';
+
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Şirket';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->company;
+            $view .= '</td>';
+            $view .= '</tr>';
+
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Vergi Dairesi';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->tax_number;
+            $view .= '</td>';
+            $view .= '</tr>';
+
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Vergi Numarası';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->tax_office;
+            $view .= '</td>';
+            $view .= '</tr>';
+
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Şehir';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->city->name;
+            $view .= '</td>';
+            $view .= '</tr>';
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'İlçe';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->county->name;
+            $view .= '</td>';
+            $view .= '</tr>';
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Adres';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->adress;
+            $view .= '</td>';
+            $view .= '</tr>';
+            $view .= '</table>';
+            $this->ftr_mail($product->user->email, $product->user->name, "Yeni Sipariş", "mail.odeme", $view);
         }
         return $market_controller->order_result(null, $order_id);
     }

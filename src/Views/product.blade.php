@@ -262,6 +262,7 @@
                         </div>
                         <div class=" col-md-2">
                             <div style="overflow: auto; height:700px;" class="scroll">
+                                <?php $file_ids[] = ''; ?>
                                 @foreach($product->files as $file)
                                     <?php $file_ids[] = $file->id ?>
                                     <div onclick="product_image({{$product->id}},{{$file->id}})" style="float: left; cursor:pointer;">

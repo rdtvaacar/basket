@@ -142,99 +142,10 @@ class iyzicoController extends Controller
         # print result
         $sepet_id = $checkoutForm->getBasketId();
         $siparis  = $sepet_model->where('id', $sepet_id)
-            ->with(['products' => function ($query) {
-                $query->with(['product' => function ($query) {
-                    $query->with['user'];
-                }]);
-            },
-                    'adress' => function ($query) {
-                        $query->where('active', 1);
-                        $query->with(['city', 'county']);
-                    }])->first();
+            ->first();
         if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
             $sepet_model->where('id', $sepet_id)->update(['order_result' => 2]);
-            foreach ($siparis->products as $product) {
-                $view = '';
-                $view .= '<table class="table table-bordered">';
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'Ürün';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->product_name;
-                $view .= '</td>';
-                $view .= '</tr>';
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'İsim';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->name;
-                $view .= '</td>';
-                $view .= '</tr>';
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'T.C.';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->tc;
-                $view .= '</td>';
-                $view .= '</tr>';
 
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'Şirket';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->company;
-                $view .= '</td>';
-                $view .= '</tr>';
-
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'Vergi Dairesi';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->tax_number;
-                $view .= '</td>';
-                $view .= '</tr>';
-
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'Vergi Numarası';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->tax_office;
-                $view .= '</td>';
-                $view .= '</tr>';
-
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'Şehir';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->city->name;
-                $view .= '</td>';
-                $view .= '</tr>';
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'İlçe';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->county->name;
-                $view .= '</td>';
-                $view .= '</tr>';
-                $view .= '<tr>';
-                $view .= '<td>';
-                $view .= 'Adres';
-                $view .= '</td>';
-                $view .= '<td>';
-                $view .= $product->adress->adress;
-                $view .= '</td>';
-                $view .= '</tr>';
-                $view .= '</table>';
-                $this->ftr_mail($product->user->email, $product->user->name, "Yeni Sipariş", "mail.odeme", $view);
-            }
             $sepetController = new AcrSepetController();
             return $sepetController->orders_active(null, $sepet_id);
         }
