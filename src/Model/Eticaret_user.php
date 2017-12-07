@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Acr\Ftr\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
