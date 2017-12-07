@@ -226,6 +226,7 @@
             vertical-align: baseline;
             position: relative;
         }
+
         @media only screen and (min-width: 720px) and (max-width: 959px) {
             .peice-list .pack-price span {
                 font-size: 33px;
@@ -250,10 +251,12 @@
                     <div class="box-body">
                         <div class=" col-md-10">
                             <div id="product_img">
-                                <img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$product->file->acr_file_id}}/medium/{{$product->file->file_name}}.{{$product->file->file_type}}"
-                                     alt="{{$product->file->org_file_name}}"/>
-                                @if(count($product->files)>1)
-                                    <img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="next_image()" src="/icon/right-arrow.png"/>
+                                @if(!empty($product->file))
+                                    <img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$product->file->acr_file_id}}/medium/{{$product->file->file_name}}.{{$product->file->file_type}}"
+                                         alt="{{$product->file->org_file_name}}"/>
+                                    @if(count($product->files)>1)
+                                        <img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="next_image()" src="/icon/right-arrow.png"/>
+                                    @endif
                                 @endif
                             </div>
                         </div>
