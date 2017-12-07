@@ -240,7 +240,8 @@
                 <div id="categories_1"></div>
                 <div id="categories_2"></div>
                 <div id="categories_3"></div>
-                <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative;">
+
+                <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative; float: right">
                     <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
                         <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
                         <i class="fa  fa-shopping-cart"></i> SEPET
@@ -272,6 +273,11 @@
                         </div>
                     </div>
                 </div>
+                <div style="float: right">
+                    <div class="input-group">
+                        <input placeholder="Arama..." id="search_product"/>
+                    </div>
+                </div>
                 <div style="clear:both;"></div>
                 <div class="box">
                     <div class="box-header with-border">ÜRÜNLER</div>
@@ -284,10 +290,6 @@
                             <div style="min-height:760px;" class="col-md-4 all_categories
                             @foreach($product->product->u_kats as $u_kat)
                                     kat_{{@$u_kat->id }}
-                            @foreach($u_kat->u_kats as $uu_kat)
-                                    kat_{{$uu_kat->id }}
-                            @endforeach
-
                             @endforeach">
                                 <div class="price-col2">
                                     <div class="title-2"><?php echo $product->product->product_name; ?></div>
@@ -361,10 +363,25 @@
 @stop
 @section('footer')
     <script>
+        $('#search_product').keypress(function () {
+            var search = $(this).val();
+            var len = search.length;
+            if (len > 3) {
+                $.ajax({
+                    type: 'post',
+                    url: '/acr/ftr/product/search/',
+                    data: 'search=' + search,
+                    success: function (veri) {
+                        $('#sepetModal').modal('show');
+                    }
+                });
+            }
+        })
         $('#kat_1').change(function () {
             var kat_id = $(this).val();
             categories(1, kat_id);
         })
+
         function categories(kat, kat_id) {
             $.ajax({
                 type: 'post',
@@ -383,8 +400,6 @@
 
                 }
             });
-
-
         }
         function urunGoster(att_id, product_id) {
             $.ajax({

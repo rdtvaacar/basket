@@ -128,4 +128,9 @@ class Sepet extends Model
     {
         Sepet::where('id', $sepet_id)->where('siparis', 0)->update(['price' => $total_price]);
     }
+
+    function adress()
+    {
+        return $this->hasOne('Acr\Ftr\Model\AcrFtrAdress');
+    }
 }

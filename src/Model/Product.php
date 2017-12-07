@@ -63,4 +63,9 @@ class Product extends Model
     {
         return $this->hasMany('Acr\Ftr\Model\Product_note');
     }
+
+    function user()
+    {
+        return $this->hasManyThrough('Acr\Ftr\Model\User_product', 'App\User');
+    }
 }
