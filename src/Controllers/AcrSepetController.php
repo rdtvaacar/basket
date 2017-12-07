@@ -952,7 +952,9 @@ class AcrSepetController extends Controller
         $sepet_row    = $sepet_model->where('id', $order_id)
             ->with(['products' => function ($query) {
                 $query->with(['product' => function ($query) {
-                    $query->with['user'];
+                    $query->with(['user_product' => function ($query) {
+                        $query->with(['user']);
+                    }]);
                 }]);
             },
                     'adress' => function ($query) {
@@ -1106,7 +1108,7 @@ class AcrSepetController extends Controller
             $view .= 'Ürün';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->product_name;
+            $view .= $product->product->product_name;
             $view .= '</td>';
             $view .= '</tr>';
             $view .= '<tr>';
@@ -1114,7 +1116,7 @@ class AcrSepetController extends Controller
             $view .= 'İsim';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->name;
+            $view .= $sepet_row->adress->name;
             $view .= '</td>';
             $view .= '</tr>';
             $view .= '<tr>';
@@ -1122,7 +1124,7 @@ class AcrSepetController extends Controller
             $view .= 'T.C.';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->tc;
+            $view .= $sepet_row->adress->tc;
             $view .= '</td>';
             $view .= '</tr>';
 
@@ -1131,7 +1133,7 @@ class AcrSepetController extends Controller
             $view .= 'Şirket';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->company;
+            $view .= $sepet_row->adress->company;
             $view .= '</td>';
             $view .= '</tr>';
 
@@ -1140,7 +1142,7 @@ class AcrSepetController extends Controller
             $view .= 'Vergi Dairesi';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->tax_number;
+            $view .= $sepet_row->adress->tax_number;
             $view .= '</td>';
             $view .= '</tr>';
 
@@ -1149,7 +1151,7 @@ class AcrSepetController extends Controller
             $view .= 'Vergi Numarası';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->tax_office;
+            $view .= $sepet_row->adress->tax_office;
             $view .= '</td>';
             $view .= '</tr>';
 
@@ -1158,7 +1160,7 @@ class AcrSepetController extends Controller
             $view .= 'Şehir';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->city->name;
+            $view .= $sepet_row->adress->city->name;
             $view .= '</td>';
             $view .= '</tr>';
             $view .= '<tr>';
@@ -1166,7 +1168,7 @@ class AcrSepetController extends Controller
             $view .= 'İlçe';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->county->name;
+            $view .= $sepet_row->adress->county->name;
             $view .= '</td>';
             $view .= '</tr>';
             $view .= '<tr>';
@@ -1174,11 +1176,13 @@ class AcrSepetController extends Controller
             $view .= 'Adres';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->adress->adress;
+            $view .= $sepet_row->adress->adress;
             $view .= '</td>';
             $view .= '</tr>';
             $view .= '</table>';
-            $this->ftr_mail($product->user->email, $product->user->name, "Yeni Sipariş", "mail.odeme", $view);
+            if (!empty($product->product->user_product->user->email)) {
+                $this->ftr_mail($product->product->user_product->user->email, @$product->product->user_product->user->name, "Yeni Sipariş", "acr_ftr::mail.odeme", @$view);
+            }
         }
         return $market_controller->order_result(null, $order_id);
     }

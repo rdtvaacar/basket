@@ -131,6 +131,6 @@ class Sepet extends Model
 
     function adress()
     {
-        return $this->hasOne('Acr\Ftr\Model\AcrFtrAdress');
+        return $this->hasOne('Acr\Ftr\Model\AcrFtrAdress', 'user_id', 'user_id');
     }
 }

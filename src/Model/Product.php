@@ -64,8 +64,8 @@ class Product extends Model
         return $this->hasMany('Acr\Ftr\Model\Product_note');
     }
 
-    function user()
+    function user_product()
     {
-        return $this->hasManyThrough('Acr\Ftr\Model\User_product', 'App\User');
+        return $this->hasOne('Acr\Ftr\Model\User_product');
     }
 }
