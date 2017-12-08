@@ -961,7 +961,7 @@ class AcrSepetController extends Controller
                         'size',
                         'kol',
                         'yaka',
-                        'note' => function ($query) use ($order_id) {
+                        'notes' => function ($query) use ($order_id) {
                             $query->where('sepet_id', $order_id);
                         }
                     ]);
