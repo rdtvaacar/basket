@@ -1103,6 +1103,8 @@ class AcrSepetController extends Controller
         foreach ($sepet_row->products as $product) {
             $view = '';
             $view .= '<table class="table table-bordered">';
+
+
             $view .= '<tr>';
             $view .= '<td>';
             $view .= 'Ürün';
@@ -1110,15 +1112,69 @@ class AcrSepetController extends Controller
             $view .= '<td>';
             $view .= $product->product->product_name;
             $view .= '</td>';
+            $view .= '<td>';
+            $view .= 'Adres Tanımı';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $sepet_row->adress->incoice_name;
+            $view .= '</td>';
             $view .= '</tr>';
+
+            $view .= '<tr>';
+            $view .= '<td colspan="2">';
+            $view .= 'Ürün Detayları';
+            $view .= '</td>';
+            $view .= '</tr>';
+
+
             $view .= '<tr>';
             $view .= '<td>';
-            $view .= 'İsim';
+            $view .= 'Beden ';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $sepet_row->adress->name;
+            $view .= $product->size->name;
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= 'Kol';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->kol->name;
             $view .= '</td>';
             $view .= '</tr>';
+
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Yaka ';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->yaka->name;
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= 'Notlar';
+            $view .= '</td>';
+            $view .= '<td>';
+            foreach ($product->notes as $note) {
+                $view .= $note->note->name . ':' . $note->name . '<br>';
+            }
+            $view .= '</td>';
+            $view .= '</tr>';
+
+            $view .= '<tr>';
+            $view .= '<td>';
+            $view .= 'Alacak Kişi';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $product->adress->name;
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= 'Adres';
+            $view .= '</td>';
+            $view .= '<td>';
+            $view .= $sepet_row->adress->adress;
+            $view .= '</td>';
+            $view .= '</tr>';
+
+
             $view .= '<tr>';
             $view .= '<td>';
             $view .= 'T.C.';
@@ -1126,9 +1182,6 @@ class AcrSepetController extends Controller
             $view .= '<td>';
             $view .= $sepet_row->adress->tc;
             $view .= '</td>';
-            $view .= '</tr>';
-
-            $view .= '<tr>';
             $view .= '<td>';
             $view .= 'Şirket';
             $view .= '</td>';
@@ -1144,9 +1197,6 @@ class AcrSepetController extends Controller
             $view .= '<td>';
             $view .= $sepet_row->adress->tax_number;
             $view .= '</td>';
-            $view .= '</tr>';
-
-            $view .= '<tr>';
             $view .= '<td>';
             $view .= 'Vergi Numarası';
             $view .= '</td>';
@@ -1162,8 +1212,6 @@ class AcrSepetController extends Controller
             $view .= '<td>';
             $view .= $sepet_row->adress->city->name;
             $view .= '</td>';
-            $view .= '</tr>';
-            $view .= '<tr>';
             $view .= '<td>';
             $view .= 'İlçe';
             $view .= '</td>';
@@ -1171,14 +1219,8 @@ class AcrSepetController extends Controller
             $view .= $sepet_row->adress->county->name;
             $view .= '</td>';
             $view .= '</tr>';
-            $view .= '<tr>';
-            $view .= '<td>';
-            $view .= 'Adres';
-            $view .= '</td>';
-            $view .= '<td>';
-            $view .= $sepet_row->adress->adress;
-            $view .= '</td>';
-            $view .= '</tr>';
+
+
             $view .= '</table>';
             if (!empty($product->product->user_product->user->email)) {
                 $this->ftr_mail($product->product->user_product->user->email, @$product->product->user_product->user->name, "Yeni Sipariş", "acr_ftr::mail.odeme", @$view);

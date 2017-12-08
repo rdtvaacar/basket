@@ -50,4 +50,24 @@ class Product_sepet extends Model
     {
         return $this->hasMany('Acr\Ftr\Model\Product_note', 'product_id');
     }
+
+    function size()
+    {
+        $this->belongsTo('Acr\Ftr\Model\Sizes');
+    }
+
+    function yaka()
+    {
+        $this->belongsTo('Acr\Ftr\Model\Yakas');
+    }
+
+    function kol()
+    {
+        $this->belongsTo('Acr\Ftr\Model\Kols');
+    }
+
+    function notes()
+    {
+        $this->hasMany('Acr\Ftr\Model\Product_sepet_notes');
+    }
 }
