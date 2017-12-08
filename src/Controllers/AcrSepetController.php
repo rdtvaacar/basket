@@ -1175,7 +1175,7 @@ class AcrSepetController extends Controller
                 $view .= 'Alacak Kişi';
                 $view .= '</td>';
                 $view .= '<td>';
-                $view .= $product->adress->name;
+                $view .= $sepet_row->adress->name;
                 $view .= '</td>';
                 $view .= '<td>';
                 $view .= 'Adres';
