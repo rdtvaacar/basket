@@ -232,7 +232,7 @@
             <div class=" col-md-12">
                 <form action="/acr/ftr/product" method="post"></form>
                 <select class="form-control" id="kat_1" style="float: left; width:280px;">
-                    <option value="all_categories">Seçiniz</option>
+                    <option value="all_categories">Kategoriler</option>
                     @foreach($p_kats as $kat)
                         <option value="{{$kat->id}}"><b>{{@$kat->kat_isim}}</b></option>
                     @endforeach
