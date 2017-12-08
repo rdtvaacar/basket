@@ -53,21 +53,21 @@ class Product_sepet extends Model
 
     function size()
     {
-        $this->belongsTo('Acr\Ftr\Model\Sizes');
+        return $this->belongsTo('Acr\Ftr\Model\Sizes');
     }
 
     function yaka()
     {
-        $this->belongsTo('Acr\Ftr\Model\Yakas');
+        return $this->belongsTo('Acr\Ftr\Model\Yakas');
     }
 
     function kol()
     {
-        $this->belongsTo('Acr\Ftr\Model\Kols');
+        return $this->belongsTo('Acr\Ftr\Model\Kols');
     }
 
     function notes()
     {
-        $this->hasMany('Acr\Ftr\Model\Product_sepet_notes');
+        return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes');
     }
 }
