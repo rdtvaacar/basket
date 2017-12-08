@@ -950,12 +950,21 @@ class AcrSepetController extends Controller
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
         $sepet_row    = $sepet_model->where('id', $order_id)
-            ->with(['products' => function ($query) {
-                $query->with(['product' => function ($query) {
-                    $query->with(['user_product' => function ($query) {
-                        $query->with(['user']);
-                    }]);
-                }]);
+            ->with(['products' => function ($query) use ($order_id) {
+                $query->with(
+                    [
+                        'product' => function ($query) {
+                            $query->with(['user_product' => function ($query) {
+                                $query->with(['user']);
+                            }]);
+                        },
+                        'size',
+                        'kol',
+                        'yaka',
+                        'note' => function ($query) use ($order_id) {
+                            $query->where('sepet_id', $order_id);
+                        }
+                    ]);
             },
                     'adress' => function ($query) {
                         $query->where('active', 1);
