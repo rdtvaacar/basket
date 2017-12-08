@@ -1132,13 +1132,13 @@ class AcrSepetController extends Controller
             $view .= 'Beden ';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->size->name;
+            $view .= @$product->size->name;
             $view .= '</td>';
             $view .= '<td>';
             $view .= 'Kol';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->kol->name;
+            $view .= @$product->kol->name;
             $view .= '</td>';
             $view .= '</tr>';
 
@@ -1147,14 +1147,16 @@ class AcrSepetController extends Controller
             $view .= 'Yaka ';
             $view .= '</td>';
             $view .= '<td>';
-            $view .= $product->yaka->name;
+            $view .= @$product->yaka->name;
             $view .= '</td>';
             $view .= '<td>';
             $view .= 'Notlar';
             $view .= '</td>';
             $view .= '<td>';
-            foreach ($product->notes as $note) {
-                $view .= $note->note->name . ':' . $note->name . '<br>';
+            if (!empty($product->notes)) {
+                foreach ($product->notes as $note) {
+                    $view .= $note->note->name . ':' . $note->name . '<br>';
+                }
             }
             $view .= '</td>';
             $view .= '</tr>';
