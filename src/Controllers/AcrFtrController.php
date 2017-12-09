@@ -254,25 +254,42 @@ class AcrFtrController extends Controller
         return View('acr_ftr::admin_sales_incoices', compact('orders'));
     }
 
-    function product_search($search)
+    function product_search(Request $request)
     {
-        $product_model = new Product();
-        $products      = $product_model->where('product_name', 'like', "%$search%")->where('yayin', 1)->where('sil', 0)->get();
-        return $products;
-    }
-
-    function product_search_row(Request $request)
-    {
-        $sepet_model = new Sepet();
-        $session_id  = session()->get('session_id');
+        $product_model = new Acrproduct();
+        $sepet_model   = new Sepet();
+        $session_id    = session()->get('session_id');
         if (Auth::check() && !empty($session_id)) {
             $sepet_model->sepet_birle($session_id);
             session()->forget('session_id');
         }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
-        $search      = $request->input('search');
-        $products    = self::product_search($search);
+        $search      = $request->search;
+        $products    = $product_model->with([
+            'product' => function ($query) use ($search) {
+                $query->with([
+                    'attributes' => function ($query) {
+                        $query->where('attributes.attribute_id', 0);
+                        $query->where('attributes.sil', 0);
+
+                    },
+                    'files' => function ($query) {
+                        $query->orderBy('id');
+                    },
+                    'file' => function ($query) {
+                        $query->orderBy('id');
+                    },
+                    'u_kats' => function ($query) {
+                        $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
+                    },
+                ])->where('product_name', 'like', "%$search%")->where('yayin', 1)->where('sil', 0);
+
+            },
+
+        ])->get();
+
         return view('acr_ftr::products_table', compact('products', 'sepet_count'))->render();
+
     }
 
     function product_row($product)

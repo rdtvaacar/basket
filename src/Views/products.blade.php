@@ -312,13 +312,13 @@
         $('#search_product').keypress(function () {
             var search = $(this).val();
             var len = search.length;
-            if (len > 3) {
+            if (len > 2) {
                 $.ajax({
                     type: 'post',
-                    url: '/acr/ftr/product/search/',
+                    url: '/acr/ftr/product/ara',
                     data: 'search=' + search,
                     success: function (veri) {
-                        $('.box-body').html(veri);
+                        $('.price-table').html(veri)
                     }
                 });
             }
