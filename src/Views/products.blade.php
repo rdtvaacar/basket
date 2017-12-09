@@ -319,7 +319,7 @@
                     data: 'search=' + search,
                     success: function (veri) {
                         $('.price-table').html(veri)
-                        $('.paginate').hide()
+                        $('.paginate').hide();
 
 
                     }
