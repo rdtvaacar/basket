@@ -950,26 +950,28 @@ class AcrSepetController extends Controller
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
         $sepet_row    = $sepet_model->where('id', $order_id)
-            ->with(['products' => function ($query) use ($order_id) {
-                $query->with(
-                    [
-                        'product' => function ($query) {
-                            $query->with(['user_product' => function ($query) {
-                                $query->with(['user']);
-                            }]);
-                        },
-                        'size',
-                        'kol',
-                        'yaka',
-                        'notes' => function ($query) use ($order_id) {
-                            $query->where('sepet_id', $order_id);
-                        }
-                    ]);
-            },
-                    'adress' => function ($query) {
-                        $query->where('active', 1);
-                        $query->with(['city', 'county']);
-                    }])->first();
+            ->with([
+                'products' => function ($query) use ($order_id) {
+                    $query->with(
+                        [
+                            'product' => function ($query) {
+                                $query->with(['user_product' => function ($query) {
+                                    $query->with(['user']);
+                                }]);
+                            },
+                            'size',
+                            'kol',
+                            'yaka',
+                            'notes' => function ($query) use ($order_id) {
+                                $query->where('sepet_id', $order_id);
+                            }
+                        ]);
+                },
+                'adress' => function ($query) {
+                    $query->where('active', 1);
+                    $query->with(['city', 'county']);
+                }])
+            ->first();
         if ($sepet_row->order_result == 2 && $sepet_row->active == 0 || $e_arsive_create == 1) {
             $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
             if (empty($adress_row->parasut_id)) {

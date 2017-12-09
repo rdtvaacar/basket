@@ -1,4 +1,7 @@
 @extends('acr_ftr.index')
+@section('title')
+    <title>Anaokulu, Kreş Malzemeleri - {{$product->product_name}}</title>
+@stop
 @section('header')
     <style>
         .scroll::-webkit-scrollbar {
@@ -253,7 +256,7 @@
                             <div id="product_img">
                                 @if(!empty($product->file))
                                     <img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$product->file->acr_file_id}}/medium/{{$product->file->file_name}}.{{$product->file->file_type}}"
-                                         alt="{{$product->file->org_file_name}}"/>
+                                         alt="{{$product->file->file_name_org}}"/>
                                     @if(count($product->files)>1)
                                         <img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="next_image()" src="/icon/right-arrow.png"/>
                                     @endif
@@ -368,6 +371,7 @@
                 links = this.getElementsByTagName('a');
             blueimp.Gallery(links, options);
         };
+
         function product_image(product_id, img_id) {
             $.ajax({
                 type: 'post',
@@ -378,9 +382,11 @@
                 }
             });
         }
+
         function next_image() {
             product_image({{$product->id}},{{$next_id}})
         }
+
         function urunGoster(att_id, product_id) {
             $.ajax({
                 type: 'post',
@@ -393,6 +399,7 @@
                 }
             });
         }
+
         function sepete_ekle(product_id) {
             $.ajax({
                 type: 'post',
@@ -404,6 +411,7 @@
                 }
             });
         }
+
         function sepet_goster() {
             $.ajax({
                 type: 'post',
@@ -415,9 +423,11 @@
                 }
             });
         }
+
         function sepet_gizle() {
             $('#sepet_row').hide();
         }
+
         function sepet_adet_guncelle(sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({

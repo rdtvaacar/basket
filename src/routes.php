@@ -2,6 +2,7 @@
 Route::group(['middleware' => ['web']], function () {
     Route::group(['namespace' => 'Acr\Ftr\Controllers', 'prefix' => 'acr/ftr'], function () {
         Route::get('/', 'AcrFtrController@index');
+        Route::get('/product/search/', 'AcrFtrController@product_search');
         Route::get('/product/detail', 'AcrFtrController@product_detail');
         Route::get('/product', 'AcrFtrController@my_product');
         Route::post('/product', 'AcrFtrController@my_product');

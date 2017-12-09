@@ -263,13 +263,16 @@ class AcrFtrController extends Controller
 
     function product_search_row(Request $request)
     {
-        $search   = $request->input('search');
-        $products = self::product_search($search);
-        $row      = '';
-        foreach ($products as $product) {
-            $row .= self::product_row($product);
+        $sepet_model = new Sepet();
+        $session_id  = session()->get('session_id');
+        if (Auth::check() && !empty($session_id)) {
+            $sepet_model->sepet_birle($session_id);
+            session()->forget('session_id');
         }
-        return $row;
+        $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
+        $search      = $request->input('search');
+        $products    = self::product_search($search);
+        return view('acr_ftr::products_table', compact('products', 'sepet_count'))->render();
     }
 
     function product_row($product)
@@ -379,10 +382,11 @@ class AcrFtrController extends Controller
                 $ukats[] = $u_kat->id;
             }
         }
-        $ukats       = array_unique($ukats);
-        $p_kat_model = new U_kat();
-        $p_kats      = $p_kat_model->whereIn('id', $ukats)->where('parent_id', 0)->with(['u_kats'])->get();
-        return View('acr_ftr::products', compact('products', 'controller', 'sepet_count', 'p_kats'));
+        $ukats          = array_unique($ukats);
+        $p_kat_model    = new U_kat();
+        $p_kats         = $p_kat_model->whereIn('id', $ukats)->where('parent_id', 0)->with(['u_kats'])->get();
+        $products_table = view('acr_ftr::products_table', compact('products', 'sepet_count'))->render();
+        return View('acr_ftr::products', compact('products', 'controller', 'sepet_count', 'p_kats', 'products_table'));
     }
 
     function my_product_api(Request $request)
@@ -408,7 +412,7 @@ class AcrFtrController extends Controller
                     },
                 ]);
             },
-        ])->get();
+        ])->paginate(99);
         $session_id    = session()->get('session_id');
         if (Auth::check() && !empty($session_id)) {
             $sepet_model->sepet_birle($session_id);
