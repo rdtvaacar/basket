@@ -282,11 +282,11 @@
                 <div class="box">
                     <div class="box-header with-border">ÜRÜNLER</div>
                     <div class="box-body">
-                        <div style="text-align: center">{{$products->links()}}</div>
+                        <div class="paginate" style="text-align: center">{{$products->links()}}</div>
                         <div class="price-table">
                             {!! $products_table !!}
                         </div>
-                        <div style="text-align: center">{{$products->links()}}</div>
+                        <div class="paginate" style="text-align: center">{{$products->links()}}</div>
                     </div>
                 </div>
             </div>
@@ -319,6 +319,9 @@
                     data: 'search=' + search,
                     success: function (veri) {
                         $('.price-table').html(veri)
+                        $('.paginate').hide()
+
+
                     }
                 });
             }
