@@ -3,6 +3,7 @@
     <title>Anaokulu, Kreş Malzemeleri - {{$product->product_name}}</title>
 @stop
 @section('header')
+    <link rel="canonical" href="https://okuloncesievrak.com/acr/ftr/product/detail?product_id={{$product->id}}"/>
     <style>
         .scroll::-webkit-scrollbar {
             width: 5px;
@@ -249,6 +250,40 @@
     <section class="content">
         <div class="row">
             {!! $msg !!}
+            <div class=" col-md-12">
+                <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative; float: right">
+                    <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
+                        <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
+                        <i class="fa  fa-shopping-cart"></i> SEPET
+                    </a>
+                    <div id="sepet_row" style="display: none;">
+                        <div class="box box-warning" style="width: 550px; right:0; top: 60px; position: absolute; z-index: 1; ">
+                            <div class="box-header with-border">Sepetiniz</div>
+                            <div class="box-body">
+                                <table width="100%" class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th width="60%">Ürün</th>
+                                        <th width="20%">Adet</th>
+                                        <th>Fiyat</th>
+                                        <th style="text-align: right">Sil</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="sepet_tbody"></tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td><a style="float: left;" class="btn btn-warning" href="/acr/ftr/card/sepet">SATIN AL</a></td>
+                                        <td colspan="3">
+                                            <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class=" col-md-7">
                 <div class="box box-primary">
                     <div class="box-body">
