@@ -50,6 +50,8 @@ Route::group(['middleware' => ['web']], function () {
             /// admin
             Route::group(['middleware' => ['admin']], function () {
                 Route::get('/product/new', 'AcrFtrController@new_product');
+                Route::post('/product/sort/edit', 'AcrFtrController@product_sort_edit');
+
                 //Route::post('/product/search_row', 'AcrFtrController@product_search_row');
                 Route::post('/product/add', 'AcrFtrController@add_product');
                 Route::post('/product/delete', 'AcrFtrController@delete_product');

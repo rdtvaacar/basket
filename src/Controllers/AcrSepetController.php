@@ -54,11 +54,12 @@ class AcrSepetController extends Controller
     function admin_orders(Request $request)
     {
         $sepet_model                 = new Sepet();
-        $orders                      = $sepet_model->where('siparis', 1)->with([
-            'user', 'products' => function ($query) {
-                $query->with('product');
-            }
-        ])->get();
+        $orders                      = $sepet_model->where('siparis', 1)
+            ->with([
+                'user', 'products' => function ($query) {
+                    $query->with('product');
+                }
+            ])->get();
         $acr_user_table_config_model = new Acr_user_table_conf();
         $config                      = $acr_user_table_config_model->first();
         $email                       = $config->email;
@@ -84,7 +85,6 @@ class AcrSepetController extends Controller
             'kol_id' => $request->kol_id,
             'size_id' => $request->size_id
         ];
-
         if (Auth::check()) {
             $sepet_id = $sepet_model->product_sepet_id();
             if (!empty($notes)) {
@@ -102,7 +102,6 @@ class AcrSepetController extends Controller
             if ($ps_model->where('sepet_id', $sepet_id)->where('product_id', $product_id)->count() > 0) {
                 return $ps_model->use_plus($product_id, $sepet_id, $data, $data_notes);
             }
-
         } else {
             if (empty($request->session()->get('session_id'))) {
                 $session_id = rand(1000000, 99999999);
@@ -127,7 +126,6 @@ class AcrSepetController extends Controller
                 return $ps_model->use_plus($product_id, $sepet_id, $data, $data_notes);
             }
         }
-
         $session_id = empty($session_id) ? null : $session_id;
         return $sepet_model->create($session_id, $product_id, $data, $data_notes);
     }
@@ -256,7 +254,6 @@ class AcrSepetController extends Controller
                   <td></td>';
         $veri .= '<td id="acr_sepet_total_price" colspan="2">' . array_sum($total_price) . '₺</td>';
         $veri .= '</tr>';
-
         return $veri;
     }
 
@@ -315,7 +312,6 @@ class AcrSepetController extends Controller
                       <td></td>';
         $veri .= '<td id="acr_sepet_total_price" colspan="2">' . array_sum($total_price) . '₺</td>';
         $veri .= '</tr>';
-
         return $veri;
     }
 
@@ -336,7 +332,6 @@ class AcrSepetController extends Controller
         $sepet_id    = $request->input('sepet_id');
         $lisans_ay   = $request->input('lisans_ay');
         $sepet_model->where('id', $sepet_id)->update(['lisans_ay' => $lisans_ay]);
-
     }
 
     function card(Request $request)
@@ -406,7 +401,6 @@ class AcrSepetController extends Controller
 
     function payment(Request $request)
     {
-
         $sepet_model = new Sepet();
         $bank_model  = new Bank();
         $order_id    = $request->input('order_id');
@@ -419,8 +413,6 @@ class AcrSepetController extends Controller
         $banks       = $bank_model->where('active', 1)->where('sil', 0)->get();
         $sepet_nav   = self::sepet_nav($order_id, 3);
         return View('acr_ftr::card_payment', compact('sepet_nav', 'banks', 'order_link', 'order_input'));
-
-
     }
 
     function adres_secimi_api(Request $request, $adress_id = null)
@@ -480,7 +472,6 @@ class AcrSepetController extends Controller
 
     function product_sepet_total_price($sepet_id = null, Request $request = null)
     {
-
         $ps_model    = new Product_sepet();
         $sepet_id    = empty($sepet_id) ? $request->sepet_id : $sepet_id;
         $productData = $ps_model->where('id', $sepet_id)->first();
@@ -511,7 +502,6 @@ class AcrSepetController extends Controller
         $user_adress     = $veri->original['data']['user_adress'];
         $company         = $veri->original['data']['company'];
         return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank', 'ps', 'user_adress', 'company', 'sepetController'));
-
     }
 
     function payment_havale_eft_api(Request $request)
@@ -545,7 +535,6 @@ class AcrSepetController extends Controller
         $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
         $company_model = new Company_conf();
         $company       = $company_model->first();
-
         return response()
             ->json([
                 'status' => 1,
@@ -553,7 +542,6 @@ class AcrSepetController extends Controller
                 'msg' => 'Siparişiniz  oluşturuldu ödeme bekleniyor.',
                 'data' => ['ps' => $ps, 'bank' => $bank, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis]
             ]);
-
     }
 
     function payment_bank_card(Request $request)

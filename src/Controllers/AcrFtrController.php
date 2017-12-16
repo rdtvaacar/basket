@@ -292,11 +292,23 @@ class AcrFtrController extends Controller
 
     }
 
+    function product_sort_edit(Request $request)
+    {
+        $acr_product_model = new Acrproduct();
+        $product_id        = $request->product_id;
+        $acr_product_model->where('id', $product_id)->update(
+            [
+                'sira' => $request->sira
+            ]
+        );
+    }
+
     function product_row($product)
     {
         $row = '<tr>';
         $row .= '<td>' . $product->id . '</td>';
         $row .= '<td>' . $product->product_name . '</td>';
+        $row .= '<td><input onchange="product_sort_edit(' . @$product->my_product->id . ')" value="' . @$product->my_product->sira . '"  id="product_sira_' . @$product->my_product->id . '"/><button class="btn btn-xs btn-success">G</button></td>';
         foreach ($product->u_kats as $kat) {
             $row .= '<td>' . $kat->kat_isim . '</td>';
         }
@@ -429,7 +441,7 @@ class AcrFtrController extends Controller
                     },
                 ]);
             },
-        ])->paginate(99);
+        ])->orderBy('sira')->paginate(99);
         $session_id    = session()->get('session_id');
         if (Auth::check() && !empty($session_id)) {
             $sepet_model->sepet_birle($session_id);
