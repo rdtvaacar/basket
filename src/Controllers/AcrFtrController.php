@@ -328,7 +328,6 @@ class AcrFtrController extends Controller
 
         } else {
             $row .= self::add_product_btn($product->id);;
-
         }
         $row .= '</div>';
         $row .= '</td>';
