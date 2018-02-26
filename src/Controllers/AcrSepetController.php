@@ -199,7 +199,7 @@ class AcrSepetController extends Controller
         return $price;
     }
 
-    function discount($price = null, $dis_price = null, Request $request = null)
+    function discount($price = null, $dis_price = null, Request $request)
     {
         $price     = empty($price) ? $request->price : $price;
         $dis_price = empty($dis_price) ? $request->dis_price : $dis_price;
@@ -434,7 +434,7 @@ class AcrSepetController extends Controller
 
     }
 
-    function sepet_total_price($sepet_id = null, Request $request = null)
+    function sepet_total_price($sepet_id = null, Request $request)
     {
         $sepet_id      = empty($sepet_id) ? $request->sepet_id : $sepet_id;
         $ps_model      = new Product_sepet();
@@ -455,7 +455,7 @@ class AcrSepetController extends Controller
         return $price;
     }
 
-    function not_dis_price($sepet_id = null, Request $request = null)
+    function not_dis_price($sepet_id = null, Request $request)
     {
         $ps_model    = new Product_sepet();
         $sepet_id    = empty($sepet_id) ? $request->sepet_id : $sepet_id;
@@ -470,7 +470,7 @@ class AcrSepetController extends Controller
         return $prices;
     }
 
-    function product_sepet_total_price($sepet_id = null, Request $request = null)
+    function product_sepet_total_price($sepet_id = null, Request $request)
     {
         $ps_model    = new Product_sepet();
         $sepet_id    = empty($sepet_id) ? $request->sepet_id : $sepet_id;
@@ -909,7 +909,7 @@ class AcrSepetController extends Controller
         return self::orders_active(null, $fatura->order_id, 1, 1);
     }
 
-    function orders_active_admin(Request $request = null, $order_id = null)
+    function orders_active_admin(Request $request, $order_id = null)
     {
         $order_id    = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model = new Sepet();
@@ -925,7 +925,7 @@ class AcrSepetController extends Controller
         $fatura_product_model->insert($data_product);
     }
 
-    function orders_active(Request $request = null, $order_id = null, $admin = null, $e_arsive_create = null)
+    function orders_active(Request $request, $order_id = null, $admin = null, $e_arsive_create = null)
     {
         $parasut           = new ParasutController();
         $order_id          = empty($order_id) ? $request->input('order_id') : $order_id;
