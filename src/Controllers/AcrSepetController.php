@@ -199,11 +199,9 @@ class AcrSepetController extends Controller
         return $price;
     }
 
-    function discount($price = null, $dis_price = null, Request $request)
+    function discount($price = null, $dis_price = null)
     {
-        $price     = empty($price) ? $request->price : $price;
-        $dis_price = empty($dis_price) ? $request->dis_price : $dis_price;
-        $discount  = 100 - round($dis_price / $price, 2) * 100;
+        $discount = 100 - round($dis_price / $price, 2) * 100;
         if ($discount > 0) {
             $discount = ' <span style="color: #0b7c0f; font-size: 9pt;">%' . $discount . '</span>';
         } else {
