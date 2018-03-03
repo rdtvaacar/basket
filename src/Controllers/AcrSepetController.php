@@ -201,7 +201,8 @@ class AcrSepetController extends Controller
 
     function discount($price = null, $dis_price = null)
     {
-        $discount = 100 - round($dis_price / $price, 2) * 100;
+
+        $discount  = 100 - round($dis_price / $price, 2) * 100;
         if ($discount > 0) {
             $discount = ' <span style="color: #0b7c0f; font-size: 9pt;">%' . $discount . '</span>';
         } else {
@@ -511,8 +512,8 @@ class AcrSepetController extends Controller
         $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $ps_model      = new Product_sepet();
         $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price         = round(self::product_sepet_total_price($ps->id), 2);
-        $not_dis_price = round(self::not_dis_price($ps->id), 2);
+        $price         = round(self::product_sepet_total_price($ps->id,$request), 2);
+        $not_dis_price = round(self::not_dis_price($ps->id,$request), 2);
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         $data_sepet    = [
             'siparis' => 1,
@@ -564,8 +565,8 @@ class AcrSepetController extends Controller
         $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $ps_model      = new Product_sepet();
         $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price         = round(self::product_sepet_total_price($ps->id), 2);
-        $not_dis_price = round(self::not_dis_price($ps->id), 2);
+        $price         = round(self::product_sepet_total_price($ps->id,$request), 2);
+        $not_dis_price = round(self::not_dis_price($ps->id,$request), 2);
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         $data_sepet    = [
             'siparis' => 1,
