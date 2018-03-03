@@ -6,11 +6,10 @@ use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrAdress;
 use Acr\Ftr\Model\Sepet;
 use Auth;
-use App\Http\Controllers\MarketController;
 use App\Siparis;
 use DB;
 use Acr\Ftr\Model\AcrFtrIyzico;
-use Request;
+use Illuminate\Http\Request;
 
 class iyzicoController extends Controller
 {
@@ -129,10 +128,10 @@ class iyzicoController extends Controller
         print_r($checkoutFormInitialize->getCheckoutFormContent());
     }
 
-    function order_result(\Illuminate\Http\Request $request)
+    function order_result(Request $req)
     {
         $sepet_model = new Sepet();
-        $token       = $request->token;
+        $token       = $req->token;
         $request     = new \Iyzipay\Request\RetrieveCheckoutFormRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);
         $request->setConversationId("123456789");
@@ -147,7 +146,7 @@ class iyzicoController extends Controller
             $sepet_model->where('id', $sepet_id)->update(['order_result' => 2]);
 
             $sepetController = new AcrSepetController();
-            return $sepetController->orders_active(null, $sepet_id);
+            return $sepetController->orders_active($req, $sepet_id);
         }
     }
 }

@@ -150,7 +150,6 @@ class AcrSepetController extends Controller
     {
         $sepet_model = new Sepet();
         $ps_model    = new Product_sepet();
-
         $session_id = $request->session()->get('session_id');
         $sepet_id   = $sepet_model->product_sepet_id($session_id);
         $products   = $ps_model->where('sepet_id', $sepet_id)->with([
@@ -905,7 +904,7 @@ class AcrSepetController extends Controller
         $sepet_model->where('id', $fatura_id)->update(
             ['updated_at' => date('Y-m-d')]
         );
-        return self::orders_active(null, $fatura->order_id, 1, 1);
+        return self::orders_active($request, $fatura->order_id, 1, 1);
     }
 
     function orders_active_admin(Request $request, $order_id = null)
@@ -913,7 +912,7 @@ class AcrSepetController extends Controller
         $order_id    = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model = new Sepet();
         $sepet_model->where('id', $order_id)->update(['order_result' => 2]);
-        self::orders_active(null, $order_id, 1);
+        self::orders_active($request, $order_id, 1);
     }
 
     function fatura_olustur($data, $data_product)
@@ -977,7 +976,7 @@ class AcrSepetController extends Controller
                     $urun_names [] = $order->product->product_name;
                     if (empty($order->product->collection) || $order->product->collection == '0.00') {
                         $kdv                    = $order->product->kdv;
-                        $ps_price               = self::sepet_total_price($order->id);
+                        $ps_price               = self::sepet_total_price($order->id,$request);
                         $fiyat                  = round(((($ps_price * ((100) / (100 + $kdv)))) / $order->adet), 4);
                         $parasut_product_data[] = [
                             'product_id' => $order->acr_product->parasut_id, // the parasut products
