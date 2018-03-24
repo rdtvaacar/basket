@@ -59,6 +59,7 @@ class iyzicoController extends Controller
 
     function odemeFormIc($price = null, $paidPrice = null, $basketId = null)
     {
+        $req                         = new Request();
         $acr_user_table_config_model = new Acr_user_table_conf();
         $acr_user_table_config       = $acr_user_table_config_model->first();
         $iyzico_model                = new AcrFtrIyzico();
@@ -93,7 +94,7 @@ class iyzicoController extends Controller
         $buyer->setLastLoginDate(date('Y-m-d H:i:s', strtotime(Auth::user()->updated_at)));
         $buyer->setRegistrationDate(date('Y-m-d H:i:s', strtotime(Auth::user()->created_at)));
         $buyer->setRegistrationAddress($adres);
-        $buyer->setIp(Request::ip());
+        $buyer->setIp($req->ip());
         $buyer->setCity($sehir);
         $buyer->setCountry("Turkey");
         $buyer->setZipCode($adresses->post_code);
