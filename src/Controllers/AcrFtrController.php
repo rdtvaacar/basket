@@ -47,11 +47,11 @@ class AcrFtrController extends Controller
     {
         $u_kat_model = new U_kat();
         $kat         = $u_kat_model->where('id', $kat_id)->with(['products' => function ($q) {
+            $q->with('my_product');
             $q->orderBy('id');
         }])->first();
         return view('acr_ftr::urun_sergi', compact('kat'))->render();
     }
-
 
     function categories(Request $request)
     {
@@ -96,16 +96,16 @@ class AcrFtrController extends Controller
         if (count($file_ids) > 0) {
             if (count($file_ids) > $img_key + 1) {
                 $next_id = $file_ids[$img_key + 1];
-                $row     .= ' < img style = "position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick = "product_image(' . $product->id . ',' . $next_id . ')" src = "/icon/right-arrow.png" />';
+                $row     .= '<img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="product_image(' . $product->id . ',' . $next_id . ')" src="/icon/right-arrow.png"/>';
             }
             if ($img_key > 0) {
                 $pre_id = $file_ids[$img_key - 1];
-                $row    .= '<img style = "position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick = "product_image(' . $product->id . ',' . $pre_id . ')" src = "/icon/left-arrow.png" />';
+                $row    .= '<img style="position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="product_image(' . $product->id . ',' . $pre_id . ')" src="/icon/left-arrow.png"/>';
             }
         }
 
-        $row .= '<img width = "100%" class="img-thumbnail" src = "//eticaret.webuldum.com/acr_files/' . $product->file->acr_file_id . '/medium/' . $product->file->file_name . '.' . $product->file->file_type . '"
-                             alt                               = "' . $product->file->org_file_name . '" />';
+        $row .= '<img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/' . $product->file->acr_file_id . '/medium/' . $product->file->file_name . '.' . $product->file->file_type . '"
+                             alt="' . $product->file->org_file_name . '"/>';
         return $row;
     }
 
@@ -116,8 +116,8 @@ class AcrFtrController extends Controller
         $ps_model      = new Product_sepet();
         $product       = $product_model->where('id', $product_id)->with([
             'attributes' => function ($query) {
-                $query->where('attributes . attribute_id', 0);
-                $query->where('attributes . sil', 0);
+                $query->where('attributes.attribute_id', 0);
+                $query->where('attributes.sil', 0);
 
             },
             'files' => function ($query) {
@@ -175,11 +175,11 @@ class AcrFtrController extends Controller
     {
         $fatura_model = new Fatura();
         /* $eski_sipas_model = new Eski_faturalar();
-         $eski_siparisler = $eski_sipas_model->where('fatura_tarihDamga', ' > ', strtotime('2017 - 06 - 31'))->get(); // hazirandan sonra alanlar
-         // $eski_siparisler = $eski_sipas_model->where('fatura_tarihDamga', ' <= ', strtotime('2017 - 06 - 31'))->get(); // hazirandan önce alanlar
+         $eski_siparisler = $eski_sipas_model->where('fatura_tarihDamga', '>', strtotime('2017-06-31'))->get(); // hazirandan sonra alanlar
+         // $eski_siparisler = $eski_sipas_model->where('fatura_tarihDamga', '<=', strtotime('2017-06-31'))->get(); // hazirandan önce alanlar
 
          foreach ($eski_siparisler as $siparis) {
-             $tarih = empty($siparis->fatura_tarihDamga) ? 0 : date('Y - 09 - d', $siparis->fatura_tarihDamga);
+             $tarih = empty($siparis->fatura_tarihDamga) ? 0 : date('Y-09-d', $siparis->fatura_tarihDamga);
              if ($tarih != 0) {
                  $siparisler[] = [
                      'tur'          => $siparis->siparis,
@@ -202,7 +202,7 @@ class AcrFtrController extends Controller
          }
          $fatura_model->insert($siparisler);
          exit();*/
-        /* $faturalar = $fatura_model->where('tarih', ' >= ', '2017 - 09 - 19')->where('guncel', 1)->get();
+        /* $faturalar = $fatura_model->where('tarih', '>=', '2017-09-19')->where('guncel', 1)->get();
        dd($faturalar);
          $tarih = "2017-09-" . rand(1, 18);
          foreach ($faturalar as $fatura) {
@@ -230,18 +230,18 @@ class AcrFtrController extends Controller
          $fatura_model->whereIn('id', $sil_id)->delete();
          exit();*/
         if (empty($request->tarih)) {
-            $tarih_veri = date('01 / m / Y') . "-" . date('d / m / Y');
-            $tarih      = explode(' - ', $tarih_veri);
+            $tarih_veri = date('01/m/Y') . "-" . date('d/m/Y');
+            $tarih      = explode('-', $tarih_veri);
         } else {
-            $tarih      = explode(' - ', $request->tarih);
+            $tarih      = explode('-', $request->tarih);
             $tarih_veri = $request->tarih;
         }
-        $tarih_1   = str_replace([' ', ' / '], ['', ' - '], $tarih[0]);
-        $tarih_2   = str_replace([' ', ' / '], ['', ' - '], $tarih[1]);
-        $tarih_ilk = date('Y - m - d', strtotime($tarih_1));
-        $tarih_son = date('Y - m - d', strtotime($tarih_2));
+        $tarih_1   = str_replace([' ', '/'], ['', '-'], $tarih[0]);
+        $tarih_2   = str_replace([' ', '/'], ['', '-'], $tarih[1]);
+        $tarih_ilk = date('Y-m-d', strtotime($tarih_1));
+        $tarih_son = date('Y-m-d', strtotime($tarih_2));
         //dd($tarih_son);
-        //  dd($tarih_ilk . ' - ' . $tarih_son);
+        //  dd($tarih_ilk . '-' . $tarih_son);
         $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
         $ciro      = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
         $fiyat     = $ciro * (100 / 118);
@@ -281,8 +281,8 @@ class AcrFtrController extends Controller
             'product' => function ($query) use ($search) {
                 $query->with([
                     'attributes' => function ($query) {
-                        $query->where('attributes . attribute_id', 0);
-                        $query->where('attributes . sil', 0);
+                        $query->where('attributes.attribute_id', 0);
+                        $query->where('attributes.sil', 0);
 
                     },
                     'files' => function ($query) {
@@ -292,7 +292,7 @@ class AcrFtrController extends Controller
                         $query->orderBy('id');
                     },
                     'u_kats' => function ($query) {
-                        $query->where('u_kats . sil', 0)->where('u_kats . yayin', 1);
+                        $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
                     },
                 ])->where('product_name', 'like', "%$search%")->where('yayin', 1)->where('sil', 0);
 
@@ -317,33 +317,33 @@ class AcrFtrController extends Controller
 
     function product_row($product)
     {
-        $row = ' < tr>';
-        $row .= ' < td>' . $product->id . ' </td > ';
-        $row .= '<td > ' . $product->product_name . '</td > ';
-        $row .= '<td ><input onchange = "product_sort_edit(' . @$product->my_product->id . ')" value = "' . @$product->my_product->sira . '"  id = "product_sira_' . @$product->my_product->id . '" /><button class="btn btn-xs btn-success" > G</button ></td > ';
+        $row = '<tr>';
+        $row .= '<td>' . $product->id . '</td>';
+        $row .= '<td>' . $product->product_name . '</td>';
+        $row .= '<td><input onchange="product_sort_edit(' . @$product->my_product->id . ')" value="' . @$product->my_product->sira . '"  id="product_sira_' . @$product->my_product->id . '"/><button class="btn btn-xs btn-success">G</button></td>';
         foreach ($product->u_kats as $kat) {
-            $row .= '<td > ' . $kat->kat_isim . '</td > ';
+            $row .= '<td>' . $kat->kat_isim . '</td>';
         }
         if ($product->u_kats->count() < 3) {
-            $row .= '<td ></td > ';
+            $row .= '<td></td>';
             if ($product->u_kats->count() < 2) {
-                $row .= '<td ></td > ';
+                $row .= '<td></td>';
                 if ($product->u_kats->count() < 1) {
-                    $row .= '<td ></td > ';
+                    $row .= '<td></td>';
                 }
             }
         }
-        $row .= '<td > ';
-        $row .= '<div id = "add_btn_' . $product->id . '" > ';
+        $row .= '<td>';
+        $row .= '<div id="add_btn_' . $product->id . '">';
         if (!empty($product->my_product->id)) {
             $row .= self::delete_product_btn($product->id);
 
         } else {
             $row .= self::add_product_btn($product->id);;
         }
-        $row .= '</div > ';
-        $row .= '</td > ';
-        $row .= '</tr > ';
+        $row .= '</div>';
+        $row .= '</td>';
+        $row .= '</tr>';
         return $row;
     }
 
@@ -402,12 +402,12 @@ class AcrFtrController extends Controller
 
     function add_product_btn($product_id)
     {
-        return ' < span style = "font-size: 16pt; color:#00AAA0; cursor:pointer;" onclick = "add_product(' . $product_id . ')" class="fa fa-plus-square" ></span > ';
+        return '<span style="font-size: 16pt; color:#00AAA0; cursor:pointer;" onclick="add_product(' . $product_id . ')" class="fa fa-plus-square"></span>';
     }
 
     function delete_product_btn($product_id)
     {
-        return '<span style = "font-size: 16pt; color:#FF7A5A; cursor:pointer;" onclick = "delete_product(' . $product_id . ')" class="fa fa-minus-square" ></span > ';
+        return '<span style="font-size: 16pt; color:#FF7A5A; cursor:pointer;" onclick="delete_product(' . $product_id . ')" class="fa fa-minus-square"></span>';
     }
 
     function my_product(Request $request)
@@ -437,8 +437,8 @@ class AcrFtrController extends Controller
             'product' => function ($query) {
                 $query->with([
                     'attributes' => function ($query) {
-                        $query->where('attributes . attribute_id', 0);
-                        $query->where('attributes . sil', 0);
+                        $query->where('attributes.attribute_id', 0);
+                        $query->where('attributes.sil', 0);
 
                     },
                     'files' => function ($query) {
@@ -448,7 +448,7 @@ class AcrFtrController extends Controller
                         $query->orderBy('id');
                     },
                     'u_kats' => function ($query) {
-                        $query->where('u_kats . sil', 0)->where('u_kats . yayin', 1);
+                        $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
                     },
                 ]);
             },
@@ -459,7 +459,7 @@ class AcrFtrController extends Controller
             session()->forget('session_id');
         }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sistemdeki ürünler çekiliyor . ', 'data' => ['products' => $products, 'sepet_counts' => $sepet_count]]);
+        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sistemdeki ürünler çekiliyor.', 'data' => ['products' => $products, 'sepet_counts' => $sepet_count]]);
     }
 
     function attribute_modal(Request $request)
@@ -473,32 +473,32 @@ class AcrFtrController extends Controller
             'product' => function ($query) use ($att_id) {
                 $query->with([
                     'attributes' => function ($query) use ($att_id) {
-                        $query->where('attributes . attribute_id', ' != ', 0);
-                        $query->where('attributes . attribute_id', $att_id);
+                        $query->where('attributes.attribute_id', '!=', 0);
+                        $query->where('attributes.attribute_id', $att_id);
                     }
                 ]);
 
             }
         ])->where('id', $product_id)->first();
-        $row           = ' < div class="modal-header" > ';
-        $row           .= '<button type = "button" class="close" data - dismiss = "modal" aria - label = "Close" ><span aria - hidden = "true" > ×</span ></button > ';
-        $row           .= '<h4 style = "color: #ff1c19 " class="modal-title" id = "myModalLabel" > ' . $attribute->att_name . '</h4 > ';
-        $row           .= '</div > ';
-        $row           .= '<div class="modal-body" > ';
-        $row           .= '<h4 > Bu seçeneğin özellikleri </h4 > ';
-        $row           .= '<ul style = "list-style-image: url(/icon/16Tik.png); font-size: 14pt;" > ';
+        $row           = '<div class="modal-header">';
+        $row           .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>';
+        $row           .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $attribute->att_name . '</h4>';
+        $row           .= '</div>';
+        $row           .= '<div class="modal-body">';
+        $row           .= '<h4>Bu seçeneğin özellikleri</h4>';
+        $row           .= '<ul style="list-style-image: url(/icon/16Tik.png); font-size: 14pt;">';
         foreach ($product->product->attributes as $att) {
-            $row .= '<li > ' . $att->att_name . '</li > ';
+            $row .= '<li>' . $att->att_name . '</li>';
         }
-        $row .= '</ul > ';
+        $row .= '</ul>';
         $row .= $attribute->att_text;
-        $row .= '<div class="modal-footer" > ';
-        $row .= '<button type = "button" class="btn btn-default" data - dismiss = "modal" > Kapat</button > ';
+        $row .= '<div class="modal-footer">';
+        $row .= '<button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>';
         if (!empty($attribute->link)) {
-            $row .= '<a href = "' . $attribute->link . '" type = "button" class="btn btn-primary" > Detaylı İncele </a > ';
+            $row .= '<a href="' . $attribute->link . '" type="button" class="btn btn-primary">Detaylı İncele</a>';
         }
-        $row .= '</div > ';
-        $row .= '</div > ';
+        $row .= '</div>';
+        $row .= '</div>';
         return $row;
     }
 
@@ -517,15 +517,15 @@ class AcrFtrController extends Controller
 
             }
         ])->where('product_id', $product_id)->first();
-        $row           = ' < div class="modal-header" > ';
-        $row           .= '<button type = "button" class="close" data - dismiss = "modal" aria - label = "Close" ><span aria - hidden = "true" ><img src = "/icon/close.png" ></span ></button > ';
-        $row           .= '<h4 style = "color: #ff1c19 " class="modal-title" id = "myModalLabel" > ' . $product->product->product_name . '</h4 > ';
-        $row           .= '</div > ';
-        $row           .= '<div class="modal-body" > ';
+        $row           = '<div class="modal-header">';
+        $row           .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="/icon/close.png"></span></button>';
+        $row           .= '<h4 style="color: #ff1c19 " class="modal-title" id="myModalLabel">' . $product->product->product_name . '</h4>';
+        $row           .= '</div>';
+        $row           .= '<div class="modal-body">';
 
         foreach ($product->product->files as $file) {
             $file_ids[]        = $file->id;
-            $images[$file->id] = '<img style = "margin :2px; max-width:100%;  cursor:pointer;" class="img-thumbnail" src = "http://eticaret.webuldum.com/acr_files/' . $file->acr_file_id . '/' . $file->file_name . '.' . $file->file_type . '" > ';
+            $images[$file->id] = '<img style="margin :2px; max-width:100%;  cursor:pointer;" class="img-thumbnail" src="http://eticaret.webuldum.com/acr_files/' . $file->acr_file_id . '/' . $file->file_name . '.' . $file->file_type . '">';
         }
         if (empty($image_id)) {
             $row     .= $images[$file_ids[0]];
@@ -538,19 +538,19 @@ class AcrFtrController extends Controller
         if (count($file_ids) > 0) {
             if (count($file_ids) > $img_key + 1) {
                 $next_id = $file_ids[$img_key + 1];
-                $row     .= '<img style = "position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick = "image_viewer(' . $product->product->id . ',' . $next_id . ')" src = "/icon/right-arrow.png" />';
+                $row     .= '<img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $next_id . ')" src="/icon/right-arrow.png"/>';
             }
             if ($img_key > 0) {
                 $pre_id = $file_ids[$img_key - 1];
-                $row    .= '<img style = "position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick = "image_viewer(' . $product->product->id . ',' . $pre_id . ')" src = "/icon/left-arrow.png" />';
+                $row    .= '<img style="position: absolute; left: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="image_viewer(' . $product->product->id . ',' . $pre_id . ')" src="/icon/left-arrow.png"/>';
             }
         }
 
-        $row .= '</ul > ';
-        $row .= '<div class="modal-footer" > ';
-        $row .= '<button type = "button" class="btn btn-default" data - dismiss = "modal" > Kapat</button > ';
-        $row .= '</div > ';
-        $row .= '</div > ';
+        $row .= '</ul>';
+        $row .= '<div class="modal-footer">';
+        $row .= '<button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>';
+        $row .= '</div>';
+        $row .= '</div>';
         return $row;
     }
 
@@ -717,30 +717,30 @@ class AcrFtrController extends Controller
     function bank_form(Request $request, $bank = null)
     {
 
-        $row = ' < form method = "post" action = "/acr/ftr/bank/create" > ';
+        $row = '<form method="post" action="/acr/ftr/bank/create">';
         $row .= csrf_field();
-        $row .= '<div class="form-group" > ';
-        $row .= '<label > Görünen İsim </label > ';
-        $row .= '<input required name = "name" id = "name" class="form-control" placeholder = "Görünen İsim" value = "' . @$bank->name . '" > ';
-        $row .= '</div > ';
+        $row .= '<div class="form-group">';
+        $row .= '<label>Görünen İsim</label>';
+        $row .= '<input required name="name" id="name" class="form-control" placeholder="Görünen İsim" value="' . @$bank->name . '">';
+        $row .= '</div>';
 
-        $row .= '<div class="form-group" > ';
-        $row .= '<label > Banka İsmi </label > ';
-        $row .= '<input required name = "bank_name"  class="form-control" placeholder = "Banka Sahibi" value = "' . @$bank->bank_name . '" > ';
-        $row .= '</div > ';
-        $row .= '<div class="form-group" > ';
-        $row .= '<label > Hesap Sahibi </label > ';
-        $row .= '<input required name = "user_name"  class="form-control" placeholder = "Hesap Sahibi" value = "' . @$bank->user_name . '" > ';
-        $row .= '</div > ';
-        $row .= '<div class="form-group" > ';
-        $row .= '<label > İban</label > ';
-        $row .= '<input required name = "iban"  class="form-control" placeholder = "İban" value = "' . @$bank->iban . '" > ';
-        $row .= '</div > ';
-        $row .= '<div class="form-group" > ';
-        $row .= '<label > Hesap Numarası </label > ';
-        $row .= '<input required name = "bank_number"  class="form-control" placeholder = "Hesap Numarası" value = "' . @$bank->bank_number . '" > ';
-        $row .= '</div > ';
-        $row .= '<div class="form-group" > ';
+        $row .= '<div class="form-group">';
+        $row .= '<label>Banka İsmi </label>';
+        $row .= '<input required name="bank_name"  class="form-control" placeholder="Banka Sahibi" value="' . @$bank->bank_name . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>Hesap Sahibi</label>';
+        $row .= '<input required name="user_name"  class="form-control" placeholder="Hesap Sahibi" value="' . @$bank->user_name . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>İban</label>';
+        $row .= '<input required name="iban"  class="form-control" placeholder="İban" value="' . @$bank->iban . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
+        $row .= '<label>Hesap Numarası</label>';
+        $row .= '<input required name="bank_number"  class="form-control" placeholder="Hesap Numarası" value="' . @$bank->bank_number . '">';
+        $row .= '</div>';
+        $row .= '<div class="form-group">';
         if (@$bank->active == 1 || empty(@$bank->active)) {
             $aktif   = 'checked';
             $deaktif = '';
@@ -748,18 +748,18 @@ class AcrFtrController extends Controller
             $aktif   = '';
             $deaktif = 'checked';
         }
-        $row .= ' < label>';
-        $row .= ' < input ' . $aktif . ' type = "radio"  required name = "active" class="flat-red" value = "1" > ';
+        $row .= '<label>';
+        $row .= '<input ' . $aktif . ' type="radio"  required name="active" class="flat-red" value="1">';
         $row .= 'Aktif Et';
-        $row .= ' </label > ';
-        $row .= '<label > ';
-        $row .= '<input ' . $deaktif . ' type = "radio" required name = "active" class="flat-red" value = "2" > ';
+        $row .= '</label>';
+        $row .= '<label>';
+        $row .= '<input ' . $deaktif . ' type="radio" required name="active" class="flat-red" value="2">';
         $row .= 'Deaktif Et';
-        $row .= ' </label > ';
-        $row .= '</div > ';
-        $row .= '<input type = "hidden" name = "bank_id"  value = "' . @$bank->id . '" > ';
-        $row .= '<button type = "submit" class="btn btn-primary" > BANKA BİLGİLERİNİ KAYDET </button > ';
-        $row .= '</form > ';
+        $row .= '</label>';
+        $row .= '</div>';
+        $row .= '<input type="hidden" name="bank_id"  value="' . @$bank->id . '">';
+        $row .= '<button type="submit" class="btn btn-primary">BANKA BİLGİLERİNİ KAYDET </button>';
+        $row .= '</form>';
         return $row;
     }
 
