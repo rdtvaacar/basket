@@ -7,7 +7,6 @@
                     <thead>
                     <tr>
                         <th>#ID</th>
-
                         <th>İsim</th>
                         <th>Sıra</th>
                         <th>Kategori 1</th>
@@ -45,7 +44,6 @@
                 }
             })
         }
-
         function product_search() {
             var search = $('#search').val();
             $.ajax({
@@ -57,7 +55,6 @@
                 }
             })
         }
-
         function add_product(id) {
 
             $.ajax({
@@ -69,7 +66,6 @@
                 }
             })
         }
-
         function delete_product(id) {
 
             $.ajax({
@@ -81,7 +77,6 @@
                 }
             })
         }
-
         $(function () {
             $("#example1").DataTable();
         })
