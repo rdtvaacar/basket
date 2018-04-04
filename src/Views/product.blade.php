@@ -3,7 +3,7 @@
     <title>Anaokulu, Kreş Malzemeleri - {{$product->product_name}}</title>
 @stop
 @section('header')
-    <link rel="canonical" href="https://okuloncesievrak.com/acr/ftr/product/detail?product_id={{$product->id}}"/>
+    <link rel="canonical" href="{{$web}}?product_id={{$product->id}}"/>
     <style>
         .scroll::-webkit-scrollbar {
             width: 5px;

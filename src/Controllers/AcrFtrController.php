@@ -24,6 +24,7 @@ use Acr\Ftr\Model\File_dosya_model;
 use Auth;
 use App\Eski_faturalar;
 use Session;
+use Illuminate\Support\Facades\URL;
 
 class AcrFtrController extends Controller
 {
@@ -50,7 +51,8 @@ class AcrFtrController extends Controller
             $q->with('my_product');
             $q->orderBy('id');
         }])->first();
-        return view('acr_ftr::urun_sergi', compact('kat'))->render();
+        $web         = url()->full();
+        return view('acr_ftr::urun_sergi', compact('kat', 'web'))->render();
     }
 
     function categories(Request $request)
@@ -155,7 +157,8 @@ class AcrFtrController extends Controller
         } else {
             $msg = '';
         }
-        return View('acr_ftr::product', compact('product', 'sepet_count', 'msg', 'ps'));
+        $web = $request->url();
+        return View('acr_ftr::product', compact('product', 'sepet_count', 'msg', 'ps', 'web'));
 
     }
 
