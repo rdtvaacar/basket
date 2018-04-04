@@ -1,6 +1,6 @@
 @extends('acr_ftr.index')
 @section('title')
-    <title>Anaokulu, Kreş Malzemeleri - {{$product->product_name}}</title>
+    <title>{{$product->product_name}}</title>
 @stop
 @section('header')
     <link rel="canonical" href="{{$web}}?product_id={{$product->id}}"/>
