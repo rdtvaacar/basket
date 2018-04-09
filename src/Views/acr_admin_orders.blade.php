@@ -41,10 +41,10 @@
                                            value="{{$order->id}}"
                                            type="checkbox"/></td>
                                 <td><?php echo $order_result?></td>
-                                <td>{{$order->user->id}}</td>
-                                <td>{{$order->user->name}}<br>
-                                    {{$order->user->$email}}<br>
-                                    {{$order->user->tel}}</td>
+                                <td>{{@$order->user->id}}</td>
+                                <td>{{@$order->user->name}}<br>
+                                    {{@$order->user->$email}}<br>
+                                    {{@$order->user->tel}}</td>
                                 <td><?php echo $payment_type ?></td>
                                 <td>
                                     <table class="table">
