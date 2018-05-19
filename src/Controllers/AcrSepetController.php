@@ -1038,7 +1038,7 @@ class AcrSepetController extends Controller
             ])->get();
 
             foreach ($orders as $order) {
-                if ($order->product->fatura_bas == 1) {
+                if ($order->product->fatura_bas == 1 && $sepet_row->fatura_active == 1) {
                     $urun_names [] = $order->product->product_name;
                     if (empty($order->product->collection) || $order->product->collection == '0.00') {
                         $kdv                    = $order->product->kdv;
