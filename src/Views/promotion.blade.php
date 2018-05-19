@@ -32,10 +32,8 @@
                     <div class="box-body">
                         <form method="post" action="/acr/ftr/promotion/code/active">
                             {{csrf_field()}}
-                            <div class="input-group">
-                                <label>Pormosyon Kodunuz</label>
-                                <input name="code" value="{{@$code}}" class="form-control" style="font-size: large; padding: 10px;"/>
-                            </div>
+                            <label>Pormosyon Kodunuz</label>
+                            <input name="code" value="{{@$code}}" class="form-control" style="font-size: large; padding: 10px;"/>
                             <button type="submit" class="btn btn-primary btn-block">PROMOSYON KODUNU AKTİF ET</button>
                         </form>
                     </div>
