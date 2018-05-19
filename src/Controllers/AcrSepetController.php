@@ -62,7 +62,7 @@ class AcrSepetController extends Controller
             'active'         => 2,
             'active_user_id' => Auth::user()->id
         ]);
-        return $market_controller->order_result($request, null, [$pr->ps->product_id], Auth::user()->id);
+        return $market_controller->order_result($request, $pr->ps->sepet_id, [$pr->ps->product_id], Auth::user()->id);
     }
 
     function order_fatura_active(Request $request, $order_id = null)
