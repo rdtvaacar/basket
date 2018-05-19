@@ -1,6 +1,9 @@
 <?php
 Route::group(['middleware' => ['web']], function () {
-    Route::group(['namespace' => 'Acr\Ftr\Controllers', 'prefix' => 'acr/ftr'], function () {
+    Route::group([
+        'namespace' => 'Acr\Ftr\Controllers',
+        'prefix'    => 'acr/ftr'
+    ], function () {
         Route::get('/', 'AcrFtrController@index');
         Route::post('/product/ara/', 'AcrFtrController@product_search');
         Route::get('/product/detail', 'AcrFtrController@product_detail');
@@ -69,7 +72,7 @@ Route::group(['middleware' => ['web']], function () {
                 Route::delete('/admin/sales_invoices', 'ParasutController@sales_invoice_delete');
                 Route::get('/admin/orders', 'AcrSepetController@admin_orders');
                 Route::post('/order/active/admin', 'AcrSepetController@orders_active_admin');
-                Route::post('/acr/ftr/order/fatura/active', 'AcrSepetController@order_fatura_active');
+                Route::post('/order/fatura/active', 'AcrSepetController@order_fatura_active');
                 Route::post('/order/deactive', 'AcrSepetController@orders_deactive');
                 Route::get('/admin/siparis/faturalar', 'AcrFtrController@admin_sales_incoices');
                 Route::post('/admin/siparis/faturalar', 'AcrFtrController@admin_sales_incoices');
