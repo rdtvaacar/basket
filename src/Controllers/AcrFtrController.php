@@ -43,7 +43,7 @@ class AcrFtrController extends Controller
     }
 
 
-    function promotion()
+    function promotion(my $my)
     {
         $pr_model = new Promotion_user();
         $prs      = $pr_model->where('user_id', Auth::user()->id)->with([
@@ -51,7 +51,9 @@ class AcrFtrController extends Controller
                 $q->with('product');
             }
         ])->orderBy('active')->get();
-        return view('acr_ftr::promotion', compact('prs'));
+        $msg =$my->msg();
+
+        return view('acr_ftr::promotion', compact('prs','msg'));
     }
 
     function urun_sergi($kat_id)

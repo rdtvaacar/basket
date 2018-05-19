@@ -2,6 +2,7 @@
 @section('acr_ftr')
     <section class="content">
         <div class="row">
+            {!! $msg !!}
             <div class=" col-md-8">
                 <div class="box box-primary">
                     <div class="box-header with-border">PROMOSYONLARINIZ</div>
