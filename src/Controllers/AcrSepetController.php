@@ -55,12 +55,14 @@ class AcrSepetController extends Controller
         if ($sayi < 1) {
             return redirect()->back()->with('msg', $this->uyariMsj('Pormosyon Kodu Geçersizdir!!!'));
         }
-        $pr = $pr_model->where('code', $code)->first();
+        $pr = $pr_model->where('code', $code)->with([
+            'ps'
+        ])->first();
         $pr_model->where('code', $code)->update([
             'active'         => 2,
             'active_user_id' => Auth::user()->id
         ]);
-        return $market_controller->order_result($request, null, [$pr->ps_id], Auth::user()->id);
+        return $market_controller->order_result($request, null, [$pr->ps->product_id], Auth::user()->id);
     }
 
     function order_fatura_active(Request $request, $order_id = null)
