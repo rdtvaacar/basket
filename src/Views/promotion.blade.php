@@ -18,7 +18,7 @@
                                     <td>{{$pr->code}}</td>
                                     <td>{{$pr->ps->product->product_name}}</td>
                                     <td>{{$pr->created_at}}</td>
-                                    <td>{{$pr->acrtive==1?'<span class="text-success">AKTİF</span>':'<span class="text-danger">KULLANILDI</span>'}}</td>
+                                    <td>{!! $pr->active==1?'<span class="text-success">AKTİF</span>':'<span class="text-danger">KULLANILDI</span>' !!}</td>
                                 </tr>
                             @endforeach
 
@@ -36,6 +36,7 @@
                                 <label>Pormosyon Kodunuz</label>
                                 <input name="code" value="{{@$code}}" class="form-control" style="font-size: large; padding: 10px;"/>
                             </div>
+                            <button type="submit" class="btn btn-primary btn-block">PROMOSYON KODUNU AKTİF ET</button>
                         </form>
                     </div>
                 </div>
