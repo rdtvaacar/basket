@@ -118,13 +118,7 @@
                 <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
                     Ödemenizi kredi aşağıdaki banka hesabına yapınız açıklama kısmına kodunuzu ekleyiniz. <br> <span
                             class="text-aqua">
-                        Sipariş Kodunuz : <?php echo $siparis_id = empty($siparis->id) ? 0 : $siparis->id; ?> -
-                        @foreach($u_kods as $key=> $u_kod)
-                            {{$u_kod}}
-                            @if(count($u_kods)>$key+1)
-                                -
-                            @endif
-                        @endforeach
+                        Sipariş Kodunuz : <?php echo $siparis_id = $siparis->id ?>
                     </span>
                 </p>
                 <table class="table table-bordered table-striped">

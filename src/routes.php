@@ -32,6 +32,7 @@ Route::group(['middleware' => ['web']], function () {
 
         Route::group(['middleware' => ['auth']], function () {
             Route::post('/order/active', 'AcrSepetController@orders_active');
+            Route::post('/promotion/code/active', 'AcrFtrController@promotion_code_active');
             // adress
             Route::get('/card/adress', 'AcrSepetController@adress');
             Route::post('/card/adress/county', 'AcrSepetController@county_row');

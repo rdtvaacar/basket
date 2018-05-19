@@ -12,6 +12,7 @@ use Acr\Ftr\Model\County;
 use Acr\Ftr\Model\Fatura;
 use Acr\Ftr\Model\Fatura_product;
 use Acr\Ftr\Model\Product_sepet;
+use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
 use App\Handlers\Commands\my;
 use App\Http\Controllers\MarketController;
@@ -37,11 +38,29 @@ class AcrSepetController extends Controller
         $this->config_email = $conf_table->email;
     }
 
+
     function index()
     {
         $user_model = new AcrUser();
         $sepets     = $user_model->find(Auth::user()->id)->sepets()->get();
         return View('acr_ftr::anasayfa');
+    }
+
+    function promotion_code_active(Request $request)
+    {
+        $market_controller = new MarketController();
+        $code              = $request->code;
+        $pr_model          = new Promotion_user();
+        $sayi              = $pr_model->where('code', $code)->count();
+        if ($sayi < 1) {
+            return redirect()->back()->with('msg', $this->uyariMsj('Pormosyon Kodu Geçersizdir!!!'));
+        }
+        $pr = $pr_model->where('code', $code)->first();
+        $pr_model->where('code', $code)->update([
+            'active'         => 1,
+            'active_user_id' => Auth::user()->id
+        ]);
+        return $market_controller->order_result($request,null,[$pr->ps_id],Auth::user()->id);
     }
 
     function order_fatura_active(Request $request, $order_id = null)

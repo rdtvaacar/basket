@@ -16,6 +16,7 @@ use Acr\Ftr\Model\File_model;
 use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\Product_sepet;
+use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\U_kat;
 use App\Eski_faturalar;
@@ -42,9 +43,15 @@ class AcrFtrController extends Controller
     }
 
 
-    function order_fatura_active()
+    function promotion()
     {
-
+        $pr_model = new Promotion_user();
+        $prs      = $pr_model->where('user_id', Auth::user()->id)->with([
+            'ps' => function ($q) {
+                $q->with('product');
+            }
+        ])->orderBy('active')->get();
+        return view('acr_ftr::promotion', compact('prs'));
     }
 
     function urun_sergi($kat_id)
@@ -338,8 +345,8 @@ class AcrFtrController extends Controller
         $acr_product_model = new Acrproduct();
         $product_id        = $request->product_id;
         $acr_product_model->where('id', $product_id)->update([
-                'sira' => $request->sira
-            ]);
+            'sira' => $request->sira
+        ]);
     }
 
     function product_row($product)
