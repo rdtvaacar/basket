@@ -38,7 +38,6 @@ class AcrFtrAdress extends Model
     {
         AcrFtrAdress::where('user_id', Auth::user()->id)->update(['active' => 2]);
         AcrFtrAdress::where('id', $adress_id)->update(['active' => 1]);
-
     }
 
 }

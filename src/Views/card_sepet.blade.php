@@ -5,6 +5,7 @@
 @section('acr_ftr')
     <section class="content">
         <div class="row">
+            {!!$msg!!}
             <div class=" col-md-12">
                 <div class="box box-warning">
                     <div class="box-header with-border"><?php  echo $sepet_nav; ?></div>
@@ -43,21 +44,21 @@
         function sepet_adet_guncelle(sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/sepet_adet_guncelle',
-                data   : 'sepet_id=' + sepet_id + '&adet=' + adet,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/sepet_adet_guncelle',
+                data: 'sepet_id=' + sepet_id + '&adet=' + adet,
                 success: function (veri) {
                     $('.sepet_count').html(veri);
                     $.ajax({
-                        type   : 'post',
-                        url    : '/acr/ftr/product/sepet/sepet_total_price',
-                        data   : 'sepet_id=' + sepet_id,
+                        type: 'post',
+                        url: '/acr/ftr/product/sepet/sepet_total_price',
+                        data: 'sepet_id=' + sepet_id,
                         success: function (msg) {
                             $('#product_price_' + sepet_id).html(msg + '₺');
                             $.ajax({
-                                type   : 'post',
-                                url    : '/acr/ftr/product/sepet/product_sepet_total_price',
-                                data   : 'sepet_id=' + sepet_id,
+                                type: 'post',
+                                url: '/acr/ftr/product/sepet/product_sepet_total_price',
+                                data: 'sepet_id=' + sepet_id,
                                 success: function (msg) {
                                     $('#acr_sepet_total_price').html(msg + '₺');
                                     $('#product_dis_' + sepet_id).hide();
@@ -74,20 +75,20 @@
 
             var lisans_ay = $('#sepet_lisans_ay_' + sepet_id).val();
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/sepet_lisans_ay_guncelle',
-                data   : 'sepet_id=' + sepet_id + '&lisans_ay=' + lisans_ay,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/sepet_lisans_ay_guncelle',
+                data: 'sepet_id=' + sepet_id + '&lisans_ay=' + lisans_ay,
                 success: function () {
                     $.ajax({
-                        type   : 'post',
-                        url    : '/acr/ftr/product/sepet/sepet_total_price',
-                        data   : 'sepet_id=' + sepet_id,
+                        type: 'post',
+                        url: '/acr/ftr/product/sepet/sepet_total_price',
+                        data: 'sepet_id=' + sepet_id,
                         success: function (msg) {
                             $('#product_price_' + sepet_id).html(msg + '₺');
                             $.ajax({
-                                type   : 'post',
-                                url    : '/acr/ftr/product/sepet/product_sepet_total_price',
-                                data   : 'sepet_id=' + sepet_id,
+                                type: 'post',
+                                url: '/acr/ftr/product/sepet/product_sepet_total_price',
+                                data: 'sepet_id=' + sepet_id,
                                 success: function (msg) {
                                     $('#acr_sepet_total_price').html(msg + '₺');
                                     $('#product_dis_' + sepet_id).hide();
@@ -101,9 +102,9 @@
 
         function sepet_delete(sepet_id) {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/delete',
-                data   : 'sepet_id=' + sepet_id,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/delete',
+                data: 'sepet_id=' + sepet_id,
                 success: function (veri) {
                     $('.sepet_count').html(veri);
                     $('#sapet_row_' + sepet_id).fadeOut(400);
@@ -112,8 +113,8 @@
         }
         function sepet_delete_all() {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/delete_all',
+                type: 'post',
+                url: '/acr/ftr/product/sepet/delete_all',
                 success: function (veri) {
                     $('.sepet_count').html(0);
                     $('.sepet_row').fadeOut(400);

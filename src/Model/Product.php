@@ -43,4 +43,29 @@ class Product extends Model
         return $this->hasOne('Acr\Ftr\Model\Product_file', 'acr_file_id', 'acr_file_id');
 
     }
+
+    function product_kols()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_kols');
+    }
+
+    function product_yakas()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_yakas');
+    }
+
+    function product_sizes()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_sizes');
+    }
+
+    function product_notes()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_note');
+    }
+
+    function user_product()
+    {
+        return $this->hasOne('Acr\Ftr\Model\User_product');
+    }
 }

@@ -227,11 +227,21 @@
     </style>
 @stop
 @section('acr_ftr')
-    <?php // echo dd($sepets); ?>
     <section class="content">
         <div class="row">
             <div class=" col-md-12">
-                <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative;">
+                <form action="/acr/ftr/product" method="post"></form>
+                <select class="form-control" id="kat_1" style="float: left; width:280px;">
+                    <option value="all_categories">Kategoriler</option>
+                    @foreach($p_kats as $kat)
+                        <option value="{{$kat->id}}"><b>{{@$kat->kat_isim}}</b></option>
+                    @endforeach
+                </select>
+                <div id="categories_1"></div>
+                <div id="categories_2"></div>
+                <div id="categories_3"></div>
+
+                <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative; float: right">
                     <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
                         <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
                         <i class="fa  fa-shopping-cart"></i> SEPET
@@ -253,7 +263,6 @@
                                     <tfoot>
                                     <tr>
                                         <td><a style="float: left;" class="btn btn-warning" href="/acr/ftr/card/sepet">SATIN AL</a></td>
-
                                         <td colspan="3">
                                             <div style="font-size: 9pt; float: right; cursor:pointer;" onclick="sepet_delete_all()">Tümünü Sil</div>
                                         </td>
@@ -264,77 +273,34 @@
                         </div>
                     </div>
                 </div>
+                <div style="float: right">
+                    <div class="input-group">
+                        <input placeholder="Arama..." id="search_product"/>
+                    </div>
+                </div>
                 <div style="clear:both;"></div>
                 <div class="box">
                     <div class="box-header with-border">ÜRÜNLER</div>
                     <div class="box-body">
+                        <div class="paginate" style="text-align: center">{{$products->links()}}</div>
                         <div class="price-table">
-                            <?php
-                            //  dd($products);
-                            foreach ($products as $product) { ?>
-                            <div class="col-md-3">
-                                <div class="price-col2">
-                                    <div class="title-2"><?php echo $product->product->product_name; ?></div>
-                                    <div class="col-md-12" style="text-align: center;">
-                                        @if(!empty($product->product->file))
-                                            <img class="img-rounded" style="cursor:pointer; margin-top: 10px;" onclick="image_viewer({{$product->product->id,$product->product->file->id}})"
-                                                 src="https://eticaret.webuldum.com/acr_files/{{$product->product->file->acr_file_id}}/thumbnail/{{$product->product->file->file_name}}.{{$product->product->file->file_type}}"/>
-                                            <hr style="padding: 0;">
-                                        @endif
-                                    </div>
-                                    <ul class="peice-list">
-                                        <?php  //dd($product->attributes);
-                                        foreach ($product->product->attributes as $attribute) { ?>
-                                        <li>
-                        <span style="cursor:pointer;" onclick="urunGoster(<?php echo $attribute->id ?>,<?php echo $product->id ?>)"><?php echo $attribute->att_name ?> <span
-                                    class="glyphicon glyphicon-question-sign"></span></span>
-                                        </li>
-                                        <?php } ?>
-                                        <li class="pack-price">
-                        <span>
-                            <?php
-                            if ($product->product->type == 1) {?>
-                            <?php echo $product->product->price ?>
-                            <sub> ₺  /Ay </sub>
-                            <?php }else { ?>
-                            <?php echo $product->product->price ?> <sub> ₺ / Adet</sub>
-                            <?php }
-                            ?>
-                        </span>
-                                            <br>
-                                            <?php if ($product->product->dis_price && ($product->product->dis_moon > 0 || $product->product->dis_person > 0)) {
-                                                echo '%' . $product->product->max_dis . ' varan indirim ';
-                                            } ?>
-                                        </li>
-
-                                        <li>
-                                            <p><a href="/acr/ftr/card/sepet?product_id=<?php echo $product->product->id ?> " class="btn btn-success  ">SATIN AL</a>
-                                                <button onclick="sepete_ekle(<?php echo $product->product->id ?>)" class="btn bg-orange margin">SEPETE EKLE</button>
-                                            </p>
-                                            <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <?php }
-
-                            ?>
+                            {!! $products_table !!}
                         </div>
-                        <div class="modal fade" id="sepetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div id="sepetAciklama"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                            <div class="modal-dialog modal-lg" role="document">
-                                <div class="modal-content">
-                                    <div style="text-align: center;" id="imageModal_div"></div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="paginate" style="text-align: center">{{$products->links()}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="sepetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div id="sepetAciklama"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div style="text-align: center;" id="imageModal_div"></div>
                     </div>
                 </div>
             </div>
@@ -343,11 +309,53 @@
 @stop
 @section('footer')
     <script>
+        $('#search_product').keypress(function () {
+            var search = $(this).val();
+            var len = search.length;
+            if (len > 2) {
+                $.ajax({
+                    type: 'post',
+                    url: '/acr/ftr/product/ara',
+                    data: 'search=' + search,
+                    success: function (veri) {
+                        $('.price-table').html(veri)
+                        $('.paginate').hide();
+
+
+                    }
+                });
+            }
+        })
+        $('#kat_1').change(function () {
+            var kat_id = $(this).val();
+            categories(1, kat_id);
+        })
+
+        function categories(kat, kat_id) {
+            $.ajax({
+                type: 'post',
+                url: '/acr/ftr/product/categories',
+                data: 'kat_id=' + kat_id + '&kat=' + kat,
+                success: function (veri) {
+                    if (kat_id == "all_categories") {
+                        $('#categories_' + kat).hide()
+                        $('.all_categories').fadeIn()
+                    } else {
+                        $('.all_categories').fadeOut()
+                        $('.kat_' + kat_id).fadeIn()
+                        $('#categories_' + kat).show()
+                        $('#categories_' + kat).html(veri)
+                    }
+
+                }
+            });
+        }
+
         function urunGoster(att_id, product_id) {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/attribute/modal',
-                data   : 'att_id=' + att_id + '&product_id=' + product_id,
+                type: 'post',
+                url: '/acr/ftr/product/attribute/modal',
+                data: 'att_id=' + att_id + '&product_id=' + product_id,
                 success: function (veri) {
                     $('#sepetModal').modal('show');
                     $('#sepetAciklama').html(veri);
@@ -355,21 +363,23 @@
                 }
             });
         }
+
         function sepete_ekle(product_id) {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/create',
-                data   : 'product_id=' + product_id,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/create',
+                data: 'product_id=' + product_id,
                 success: function () {
                     var sepet_count = $('.sepet_count').html();
                     $('.sepet_count').html(parseInt(sepet_count) + 1)
                 }
             });
         }
+
         function sepet_goster() {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/products',
+                type: 'post',
+                url: '/acr/ftr/product/sepet/products',
                 success: function (veri) {
                     console.log(veri)
                     $('#sepet_tbody').html(veri);
@@ -377,27 +387,29 @@
                 }
             });
         }
+
         function sepet_gizle() {
             $('#sepet_row').hide();
         }
+
         function sepet_adet_guncelle(sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/sepet_adet_guncelle',
-                data   : 'sepet_id=' + sepet_id + '&adet=' + adet,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/sepet_adet_guncelle',
+                data: 'sepet_id=' + sepet_id + '&adet=' + adet,
                 success: function (veri) {
                     $('.sepet_count').html(veri);
                     $.ajax({
-                        type   : 'post',
-                        url    : '/acr/ftr/product/sepet/sepet_total_price',
-                        data   : 'sepet_id=' + sepet_id,
+                        type: 'post',
+                        url: '/acr/ftr/product/sepet/sepet_total_price',
+                        data: 'sepet_id=' + sepet_id,
                         success: function (msg) {
                             $('#product_price_' + sepet_id).html(msg + '₺');
                             $.ajax({
-                                type   : 'post',
-                                url    : '/acr/ftr/product/sepet/product_sepet_total_price',
-                                data   : 'sepet_id=' + sepet_id,
+                                type: 'post',
+                                url: '/acr/ftr/product/sepet/product_sepet_total_price',
+                                data: 'sepet_id=' + sepet_id,
                                 success: function (msg) {
                                     $('#acr_sepet_total_price').html(msg + '₺');
                                     $('#product_dis_' + sepet_id).hide();
@@ -413,9 +425,9 @@
 
         function sepet_delete(sepet_id) {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/delete',
-                data   : 'sepet_id=' + sepet_id,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/delete',
+                data: 'sepet_id=' + sepet_id,
                 success: function (veri) {
                     $('.sepet_count').html(veri);
                     $('#sapet_row_' + sepet_id).fadeOut(400);
@@ -425,9 +437,9 @@
 
         function image_viewer(product_id, image_id) {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/image/modal',
-                data   : 'product_id=' + product_id + '&image_id=' + image_id,
+                type: 'post',
+                url: '/acr/ftr/product/image/modal',
+                data: 'product_id=' + product_id + '&image_id=' + image_id,
                 success: function (veri) {
                     $('#imageModal').modal('show');
                     $('#imageModal_div').html(veri);
@@ -437,8 +449,8 @@
 
         function sepet_delete_all() {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/delete_all',
+                type: 'post',
+                url: '/acr/ftr/product/sepet/delete_all',
                 success: function (veri) {
                     $('.sepet_count').html(0);
                     $('.sepet_row').fadeOut(400);
