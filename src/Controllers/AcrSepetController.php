@@ -44,7 +44,7 @@ class AcrSepetController extends Controller
         return View('acr_ftr::anasayfa');
     }
 
-    function fatura_active(Request $request, $order_id = null)
+    function order_fatura_active(Request $request, $order_id = null)
     {
         $order_id             = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model          = new Sepet();
