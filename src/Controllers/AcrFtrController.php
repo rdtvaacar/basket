@@ -42,13 +42,20 @@ class AcrFtrController extends Controller
     }
 
 
+    function order_fatura_active()
+    {
+
+    }
+
     function urun_sergi($kat_id)
     {
         $u_kat_model = new U_kat();
-        $kat         = $u_kat_model->where('id', $kat_id)->with(['products' => function ($q) {
-            $q->with('my_product');
-            $q->orderBy('id');
-        }])->first();
+        $kat         = $u_kat_model->where('id', $kat_id)->with([
+            'products' => function ($q) {
+                $q->with('my_product');
+                $q->orderBy('id');
+            }
+        ])->first();
         $web         = url()->full();
         return view('acr_ftr::urun_sergi', compact('kat', 'web'))->render();
     }
@@ -77,7 +84,7 @@ class AcrFtrController extends Controller
         $product_model = new Product();
 
         $product = $product_model->where('id', $product_id)->with([
-            'file' => function ($query) use ($img_id) {
+            'file'  => function ($query) use ($img_id) {
                 @$query->where('id', $img_id);
             },
             'files' => function ($query) {
@@ -115,15 +122,15 @@ class AcrFtrController extends Controller
         $product_model = new Product();
         $ps_model      = new Product_sepet();
         $product       = $product_model->where('id', $product_id)->with([
-            'attributes' => function ($query) {
+            'attributes'    => function ($query) {
                 $query->where('attributes.attribute_id', 0);
                 $query->where('attributes.sil', 0);
 
             },
-            'files' => function ($query) {
+            'files'         => function ($query) {
                 $query->orderBy('id');
             },
-            'file' => function ($query) {
+            'file'          => function ($query) {
                 $query->orderBy('id');
             },
             'product_yakas',
@@ -166,7 +173,10 @@ class AcrFtrController extends Controller
 
         $tarih_ilk = $request->tarih_ilk;
         $tarih_son = $request->tarih_son;
-        $faturalar = $fatura_model->orderBy('tarih')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
+        $faturalar = $fatura_model->orderBy('tarih')->whereBetween('tarih', [
+            $tarih_ilk,
+            $tarih_son
+        ])->get();
 
         return View('acr_ftr::admin_fatura_yazdir', compact('faturalar'));
 
@@ -237,14 +247,32 @@ class AcrFtrController extends Controller
             $tarih      = explode('-', $request->tarih);
             $tarih_veri = $request->tarih;
         }
-        $tarih_1   = str_replace([' ', '/'], ['', '-'], $tarih[0]);
-        $tarih_2   = str_replace([' ', '/'], ['', '-'], $tarih[1]);
+        $tarih_1   = str_replace([
+            ' ',
+            '/'
+        ], [
+            '',
+            '-'
+        ], $tarih[0]);
+        $tarih_2   = str_replace([
+            ' ',
+            '/'
+        ], [
+            '',
+            '-'
+        ], $tarih[1]);
         $tarih_ilk = date('Y-m-d', strtotime($tarih_1));
         $tarih_son = date('Y-m-d', strtotime($tarih_2));
         //dd($tarih_son);
         //  dd($tarih_ilk . '-' . $tarih_son);
-        $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get();
-        $ciro      = $fatura_model->whereBetween('tarih', [$tarih_ilk, $tarih_son])->get()->sum('fiyat');
+        $faturalar = $fatura_model->orderBy('tarih', 'desc')->whereBetween('tarih', [
+            $tarih_ilk,
+            $tarih_son
+        ])->get();
+        $ciro      = $fatura_model->whereBetween('tarih', [
+            $tarih_ilk,
+            $tarih_son
+        ])->get()->sum('fiyat');
         $fiyat     = $ciro * (100 / 118);
         $kdv       = $ciro - $fiyat;
         $email     = $this->config_email;
@@ -286,13 +314,13 @@ class AcrFtrController extends Controller
                         $query->where('attributes.sil', 0);
 
                     },
-                    'files' => function ($query) {
+                    'files'      => function ($query) {
                         $query->orderBy('id');
                     },
-                    'file' => function ($query) {
+                    'file'       => function ($query) {
                         $query->orderBy('id');
                     },
-                    'u_kats' => function ($query) {
+                    'u_kats'     => function ($query) {
                         $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
                     },
                 ])->where('product_name', 'like', "%$search%")->where('yayin', 1)->where('sil', 0);
@@ -309,11 +337,9 @@ class AcrFtrController extends Controller
     {
         $acr_product_model = new Acrproduct();
         $product_id        = $request->product_id;
-        $acr_product_model->where('id', $product_id)->update(
-            [
+        $acr_product_model->where('id', $product_id)->update([
                 'sira' => $request->sira
-            ]
-        );
+            ]);
     }
 
     function product_row($product)
@@ -353,7 +379,8 @@ class AcrFtrController extends Controller
         $product_model = new Product();
         $controller    = new AcrFtrController();
         $products      = $product_model->where('yayin', 1)->where('sil', 0)->with([
-            'u_kats', 'my_product' => function ($q) {
+            'u_kats',
+            'my_product' => function ($q) {
                 $q->where('sil', 0);
             }
         ])->get();
@@ -370,10 +397,10 @@ class AcrFtrController extends Controller
 
         $product_row = $product_model->where('id', $id)->first();
         $data        = [
-            'name' => $product_row->product_name,
-            'quantity' => 1,
+            'name'       => $product_row->product_name,
+            'quantity'   => 1,
             'unit_price' => $product_row->price,
-            'vat_rate' => $product_row->kdv
+            'vat_rate'   => $product_row->kdv
         ];
         $product_id  = $parasut->product($data);
         if ($acr_product_model->where('product_id', $id)->count() > 0) {
@@ -383,7 +410,7 @@ class AcrFtrController extends Controller
             $data       = [
                 'product_id' => $id,
                 'parasut_id' => $product_id,
-                'user_id' => Auth::user()->id
+                'user_id'    => Auth::user()->id
             ];
             $product_id = $acr_product_model->insertGetId($data);
         }
@@ -442,13 +469,13 @@ class AcrFtrController extends Controller
                         $query->where('attributes.sil', 0);
 
                     },
-                    'files' => function ($query) {
+                    'files'      => function ($query) {
                         $query->orderBy('id');
                     },
-                    'file' => function ($query) {
+                    'file'       => function ($query) {
                         $query->orderBy('id');
                     },
-                    'u_kats' => function ($query) {
+                    'u_kats'     => function ($query) {
                         $query->where('u_kats.sil', 0)->where('u_kats.yayin', 1);
                     },
                 ]);
@@ -460,7 +487,15 @@ class AcrFtrController extends Controller
             session()->forget('session_id');
         }
         $sepet_count = empty($sepet_model->sepets($session_id)) ? 0 : $sepet_model->sepets($session_id);
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sistemdeki ürünler çekiliyor.', 'data' => ['products' => $products, 'sepet_counts' => $sepet_count]]);
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Sistemdeki ürünler çekiliyor.',
+            'data'   => [
+                'products'     => $products,
+                'sepet_counts' => $sepet_count
+            ]
+        ]);
     }
 
     function attribute_modal(Request $request)
@@ -586,13 +621,13 @@ class AcrFtrController extends Controller
     {
         $user_conf_model = new Acr_user_table_conf();
         $data            = [
-            'user_id' => Auth::user()->id,
-            'name' => $request->input('name'),
-            'user_name' => $request->input('user_name'),
-            'email' => $request->input('email'),
-            'lisans_durum' => $request->input('lisans_durum'),
+            'user_id'          => Auth::user()->id,
+            'name'             => $request->input('name'),
+            'user_name'        => $request->input('user_name'),
+            'email'            => $request->input('email'),
+            'lisans_durum'     => $request->input('lisans_durum'),
             'lisans_baslangic' => $request->input('lisans_baslangic'),
-            'lisans_bitis' => $request->input('lisans_bitis')
+            'lisans_bitis'     => $request->input('lisans_bitis')
         ];
         if ($user_conf_model->count() > 0) {
             $user_conf_model->where('id', $request->id)->update($data);
@@ -607,12 +642,12 @@ class AcrFtrController extends Controller
         $parasut_conf = new Parasut_conf();
 
         $data = [
-            'user_id' => Auth::user()->id,
-            'client_id' => $request->input('client_id'),
+            'user_id'       => Auth::user()->id,
+            'client_id'     => $request->input('client_id'),
             'client_secret' => $request->input('client_secret'),
-            'username' => $request->input('username'),
-            'password' => $request->input('password'),
-            'company_id' => $request->input('company_id')
+            'username'      => $request->input('username'),
+            'password'      => $request->input('password'),
+            'company_id'    => $request->input('company_id')
 
         ];
         if ($parasut_conf->count() > 0) {
@@ -632,13 +667,13 @@ class AcrFtrController extends Controller
 
         $data = [
             'user_id' => Auth::user()->id,
-            'name' => $request->input('name'),
-            'city' => $request->input('city'),
-            'county' => $request->input('county'),
-            'adress' => $request->input('adress'),
-            'tel' => $request->input('tel'),
-            'email' => $request->input('email'),
-            'url' => $request->input('url')
+            'name'    => $request->input('name'),
+            'city'    => $request->input('city'),
+            'county'  => $request->input('county'),
+            'adress'  => $request->input('adress'),
+            'tel'     => $request->input('tel'),
+            'email'   => $request->input('email'),
+            'url'     => $request->input('url')
 
         ];
         if ($company_model->count() > 0) {
@@ -653,10 +688,10 @@ class AcrFtrController extends Controller
     {
         $iyzi_model = new AcrFtrIyzico();
         $data       = [
-            'user_id' => Auth::user()->id,
-            'setApiKey' => $request->input('setApiKey'),
-            'setSecretKey' => $request->input('setSecretKey'),
-            'setBaseUrl' => $request->input('setBaseUrl'),
+            'user_id'        => Auth::user()->id,
+            'setApiKey'      => $request->input('setApiKey'),
+            'setSecretKey'   => $request->input('setSecretKey'),
+            'setBaseUrl'     => $request->input('setBaseUrl'),
             'setCallbackUrl' => $request->input('setCallbackUrl'),
         ];
 
@@ -701,13 +736,13 @@ class AcrFtrController extends Controller
     {
         $bank_model = new Bank();
         $data       = [
-            'user_id' => Auth::user()->id,
-            'name' => $request->input('name'),
-            'bank_name' => $request->input('bank_name'),
-            'user_name' => $request->input('user_name'),
-            'iban' => $request->input('iban'),
+            'user_id'     => Auth::user()->id,
+            'name'        => $request->input('name'),
+            'bank_name'   => $request->input('bank_name'),
+            'user_name'   => $request->input('user_name'),
+            'iban'        => $request->input('iban'),
             'bank_number' => $request->input('bank_number'),
-            'active' => $request->input('active'),
+            'active'      => $request->input('active'),
 
         ];
         $bank_id    = empty($request->input('bank_id')) ? 0 : $request->input('bank_id');

@@ -14,6 +14,7 @@
                             <tr>
                                 <th>Son Güncelleme</th>
                                 <th>S. NO</th>
+                                <th>Fatura</th>
                                 <th>Sipariş Onayla</th>
                                 <th>Ödeme Sonucu</th>
                                 <th>UserID</th>
@@ -35,11 +36,20 @@
                             <tr>
                                 <td>{{$order->updated_at}}</td>
                                 <td>{{$order->id}}</td>
-                                <td><input onclick="order_active(<?php echo $order->id; ?>)" id="order_input_{{$order->id}}"
+                                <td>
+                                    <input onclick="fatura_active(<?php echo $order->id; ?>)" id="fatura_input_{{$order->id}}"
+                                           <?php  echo $order->fatura_active == 1 ? 'checked' : 0; ?> style="width: 32px; height: 32px; cursor:pointer;"
+                                           name="siparis"
+                                           value="{{$order->id}}"
+                                           type="checkbox"/>
+                                </td>
+                                <td>
+                                    <input onclick="order_active(<?php echo $order->id; ?>)" id="order_input_{{$order->id}}"
                                            <?php  echo $order->active == 1 ? 'checked' : 0; ?> style="width: 32px; height: 32px; cursor:pointer;"
                                            name="siparis"
                                            value="{{$order->id}}"
-                                           type="checkbox"/></td>
+                                           type="checkbox"/>
+                                </td>
                                 <td><?php echo $order_result?></td>
                                 <td>{{@$order->user->id}}</td>
                                 <td>{{@$order->user->name}}<br>
@@ -173,6 +183,17 @@
                     }
                 });
             }
+        }
+
+        function fatura_active(id) {
+            var order_id = id;
+            $.ajax({
+                type: 'post',
+                url: '/acr/ftr/order/fatura/active',
+                data: 'order_id=' + order_id,
+                success: function () {
+                }
+            });
         }
     </script>
 @stop

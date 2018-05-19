@@ -44,6 +44,16 @@ class AcrSepetController extends Controller
         return View('acr_ftr::anasayfa');
     }
 
+    function fatura_active(Request $request, $order_id = null)
+    {
+        $order_id             = empty($order_id) ? $request->input('order_id') : $order_id;
+        $sepet_model          = new Sepet();
+        $sepet                = $sepet_model->find($order_id);
+        $active               = $sepet->fatura_active == 1 ? 0 : 1;
+        $sepet->fatura_active = $active;
+        $sepet->save();
+    }
+
     function orders(Request $request)
     {
         $sepet_model = new Sepet();
@@ -54,12 +64,12 @@ class AcrSepetController extends Controller
     function admin_orders(Request $request)
     {
         $sepet_model                 = new Sepet();
-        $orders                      = $sepet_model->where('siparis', 1)
-            ->with([
-                'user', 'products' => function ($query) {
-                    $query->with('product');
-                }
-            ])->get();
+        $orders                      = $sepet_model->where('siparis', 1)->with([
+            'user',
+            'products' => function ($query) {
+                $query->with('product');
+            }
+        ])->get();
         $acr_user_table_config_model = new Acr_user_table_conf();
         $config                      = $acr_user_table_config_model->first();
         $email                       = $config->email;
@@ -82,7 +92,7 @@ class AcrSepetController extends Controller
         $notes = $request->notes;
         $data  = [
             'yaka_id' => $request->yaka_id,
-            'kol_id' => $request->kol_id,
+            'kol_id'  => $request->kol_id,
             'size_id' => $request->size_id
         ];
         if (Auth::check()) {
@@ -90,10 +100,10 @@ class AcrSepetController extends Controller
             if (!empty($notes)) {
                 foreach ($notes as $key => $note) {
                     $data_notes[] = [
-                        'sepet_id' => $sepet_id,
+                        'sepet_id'   => $sepet_id,
                         'product_id' => $product_id,
-                        'note_id' => $request->note_ids[$key],
-                        'name' => $request->notes[$key]
+                        'note_id'    => $request->note_ids[$key],
+                        'name'       => $request->notes[$key]
                     ];
                 }
             } else {
@@ -113,10 +123,10 @@ class AcrSepetController extends Controller
             if (!empty($notes)) {
                 foreach ($notes as $key => $note) {
                     $data_notes[] = [
-                        'sepet_id' => $sepet_id,
+                        'sepet_id'   => $sepet_id,
                         'product_id' => $product_id,
-                        'note_id' => $request->note_ids[$key],
-                        'name' => $request->notes[$key]
+                        'note_id'    => $request->note_ids[$key],
+                        'name'       => $request->notes[$key]
                     ];
                 }
             } else {
@@ -150,9 +160,9 @@ class AcrSepetController extends Controller
     {
         $sepet_model = new Sepet();
         $ps_model    = new Product_sepet();
-        $session_id = $request->session()->get('session_id');
-        $sepet_id   = $sepet_model->product_sepet_id($session_id);
-        $products   = $ps_model->where('sepet_id', $sepet_id)->with([
+        $session_id  = $request->session()->get('session_id');
+        $sepet_id    = $sepet_model->product_sepet_id($session_id);
+        $products    = $ps_model->where('sepet_id', $sepet_id)->with([
             'product' => function ($query) {
                 $query->where('sil', 0);
             }
@@ -201,7 +211,7 @@ class AcrSepetController extends Controller
     function discount($price = null, $dis_price = null)
     {
 
-        $discount  = 100 - round($dis_price / $price, 2) * 100;
+        $discount = 100 - round($dis_price / $price, 2) * 100;
         if ($discount > 0) {
             $discount = ' <span style="color: #0b7c0f; font-size: 9pt;">%' . $discount . '</span>';
         } else {
@@ -354,7 +364,15 @@ class AcrSepetController extends Controller
         $session_id = session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);
         $order_id   = $request->input('order_id');
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Sepet bilgileri çekiliyor.', 'data' => ['products' => $products, 'order_id' => $order_id]]);
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Sepet bilgileri çekiliyor.',
+            'data'   => [
+                'products' => $products,
+                'order_id' => $order_id
+            ]
+        ]);
     }
 
     function adress(Request $request)
@@ -368,9 +386,11 @@ class AcrSepetController extends Controller
         }
         $order_id = $request->input('order_id');
         $order_id = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
-        $sepet    = $sepet_model->where('id', $order_id)->with(['products' => function ($query) {
-            $query->with('product');
-        }])->first();
+        $sepet    = $sepet_model->where('id', $order_id)->with([
+            'products' => function ($query) {
+                $query->with('product');
+            }
+        ])->first();
         foreach ($sepet->products as $product) {
             if ($product->adet < $product->product->min_adet) {
                 return redirect()->to('/acr/ftr/card/sepet')->with('msg', '<div style="text-align: center; margin-right: auto; margin-left: auto;" class="alert alert-danger">' . $product->product->product_name . ' ürününü en az ' . $product->product->min_adet . ' adet sipariş verebilirsiniz. </div>');
@@ -420,7 +440,12 @@ class AcrSepetController extends Controller
         if (!empty($adress_id)) {
             $adress_model->active_adress($adress_id);
         }
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres aktif edildi.', 'data' => null]);
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Adres aktif edildi.',
+            'data'   => null
+        ]);
 
     }
 
@@ -428,7 +453,12 @@ class AcrSepetController extends Controller
     {
         $adress_model = new AcrFtrAdress();
         $adresses     = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres bilgileri çekiliyor.', 'data' => $adresses]);
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Adres bilgileri çekiliyor.',
+            'data'   => $adresses
+        ]);
 
     }
 
@@ -511,15 +541,15 @@ class AcrSepetController extends Controller
         $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $ps_model      = new Product_sepet();
         $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price         = round(self::product_sepet_total_price($ps->id,$request), 2);
-        $not_dis_price = round(self::not_dis_price($ps->id,$request), 2);
+        $price         = round(self::product_sepet_total_price($ps->id, $request), 2);
+        $not_dis_price = round(self::not_dis_price($ps->id, $request), 2);
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         $data_sepet    = [
-            'siparis' => 1,
-            'price' => $price,
-            'bank_id' => $bank_id,
+            'siparis'      => 1,
+            'price'        => $price,
+            'bank_id'      => $bank_id,
             'payment_type' => 1,
-            'dis_rate' => $dis_rate
+            'dis_rate'     => $dis_rate
         ];
         self::order_set($data_sepet, $sepet_id);
         $siparis = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
@@ -533,13 +563,19 @@ class AcrSepetController extends Controller
         $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
         $company_model = new Company_conf();
         $company       = $company_model->first();
-        return response()
-            ->json([
-                'status' => 1,
-                'title' => 'Bilgi',
-                'msg' => 'Siparişiniz  oluşturuldu ödeme bekleniyor.',
-                'data' => ['ps' => $ps, 'bank' => $bank, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis]
-            ]);
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Siparişiniz  oluşturuldu ödeme bekleniyor.',
+            'data'   => [
+                'ps'          => $ps,
+                'bank'        => $bank,
+                'sepet_nav'   => $sepet_nav,
+                'user_adress' => $user_adress,
+                'company'     => $company,
+                'siparis'     => $siparis
+            ]
+        ]);
     }
 
     function payment_bank_card(Request $request)
@@ -564,14 +600,14 @@ class AcrSepetController extends Controller
         $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $ps_model      = new Product_sepet();
         $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price         = round(self::product_sepet_total_price($ps->id,$request), 2);
-        $not_dis_price = round(self::not_dis_price($ps->id,$request), 2);
+        $price         = round(self::product_sepet_total_price($ps->id, $request), 2);
+        $not_dis_price = round(self::not_dis_price($ps->id, $request), 2);
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         $data_sepet    = [
-            'siparis' => 1,
-            'price' => $price,
+            'siparis'      => 1,
+            'price'        => $price,
             'payment_type' => 2,
-            'dis_rate' => $dis_rate
+            'dis_rate'     => $dis_rate
         ];
         self::order_set($data_sepet, $sepet_id);
         $siparis = $sepet_model->where('id', $sepet_id)->where('siparis', 1)->first();
@@ -584,23 +620,44 @@ class AcrSepetController extends Controller
         $user_adress   = $adress_model->where('id', $siparis->adress_id)->with('city', 'county')->first();
         $company_model = new Company_conf();
         $company       = $company_model->first();
-        return response()
-            ->json([
-                'status' => 1,
-                'title' => 'Bilgi',
-                'msg' => 'Kredi kartı için ödeme bekleniyor.',
-                'data' => ['ps' => $ps, 'sepet_nav' => $sepet_nav, 'user_adress' => $user_adress, 'company' => $company, 'siparis' => $siparis]
-            ]);
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Kredi kartı için ödeme bekleniyor.',
+            'data'   => [
+                'ps'          => $ps,
+                'sepet_nav'   => $sepet_nav,
+                'user_adress' => $user_adress,
+                'company'     => $company,
+                'siparis'     => $siparis
+            ]
+        ]);
     }
 
     function sepet_nav($order_id = null, $step)
     {
         $sepet_link = empty($order_id) ? '' : '?order_id=' . $order_id;
         $navs       = [
-            1 => ['sepet', 'SEPET', 11],
-            ['adress', 'ADRES/FATURA', 10],
-            ['payment', 'ÖDEME YÖNETİ', 9],
-            ['result', ' ÖDEME', 8]
+            1 => [
+                'sepet',
+                'SEPET',
+                11
+            ],
+            [
+                'adress',
+                'ADRES/FATURA',
+                10
+            ],
+            [
+                'payment',
+                'ÖDEME YÖNETİ',
+                9
+            ],
+            [
+                'result',
+                ' ÖDEME',
+                8
+            ]
         ];
 
         $row = '<div id="breadcrumb">';
@@ -726,7 +783,7 @@ class AcrSepetController extends Controller
             $city_id = $request->input('city_id');
         }
         $counties = $county_model->where('city_id', $city_id)->get();
-// citys
+        // citys
         $row = '<div class="form-group">';
         $row .= '<label>İlçe</label>';
         $row .= '<select required name="county" class="form-control">';
@@ -751,26 +808,27 @@ class AcrSepetController extends Controller
     function adress_create_api(Request $request)
     {
         $rules   = array(
-            'name' => 'required', // make sure the email is an actual email
-            'city' => 'required', // password can only be alphanumeric and has to be greater than 3 characters
-            'county' => 'required',
+            'name'      => 'required',
+            // make sure the email is an actual email
+            'city'      => 'required',
+            // password can only be alphanumeric and has to be greater than 3 characters
+            'county'    => 'required',
             'post_code' => 'required',
-            'tel' => 'required'
+            'tel'       => 'required'
         );
         $massage = [
-            'name.required' => 'Adres İsmi Giriniz',
-            'city.required' => 'Şehir Seçiniz.',
-            'county.required' => 'İlçe Seçiniz.',
+            'name.required'      => 'Adres İsmi Giriniz',
+            'city.required'      => 'Şehir Seçiniz.',
+            'county.required'    => 'İlçe Seçiniz.',
             'post_code.required' => 'Posta Kodu Giriniz.',
-            'tel.required' => 'Telefon Numarası Giriniz.'
+            'tel.required'       => 'Telefon Numarası Giriniz.'
         ];
-// run the validation rules on the inputs from the form
+        // run the validation rules on the inputs from the form
         $validator = Validator::make($request->all(), $rules, $massage);
-// if the validator fails, redirect back to the form
+        // if the validator fails, redirect back to the form
         if ($validator->fails()) {
-            return Redirect()->back()
-                ->withErrors($validator)// send back all errors to the login form
-                ->withInput($request->all()); //
+            return Redirect()->back()->withErrors($validator)// send back all errors to the login form
+            ->withInput($request->all()); //
         } else {
             $e_fatura         = empty($request->input('e_fatura')) ? 1 : $request->input('e_fatura');
             $adress_model     = new AcrFtrAdress();
@@ -782,28 +840,33 @@ class AcrSepetController extends Controller
             }
             $tc        = strlen($request->input('tc')) < 11 ? '11111111111' : $request->input('tc');
             $data      = [
-                'user_id' => Auth::user()->id,
-                'name' => $request->input('name'),
+                'user_id'      => Auth::user()->id,
+                'name'         => $request->input('name'),
                 'invoice_name' => $invoice_name,
-                'tc' => $tc,
-                'adress' => $request->input('adress'),
-                'city_id' => $request->input('city'),
-                'county_id' => $request->input('county'),
-                'post_code' => $request->input('post_code'),
-                'tel' => $request->input('tel'),
-                'type' => $request->input('type'),
-                'company' => $request->input('company'),
-                'tax_number' => $request->input('tax_number'),
-                'tax_office' => $request->input('tax_office'),
-                'e_fatura' => $e_fatura,
-                'active' => 1,
+                'tc'           => $tc,
+                'adress'       => $request->input('adress'),
+                'city_id'      => $request->input('city'),
+                'county_id'    => $request->input('county'),
+                'post_code'    => $request->input('post_code'),
+                'tel'          => $request->input('tel'),
+                'type'         => $request->input('type'),
+                'company'      => $request->input('company'),
+                'tax_number'   => $request->input('tax_number'),
+                'tax_office'   => $request->input('tax_office'),
+                'e_fatura'     => $e_fatura,
+                'active'       => 1,
 
             ];
             $adress_id = $request->input('adress_id') ? $request->input('adress_id') : 0;
 
             $adress_id = $adress_model->create($adress_id, $data);
             self::parasut_contact_update($adress_id);
-            return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Adres bilgileri başarıyla eklendi.', 'data' => null]);
+            return response()->json([
+                'status' => 1,
+                'title'  => 'Bilgi',
+                'msg'    => 'Adres bilgileri başarıyla eklendi.',
+                'data'   => null
+            ]);
 
         }
     }
@@ -867,22 +930,22 @@ class AcrSepetController extends Controller
         }
         $user_email      = $this->config_email;
         $parasut_contact = [
-            'name' => $invoice_name,
-            'contact_type' => $contact_type,
-            'tax_number' => $tax_number,
-            'tax_office' => $adress_row->office,
-            'category_id' => null,
-            'city' => $adress_row->city->name,
-            'district' => $adress_row->county->name,
-            'email' => Auth::user()->$user_email,
-            'address_attributes' => [
+            'name'                      => $invoice_name,
+            'contact_type'              => $contact_type,
+            'tax_number'                => $tax_number,
+            'tax_office'                => $adress_row->office,
+            'category_id'               => null,
+            'city'                      => $adress_row->city->name,
+            'district'                  => $adress_row->county->name,
+            'email'                     => Auth::user()->$user_email,
+            'address_attributes'        => [
                 'address' => $adress_row->adress,
-                'phone' => $adress_row->tel,
-                'fax' => null,
+                'phone'   => $adress_row->tel,
+                'fax'     => null,
             ],
             'contact_people_attributes' => [
                 [
-                    'name' => $contact_name,
+                    'name'  => $contact_name,
                     'phone' => $adress_row->tel,
                 ],
             ],
@@ -898,12 +961,8 @@ class AcrSepetController extends Controller
         $fatura         = $fatura_model->where('id', $fatura_id)->first();
         $user_mail_conf = $this->config_email;
         $user_email     = $fatura->user->$user_mail_conf;
-        $fatura_model->where('id', $fatura_id)->update(
-            ['tarih' => date('Y-m-d')]
-        );
-        $sepet_model->where('id', $fatura_id)->update(
-            ['updated_at' => date('Y-m-d')]
-        );
+        $fatura_model->where('id', $fatura_id)->update(['tarih' => date('Y-m-d')]);
+        $sepet_model->where('id', $fatura_id)->update(['updated_at' => date('Y-m-d')]);
         return self::orders_active($request, $fatura->order_id, 1, 1);
     }
 
@@ -935,29 +994,32 @@ class AcrSepetController extends Controller
         /*$parasut_conf     = new Parasut_conf();
         $parasut_conf_row = $parasut_conf->where('user_id', Auth::user()->id)->first();*/
         $adress_model = new AcrFtrAdress();
-        $sepet_row    = $sepet_model->where('id', $order_id)
-            ->with([
-                'products' => function ($query) use ($order_id) {
-                    $query->with(
-                        [
-                            'product' => function ($query) {
-                                $query->with(['user_product' => function ($query) {
-                                    $query->with(['user']);
-                                }]);
-                            },
-                            'size',
-                            'kol',
-                            'yaka',
-                            'notes' => function ($query) use ($order_id) {
-                                $query->where('sepet_id', $order_id);
+        $sepet_row    = $sepet_model->where('id', $order_id)->with([
+            'products' => function ($query) use ($order_id) {
+                $query->with([
+                    'product' => function ($query) {
+                        $query->with([
+                            'user_product' => function ($query) {
+                                $query->with(['user']);
                             }
                         ]);
-                },
-                'adress' => function ($query) {
-                    $query->where('active', 1);
-                    $query->with(['city', 'county']);
-                }])
-            ->first();
+                    },
+                    'size',
+                    'kol',
+                    'yaka',
+                    'notes'   => function ($query) use ($order_id) {
+                        $query->where('sepet_id', $order_id);
+                    }
+                ]);
+            },
+            'adress'   => function ($query) {
+                $query->where('active', 1);
+                $query->with([
+                    'city',
+                    'county'
+                ]);
+            }
+        ])->first();
         if ($sepet_row->order_result == 2 && $sepet_row->active == 0 || $e_arsive_create == 1) {
             $adress_row = $adress_model->where('active', 1)->where('user_id', $sepet_row->user_id)->with('city', 'county')->first();
             if (empty($adress_row->parasut_id)) {
@@ -969,21 +1031,26 @@ class AcrSepetController extends Controller
             } else {
                 $parasut_contact_id = $adress_row->parasut_id;
             }
-            $orders = $ps_model->where('sepet_id', $order_id)->with(['product', 'acr_product', 'sepet'])->get();
+            $orders = $ps_model->where('sepet_id', $order_id)->with([
+                'product',
+                'acr_product',
+                'sepet'
+            ])->get();
 
             foreach ($orders as $order) {
                 if ($order->product->fatura_bas == 1) {
                     $urun_names [] = $order->product->product_name;
                     if (empty($order->product->collection) || $order->product->collection == '0.00') {
                         $kdv                    = $order->product->kdv;
-                        $ps_price               = self::sepet_total_price($order->id,$request);
+                        $ps_price               = self::sepet_total_price($order->id, $request);
                         $fiyat                  = round(((($ps_price * ((100) / (100 + $kdv)))) / $order->adet), 4);
                         $parasut_product_data[] = [
-                            'product_id' => $order->acr_product->parasut_id, // the parasut products
-                            'quantity' => $order->adet,
-                            'unit_price' => $fiyat,
-                            'discount' => round($order->product->price * $order->sepet->dis_rate, 4),
-                            'vat_rate' => $kdv,
+                            'product_id'    => $order->acr_product->parasut_id,
+                            // the parasut products
+                            'quantity'      => $order->adet,
+                            'unit_price'    => $fiyat,
+                            'discount'      => round($order->product->price * $order->sepet->dis_rate, 4),
+                            'vat_rate'      => $kdv,
                             'discount_type' => 'amount',
                             'discount_rate' => $order->sepet->dis_rate,
                         ];
@@ -993,23 +1060,24 @@ class AcrSepetController extends Controller
                         $kdv                    = $order->product->collection_kdv;
                         $fiyat                  = round(((($order->product->collection * ((100) / (100 + $kdv)))) / $order->adet), 4);
                         $parasut_product_data[] = [
-                            'product_id' => $order->acr_product->parasut_id, // the parasut products
-                            'quantity' => $order->adet,
-                            'unit_price' => $fiyat,
-                            'discount' => 0,
-                            'vat_rate' => $kdv,
+                            'product_id'    => $order->acr_product->parasut_id,
+                            // the parasut products
+                            'quantity'      => $order->adet,
+                            'unit_price'    => $fiyat,
+                            'discount'      => 0,
+                            'vat_rate'      => $kdv,
                             'discount_type' => 'amount',
                             'discount_rate' => 0,
                         ];
                         $total_vat[]            = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
                     }
                     $acr_fatura_product[] = [
-                        'order_id' => $order_id,
-                        'name' => $order->product->product_name,
-                        'kdv' => $order->adet * (0.18 * $fiyat),
-                        'fiyat' => $order->adet * $fiyat,
+                        'order_id'     => $order_id,
+                        'name'         => $order->product->product_name,
+                        'kdv'          => $order->adet * (0.18 * $fiyat),
+                        'fiyat'        => $order->adet * $fiyat,
                         'toplam_fiyat' => $order->adet * ($fiyat + (0.18 * $fiyat)),
-                        'adet' => $order->adet,
+                        'adet'         => $order->adet,
                     ];
                     $fatura_bas           = 1;
                 } else {
@@ -1020,46 +1088,47 @@ class AcrSepetController extends Controller
                 $payment_add_contact = ['balance' => $sepet_row->price];
                 $parasut->contact_update($parasut_contact_id, $payment_add_contact);
                 $parasut_sale_data = [
-                    'description' => $adress_row->invoice_name,
-                    'item_type' => 'invoice',
-                    'contact_id' => $parasut_contact_id,
-                    'gross_total' => round(($sepet_row->price * (100 / 118)), 2),
-                    'net_total' => $sepet_row->price,
-                    'archived' => null,
-                    'issue_date' => date('Y-m-d'),
+                    'description'        => $adress_row->invoice_name,
+                    'item_type'          => 'invoice',
+                    'contact_id'         => $parasut_contact_id,
+                    'gross_total'        => round(($sepet_row->price * (100 / 118)), 2),
+                    'net_total'          => $sepet_row->price,
+                    'archived'           => null,
+                    'issue_date'         => date('Y-m-d'),
                     'details_attributes' => $parasut_product_data,
-                    'total_paid' => $sepet_row->price,
-                    'payment_status' => 'paid',
-                    'payments' => [
-                        "id" => 1,
-                        "payable_id" => 1,
+                    'total_paid'         => $sepet_row->price,
+                    'payment_status'     => 'paid',
+                    'payments'           => [
+                        "id"           => 1,
+                        "payable_id"   => 1,
                         "payable_type" => "SalesInvoice",
-                        "amount" => $sepet_row->price,
-                        "notes" => null,
-                        "flow" => "in",
-                        "is_overdue" => false,
-                        "is_paid" => true,
+                        "amount"       => $sepet_row->price,
+                        "notes"        => null,
+                        "flow"         => "in",
+                        "is_overdue"   => false,
+                        "is_paid"      => true,
                     ]
                 ];
                 $invoice           = $parasut->sale($parasut_sale_data);
 
                 $fatura_data = [
-                    'order_id' => $order_id,
+                    'order_id'           => $order_id,
                     'parasut_invoice_id' => $invoice->id,
-                    'invoice_name' => $adress_row->invoice_name,
-                    'adress' => $adress_row->adress . ' ' . $adress_row->county->name . '/' . $adress_row->city->name,
-                    'tax_office' => $adress_row->tax_office,
-                    'tax_number' => $adress_row->tax_number,
-                    'tc' => $adress_row->tc,
-                    'tarih' => $adress_row->updated_at,
-                    'user_id' => $adress_row->user_id,
-                    'tel' => $adress_row->tel,
-                    'post_code' => $adress_row->post_code,
-                    'type' => $adress_row->type,
-                    'payment_type' => $sepet_row->payment_type,
-                    'guncel' => 1, // '0 eski 1 güncel,
-                    'fiyat' => $sepet_row->price,
-                    'fiyat_yazi' => self::paraYazi($sepet_row->price)
+                    'invoice_name'       => $adress_row->invoice_name,
+                    'adress'             => $adress_row->adress . ' ' . $adress_row->county->name . '/' . $adress_row->city->name,
+                    'tax_office'         => $adress_row->tax_office,
+                    'tax_number'         => $adress_row->tax_number,
+                    'tc'                 => $adress_row->tc,
+                    'tarih'              => $adress_row->updated_at,
+                    'user_id'            => $adress_row->user_id,
+                    'tel'                => $adress_row->tel,
+                    'post_code'          => $adress_row->post_code,
+                    'type'               => $adress_row->type,
+                    'payment_type'       => $sepet_row->payment_type,
+                    'guncel'             => 1,
+                    // '0 eski 1 güncel,
+                    'fiyat'              => $sepet_row->price,
+                    'fiyat_yazi'         => self::paraYazi($sepet_row->price)
                 ];
                 if ($e_arsive_create != 1) {
                     self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
@@ -1235,13 +1304,13 @@ class AcrSepetController extends Controller
         $company       = $company_model->first();
         $payment       = $payment_type == 1 ? 'KREDIKARTI/BANKAKARTI' : 'EFT/HAVALE';
         $e_arsiv       = [
-            "note" => "Bu fatura $company->url aracılığıyla oluşturulmuştur.",
-            "to" => "urn=>mail=>$user_email",
+            "note"          => "Bu fatura $company->url aracılığıyla oluşturulmuştur.",
+            "to"            => "urn=>mail=>$user_email",
             'internet_sale' => [
-                'url' => $company->url,
-                'payment_type' => $payment,
+                'url'              => $company->url,
+                'payment_type'     => $payment,
                 'payment_platform' => '-',
-                'payment_date' => date('Y-m-d')
+                'payment_date'     => date('Y-m-d')
             ]
         ];
         $parasut->e_arsiv($invoice_id, $e_arsiv);
@@ -1253,7 +1322,11 @@ class AcrSepetController extends Controller
         $ps_model             = new Product_sepet();
         $adress_model         = new AcrFtrAdress();
         $fatura_product_model = new Fatura_product();
-        $sepets               = $sepet_model->where('active', 1)->where('order_result', 2)->whereNotIn('user_id', [1, 5, 35746])->where('sil', 0)->get();
+        $sepets               = $sepet_model->where('active', 1)->where('order_result', 2)->whereNotIn('user_id', [
+            1,
+            5,
+            35746
+        ])->where('sil', 0)->get();
         $fatura_model         = new Fatura();
         /*$fatura_model->where('guncel', 0)->orWhereNull('cinsi', null)->delete();
         $fatura_product_model->where('id', '!=', 0)->delete();
@@ -1279,29 +1352,30 @@ class AcrSepetController extends Controller
                         $total_vat[] = ($order->product->price - ($order->product->price * $order->sepet->dis_rate)) * $kdv;
                     }
                     $acr_fatura_product[] = [
-                        'order_id' => $sepet_row->id,
-                        'name' => $order->product->product_name,
-                        'kdv' => $order->adet * (0.18 * $fiyat),
-                        'fiyat' => $order->adet * $fiyat,
+                        'order_id'     => $sepet_row->id,
+                        'name'         => $order->product->product_name,
+                        'kdv'          => $order->adet * (0.18 * $fiyat),
+                        'fiyat'        => $order->adet * $fiyat,
                         'toplam_fiyat' => $order->adet * ($fiyat + (0.18 * $fiyat)),
-                        'adet' => $order->adet,
+                        'adet'         => $order->adet,
                     ];
                 }
                 $fatura_data = [
-                    'order_id' => $sepet_row->id,
+                    'order_id'     => $sepet_row->id,
                     'invoice_name' => $adress_row->invoice_name,
-                    'adress' => $adress_row->adress . ' ' . $adress_row->county->name . '/' . $adress_row->city->name,
-                    'tax_office' => $adress_row->tax_office,
-                    'tax_number' => $adress_row->tax_number,
-                    'tc' => $adress_row->tc,
-                    'tarih' => $adress_row->updated_at,
-                    'user_id' => $adress_row->user_id,
-                    'tel' => $adress_row->tel,
-                    'post_code' => $adress_row->post_code,
-                    'type' => $adress_row->type,
-                    'guncel' => 1, // '0 eski 1 güncel,
-                    'fiyat' => $sepet_row->price,
-                    'fiyat_yazi' => self::paraYazi($sepet_row->price)
+                    'adress'       => $adress_row->adress . ' ' . $adress_row->county->name . '/' . $adress_row->city->name,
+                    'tax_office'   => $adress_row->tax_office,
+                    'tax_number'   => $adress_row->tax_number,
+                    'tc'           => $adress_row->tc,
+                    'tarih'        => $adress_row->updated_at,
+                    'user_id'      => $adress_row->user_id,
+                    'tel'          => $adress_row->tel,
+                    'post_code'    => $adress_row->post_code,
+                    'type'         => $adress_row->type,
+                    'guncel'       => 1,
+                    // '0 eski 1 güncel,
+                    'fiyat'        => $sepet_row->price,
+                    'fiyat_yazi'   => self::paraYazi($sepet_row->price)
                 ];
                 self::fatura_olustur($fatura_data, $acr_fatura_product); // sistem içinde tutulan faturalar
             }
@@ -1311,37 +1385,58 @@ class AcrSepetController extends Controller
     function paraYazi($money = '0.00')
     {
         $money = explode('.', $money);
-        if (count($money) != 2) return false;
+        if (count($money) != 2)
+            return false;
         $money_left  = $money['0'];
         $money_right = $money['1'];
         //DOKUZLAR
         if (strlen($money_left) == 9) {
             $i = (int)floor($money_left / 100000000);
-            if ($i == 1) $l9 = "YÜZ";
-            if ($i == 2) $l9 = "İKİ YÜZ";
-            if ($i == 3) $l9 = "ÜÇ YÜZ";
-            if ($i == 4) $l9 = "DÖRT YÜZ";
-            if ($i == 5) $l9 = "BEŞ YÜZ";
-            if ($i == 6) $l9 = "ALTI YÜZ";
-            if ($i == 7) $l9 = "YEDİ YÜZ";
-            if ($i == 8) $l9 = "SEKİZ YÜZ";
-            if ($i == 9) $l9 = "DOKUZ YÜZ";
-            if ($i == 0) $l9 = "";
+            if ($i == 1)
+                $l9 = "YÜZ";
+            if ($i == 2)
+                $l9 = "İKİ YÜZ";
+            if ($i == 3)
+                $l9 = "ÜÇ YÜZ";
+            if ($i == 4)
+                $l9 = "DÖRT YÜZ";
+            if ($i == 5)
+                $l9 = "BEŞ YÜZ";
+            if ($i == 6)
+                $l9 = "ALTI YÜZ";
+            if ($i == 7)
+                $l9 = "YEDİ YÜZ";
+            if ($i == 8)
+                $l9 = "SEKİZ YÜZ";
+            if ($i == 9)
+                $l9 = "DOKUZ YÜZ";
+            if ($i == 0)
+                $l9 = "";
             $money_left = substr($money_left, 1, strlen($money_left) - 1);
         }
         //SEKİZLER
         if (strlen($money_left) == 8) {
             $i = (int)floor($money_left / 10000000);
-            if ($i == 1) $l8 = "ON";
-            if ($i == 2) $l8 = "YİRMİ";
-            if ($i == 3) $l8 = "OTUZ";
-            if ($i == 4) $l8 = "KIRK";
-            if ($i == 5) $l8 = "ELLİ";
-            if ($i == 6) $l8 = "ATMIŞ";
-            if ($i == 7) $l8 = "YETMİŞ";
-            if ($i == 8) $l8 = "SEKSEN";
-            if ($i == 9) $l8 = "DOKSAN";
-            if ($i == 0) $l8 = "";
+            if ($i == 1)
+                $l8 = "ON";
+            if ($i == 2)
+                $l8 = "YİRMİ";
+            if ($i == 3)
+                $l8 = "OTUZ";
+            if ($i == 4)
+                $l8 = "KIRK";
+            if ($i == 5)
+                $l8 = "ELLİ";
+            if ($i == 6)
+                $l8 = "ATMIŞ";
+            if ($i == 7)
+                $l8 = "YETMİŞ";
+            if ($i == 8)
+                $l8 = "SEKSEN";
+            if ($i == 9)
+                $l8 = "DOKSAN";
+            if ($i == 0)
+                $l8 = "";
             $money_left = substr($money_left, 1, strlen($money_left) - 1);
         }
         //YEDİLER
@@ -1354,14 +1449,22 @@ class AcrSepetController extends Controller
                     $l7 = "MİLYON";
                 }
             }
-            if ($i == 2) $l7 = "İKİ MİLYON";
-            if ($i == 3) $l7 = "ÜÇ MİLYON";
-            if ($i == 4) $l7 = "DÖRT MİLYON";
-            if ($i == 5) $l7 = "BEŞ MİLYON";
-            if ($i == 6) $l7 = "ALTI MİLYON";
-            if ($i == 7) $l7 = "YEDİ MİLYON";
-            if ($i == 8) $l7 = "SEKİZ MİLYON";
-            if ($i == 9) $l7 = "DOKUZ MİLYON";
+            if ($i == 2)
+                $l7 = "İKİ MİLYON";
+            if ($i == 3)
+                $l7 = "ÜÇ MİLYON";
+            if ($i == 4)
+                $l7 = "DÖRT MİLYON";
+            if ($i == 5)
+                $l7 = "BEŞ MİLYON";
+            if ($i == 6)
+                $l7 = "ALTI MİLYON";
+            if ($i == 7)
+                $l7 = "YEDİ MİLYON";
+            if ($i == 8)
+                $l7 = "SEKİZ MİLYON";
+            if ($i == 9)
+                $l7 = "DOKUZ MİLYON";
             if ($i == 0) {
                 if ($i != "NULL") {
                     $l7 = "MİLYON";
@@ -1374,31 +1477,51 @@ class AcrSepetController extends Controller
         //ALTILAR
         if (strlen($money_left) == 6) {
             $i = (int)floor($money_left / 100000);
-            if ($i == 1) $l6 = "YÜZ";
-            if ($i == 2) $l6 = "İKİ YÜZ";
-            if ($i == 3) $l6 = "ÜÇ YÜZ";
-            if ($i == 4) $l6 = "DÖRT YÜZ";
-            if ($i == 5) $l6 = "BEŞ YÜZ";
-            if ($i == 6) $l6 = "ALTI YÜZ";
-            if ($i == 7) $l6 = "YEDİ YÜZ";
-            if ($i == 8) $l6 = "SEKİZ YÜZ";
-            if ($i == 9) $l6 = "DOKUZ YÜZ";
-            if ($i == 0) $l6 = "";
+            if ($i == 1)
+                $l6 = "YÜZ";
+            if ($i == 2)
+                $l6 = "İKİ YÜZ";
+            if ($i == 3)
+                $l6 = "ÜÇ YÜZ";
+            if ($i == 4)
+                $l6 = "DÖRT YÜZ";
+            if ($i == 5)
+                $l6 = "BEŞ YÜZ";
+            if ($i == 6)
+                $l6 = "ALTI YÜZ";
+            if ($i == 7)
+                $l6 = "YEDİ YÜZ";
+            if ($i == 8)
+                $l6 = "SEKİZ YÜZ";
+            if ($i == 9)
+                $l6 = "DOKUZ YÜZ";
+            if ($i == 0)
+                $l6 = "";
             $money_left = substr($money_left, 1, strlen($money_left) - 1);
         }
         //BEŞLER
         if (strlen($money_left) == 5) {
             $i = (int)floor($money_left / 10000);
-            if ($i == 1) $l5 = "ON";
-            if ($i == 2) $l5 = "YİRMİ";
-            if ($i == 3) $l5 = "OTUZ";
-            if ($i == 4) $l5 = "KIRK";
-            if ($i == 5) $l5 = "ELLİ";
-            if ($i == 6) $l5 = "ATMIŞ";
-            if ($i == 7) $l5 = "YETMİŞ";
-            if ($i == 8) $l5 = "SEKSEN";
-            if ($i == 9) $l5 = "DOKSAN";
-            if ($i == 0) $l5 = "";
+            if ($i == 1)
+                $l5 = "ON";
+            if ($i == 2)
+                $l5 = "YİRMİ";
+            if ($i == 3)
+                $l5 = "OTUZ";
+            if ($i == 4)
+                $l5 = "KIRK";
+            if ($i == 5)
+                $l5 = "ELLİ";
+            if ($i == 6)
+                $l5 = "ATMIŞ";
+            if ($i == 7)
+                $l5 = "YETMİŞ";
+            if ($i == 8)
+                $l5 = "SEKSEN";
+            if ($i == 9)
+                $l5 = "DOKSAN";
+            if ($i == 0)
+                $l5 = "";
             $money_left = substr($money_left, 1, strlen($money_left) - 1);
         }
         //DÖRTLER
@@ -1411,14 +1534,22 @@ class AcrSepetController extends Controller
                     $l4 = "BİN";
                 }
             }
-            if ($i == 2) $l4 = "İKİ BİN";
-            if ($i == 3) $l4 = "ÜÇ BİN";
-            if ($i == 4) $l4 = "DÖRT BİN";
-            if ($i == 5) $l4 = "BEŞ BİN";
-            if ($i == 6) $l4 = "ALTI BİN";
-            if ($i == 7) $l4 = "YEDİ BİN";
-            if ($i == 8) $l4 = "SEKZ BİN";
-            if ($i == 9) $l4 = "DOKUZ BİN";
+            if ($i == 2)
+                $l4 = "İKİ BİN";
+            if ($i == 3)
+                $l4 = "ÜÇ BİN";
+            if ($i == 4)
+                $l4 = "DÖRT BİN";
+            if ($i == 5)
+                $l4 = "BEŞ BİN";
+            if ($i == 6)
+                $l4 = "ALTI BİN";
+            if ($i == 7)
+                $l4 = "YEDİ BİN";
+            if ($i == 8)
+                $l4 = "SEKZ BİN";
+            if ($i == 9)
+                $l4 = "DOKUZ BİN";
             if ($i == 0) {
                 if ($i != "") {
                     $l4 = "BİN";
@@ -1431,76 +1562,126 @@ class AcrSepetController extends Controller
         //ÜÇLER
         if (strlen($money_left) == 3) {
             $i = (int)floor($money_left / 100);
-            if ($i == 1) $l3 = "YÜZ";
-            if ($i == 2) $l3 = "İKİYÜZ";
-            if ($i == 3) $l3 = "ÜÇYÜZ";
-            if ($i == 4) $l3 = "DÖRTYÜZ";
-            if ($i == 5) $l3 = "BEŞYÜZ";
-            if ($i == 6) $l3 = "ALTIYÜZ";
-            if ($i == 7) $l3 = "YEDİYÜZ";
-            if ($i == 8) $l3 = "SEKİZYÜZ";
-            if ($i == 9) $l3 = "DOKUZYÜZ";
-            if ($i == 0) $l3 = "";
+            if ($i == 1)
+                $l3 = "YÜZ";
+            if ($i == 2)
+                $l3 = "İKİYÜZ";
+            if ($i == 3)
+                $l3 = "ÜÇYÜZ";
+            if ($i == 4)
+                $l3 = "DÖRTYÜZ";
+            if ($i == 5)
+                $l3 = "BEŞYÜZ";
+            if ($i == 6)
+                $l3 = "ALTIYÜZ";
+            if ($i == 7)
+                $l3 = "YEDİYÜZ";
+            if ($i == 8)
+                $l3 = "SEKİZYÜZ";
+            if ($i == 9)
+                $l3 = "DOKUZYÜZ";
+            if ($i == 0)
+                $l3 = "";
             $money_left = substr($money_left, 1, strlen($money_left) - 1);
         }
         //İKİLER
         if (strlen($money_left) == 2) {
             $i = (int)floor($money_left / 10);
-            if ($i == 1) $l2 = "ON";
-            if ($i == 2) $l2 = "YİRMİ";
-            if ($i == 3) $l2 = "OTUZ";
-            if ($i == 4) $l2 = "KIRK";
-            if ($i == 5) $l2 = "ELLİ";
-            if ($i == 6) $l2 = "ATMIŞ";
-            if ($i == 7) $l2 = "YETMİŞ";
-            if ($i == 8) $l2 = "SEKSEN";
-            if ($i == 9) $l2 = "DOKSAN";
-            if ($i == 0) $l2 = "";
+            if ($i == 1)
+                $l2 = "ON";
+            if ($i == 2)
+                $l2 = "YİRMİ";
+            if ($i == 3)
+                $l2 = "OTUZ";
+            if ($i == 4)
+                $l2 = "KIRK";
+            if ($i == 5)
+                $l2 = "ELLİ";
+            if ($i == 6)
+                $l2 = "ATMIŞ";
+            if ($i == 7)
+                $l2 = "YETMİŞ";
+            if ($i == 8)
+                $l2 = "SEKSEN";
+            if ($i == 9)
+                $l2 = "DOKSAN";
+            if ($i == 0)
+                $l2 = "";
             $money_left = substr($money_left, 1, strlen($money_left) - 1);
         }
         //BİRLER
         if (strlen($money_left) == 1) {
             $i = (int)floor($money_left / 1);
-            if ($i == 1) $l1 = "BİR";
-            if ($i == 2) $l1 = "İKİ";
-            if ($i == 3) $l1 = "ÜÇ";
-            if ($i == 4) $l1 = "DÖRT";
-            if ($i == 5) $l1 = "BEŞ";
-            if ($i == 6) $l1 = "ALTI";
-            if ($i == 7) $l1 = "YEDİ";
-            if ($i == 8) $l1 = "SEKİZ";
-            if ($i == 9) $l1 = "DOKUZ";
-            if ($i == 0) $l1 = "";
+            if ($i == 1)
+                $l1 = "BİR";
+            if ($i == 2)
+                $l1 = "İKİ";
+            if ($i == 3)
+                $l1 = "ÜÇ";
+            if ($i == 4)
+                $l1 = "DÖRT";
+            if ($i == 5)
+                $l1 = "BEŞ";
+            if ($i == 6)
+                $l1 = "ALTI";
+            if ($i == 7)
+                $l1 = "YEDİ";
+            if ($i == 8)
+                $l1 = "SEKİZ";
+            if ($i == 9)
+                $l1 = "DOKUZ";
+            if ($i == 0)
+                $l1 = "";
             $money_left = substr($money_left, 1, strlen($money_left) - 1);
         }
         //SAĞ İKİ
         if (strlen($money_right) == 2) {
             $i = (int)floor($money_right / 10);
-            if ($i == 1) $r2 = "ON";
-            if ($i == 2) $r2 = "YİRMİ";
-            if ($i == 3) $r2 = "OTUZ";
-            if ($i == 4) $r2 = "KIRK";
-            if ($i == 5) $r2 = "ELLİ";
-            if ($i == 6) $r2 = "ALTMIŞ";
-            if ($i == 7) $r2 = "YETMİŞ";
-            if ($i == 8) $r2 = "SEKSEN";
-            if ($i == 9) $r2 = "DOKSAN";
-            if ($i == 0) $r2 = "SIFIR";
+            if ($i == 1)
+                $r2 = "ON";
+            if ($i == 2)
+                $r2 = "YİRMİ";
+            if ($i == 3)
+                $r2 = "OTUZ";
+            if ($i == 4)
+                $r2 = "KIRK";
+            if ($i == 5)
+                $r2 = "ELLİ";
+            if ($i == 6)
+                $r2 = "ALTMIŞ";
+            if ($i == 7)
+                $r2 = "YETMİŞ";
+            if ($i == 8)
+                $r2 = "SEKSEN";
+            if ($i == 9)
+                $r2 = "DOKSAN";
+            if ($i == 0)
+                $r2 = "SIFIR";
             $money_right = substr($money_right, 1, strlen($money_right) - 1);
         }
         //SAĞ BİR
         if (strlen($money_right) == 1) {
             $i = (int)floor($money_right / 1);
-            if ($i == 1) $r1 = "BİR";
-            if ($i == 2) $r1 = "İKİ";
-            if ($i == 3) $r1 = "ÜÇ";
-            if ($i == 4) $r1 = "DÖRT";
-            if ($i == 5) $r1 = "BEŞ";
-            if ($i == 6) $r1 = "ALTI";
-            if ($i == 7) $r1 = "YEDİ";
-            if ($i == 8) $r1 = "SEKİZ";
-            if ($i == 9) $r1 = "DOKUZ";
-            if ($i == 0) $r1 = "";
+            if ($i == 1)
+                $r1 = "BİR";
+            if ($i == 2)
+                $r1 = "İKİ";
+            if ($i == 3)
+                $r1 = "ÜÇ";
+            if ($i == 4)
+                $r1 = "DÖRT";
+            if ($i == 5)
+                $r1 = "BEŞ";
+            if ($i == 6)
+                $r1 = "ALTI";
+            if ($i == 7)
+                $r1 = "YEDİ";
+            if ($i == 8)
+                $r1 = "SEKİZ";
+            if ($i == 9)
+                $r1 = "DOKUZ";
+            if ($i == 0)
+                $r1 = "";
             $money_right = substr($money_right, 1, strlen($money_right) - 1);
         }
         return @$l9 . " " . @$l8 . " " . @$l7 . " " . @$l6 . " " . @$l5 . " " . @$l4 . " " . @$l3 . " " . @$l2 . " " . @$l1 . " TÜRK LİRASI " . @$r2 . " " . @$r1 . " KURUŞ";
