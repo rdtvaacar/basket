@@ -51,16 +51,16 @@ class AcrSepetController extends Controller
         $market_controller = new MarketController();
         $code              = $request->code;
         $pr_model          = new Promotion_user();
-        $sayi              = $pr_model->where('code', $code)->count();
+        $sayi              = $pr_model->where('code', $code)->where('active', 1)->count();
         if ($sayi < 1) {
             return redirect()->back()->with('msg', $this->uyariMsj('Pormosyon Kodu Geçersizdir!!!'));
         }
         $pr = $pr_model->where('code', $code)->first();
         $pr_model->where('code', $code)->update([
-            'active'         => 1,
+            'active'         => 2,
             'active_user_id' => Auth::user()->id
         ]);
-        return $market_controller->order_result($request,null,[$pr->ps_id],Auth::user()->id);
+        return $market_controller->order_result($request, null, [$pr->ps_id], Auth::user()->id);
     }
 
     function order_fatura_active(Request $request, $order_id = null)
