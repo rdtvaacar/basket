@@ -12,6 +12,7 @@ use Acr\Ftr\Model\County;
 use Acr\Ftr\Model\Fatura;
 use Acr\Ftr\Model\Fatura_product;
 use Acr\Ftr\Model\Product_sepet;
+use Acr\Ftr\Model\Promotion;
 use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
 use App\Handlers\Commands\my;
@@ -52,6 +53,13 @@ class AcrSepetController extends Controller
         $code              = $request->code;
         $pr_model          = new Promotion_user();
         $sayi              = $pr_model->where('code', $code)->where('active', 1)->count();
+        preg_match('/promotion/', $code, $deger);
+        if (count($deger) > 0) {
+            $promo_model = new Promotion();
+            $pr          = $promo_model->where('code', $code)->first();
+            self::create($request, $pr->product_id);
+            return redirect()->to('/acr/ftr/card/sepet');
+        }
         if ($sayi < 1) {
             return redirect()->back()->with('msg', $this->uyariMsj('Pormosyon Kodu Geçersizdir!!!'));
         }
@@ -381,6 +389,7 @@ class AcrSepetController extends Controller
         $product_id  = $request->input('product_id');
         if (!empty($product_id)) {
             self::create($request, $product_id);
+            return redirect()->to('/acr/ftr/card/sepet');
         }
         $session_id = session()->get('session_id');
         $products   = $sepet_model->product_sepet($session_id);

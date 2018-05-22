@@ -42,6 +42,52 @@ class AcrFtrController extends Controller
         $this->config_email = @$conf_table->email;
     }
 
+    function promotion_kod_refresh(Request $request) {
+        $pr_model   = new Promotion();
+        $id         = $request->id;
+        $code       = 'product.' . uniqid(rand(1000000, 9999999));
+        $data       = [
+            'code'       => $code
+        ];
+        $pr_model->where('id', $id)->update($data);
+        return $code;
+    }
+    function admin_promotion_create(Request $request)
+    {
+        $pr_model   = new Promotion();
+        $produck_id = $request->product_id;
+        $son        = $request->son;
+        $id         = $request->id;
+
+        if (empty($id)) {
+            $code       = 'product.' . uniqid(rand(1000000, 9999999));
+            $data       = [
+                'id'         => $id,
+                'son'        => $son,
+                'product_id' => $produck_id,
+                'code'       => $code
+            ];
+            $pr_model->insert($data);
+        } else {
+            $data       = [
+                'son'        => $son,
+                'product_id' => $produck_id,
+            ];
+            $pr_model->where('id', $id)->update($data);
+        }
+        return redirect()->back()->with('msg', $this->basarili());
+    }
+
+    function admin_promotions()
+    {
+        $pr_model = new Promotion();
+        $prs      = $pr_model->where('user_id', Auth::user()->id)->with([
+            'product'
+        ])->get();
+        $msg      = session('msg');
+
+        return view('acr_ftr::admin_promotions', compact('prs', 'msg'));
+    }
 
     function promotion()
     {
@@ -51,9 +97,9 @@ class AcrFtrController extends Controller
                 $q->with('product');
             }
         ])->orderBy('active')->get();
-        $msg =session('msg');
+        $msg      = session('msg');
 
-        return view('acr_ftr::promotion', compact('prs','msg'));
+        return view('acr_ftr::promotion', compact('prs', 'msg'));
     }
 
     function urun_sergi($kat_id)

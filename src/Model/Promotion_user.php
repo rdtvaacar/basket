@@ -33,4 +33,9 @@ class Promotion_user extends Model
         }
     }
 
+    function user()
+    {
+        return $this->hasOne('App\User', 'id', 'user_id');
+    }
+
 }
