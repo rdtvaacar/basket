@@ -16,6 +16,7 @@ use Acr\Ftr\Model\File_model;
 use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\Product_sepet;
+use Acr\Ftr\Model\Promotion;
 use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\U_kat;
