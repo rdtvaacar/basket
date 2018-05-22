@@ -50,7 +50,7 @@
 @stop
 @section('footer')
     <script>
-        function kod_yenile(id) {
+        function sil(id) {
             if (confirm('Kodu güncellemek mevcut kodun geçirsiz olmasını sebep olur, emin misiniz?') == true) {
                 $.ajax({
                     type: 'post',

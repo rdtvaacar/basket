@@ -57,8 +57,9 @@ Route::group(['middleware' => ['web']], function () {
                 Route::get('/product/new', 'AcrFtrController@new_product');
                 Route::get('/admin/promotions', 'AcrFtrController@admin_promotions');
                 Route::get('/admin/promotion/create', 'AcrFtrController@admin_promotion_create');
-                Route::get('/admin/promotion/kod/refresh', 'AcrFtrController@promotion_kod_refresh');
-                Route::post('/product/sort/edit', 'AcrFtrController@product_sort_edit');
+                Route::post('/admin/promotion/create', 'AcrFtrController@admin_promotion_create');
+                Route::post('/admin/promotion/kod/delete', 'AcrFtrController@admin_promotion_kod_delete');
+                Route::post('/admin/promotion/kod/refresh', 'AcrFtrController@promotion_kod_refresh');
 
                 //Route::post('/product/search_row', 'AcrFtrController@product_search_row');
                 Route::post('/product/add', 'AcrFtrController@add_product');
