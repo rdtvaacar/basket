@@ -82,7 +82,7 @@ class AcrFtrController extends Controller
     function admin_promotions()
     {
         $pr_model = new Promotion();
-        $prs      = $pr_model->where('user_id', Auth::user()->id)->with([
+        $prs      = $pr_model->with([
             'product'
         ])->get();
         $msg      = session('msg');
