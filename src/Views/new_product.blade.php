@@ -5,27 +5,32 @@
 @section('acr_ftr')
     <section class="content">
         <div class="row">
-            <div class=" col-md-12">
-                <table id="example1" class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th>#ID</th>
-                        <th>İsim</th>
-                        <th>Sıra</th>
-                        <th>Kategori 1</th>
-                        <th>Kategori 2</th>
-                        <th>Kategori 3</th>
-                        <th>Ekle</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($products as $product) {
-                        echo $controller->product_row($product);
-                    } ?>
-                    </tbody>
-                </table>
-                <div id="search_div" class="">
+            <div class="box box-success">
+                <div class="box-header with-border">Paraşüt Fatura Bilgileri</div>
+                <div class="box-body">
+                    <div class=" col-md-12">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>İsim</th>
+                                <th>Sıra</th>
+                                <th>Kategori 1</th>
+                                <th>Kategori 2</th>
+                                <th>Kategori 3</th>
+                                <th>Ekle</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($products as $product) {
+                                echo $controller->product_row($product);
+                            } ?>
+                            </tbody>
+                        </table>
+                        <div id="search_div" class="">
 
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -44,6 +49,7 @@
                 }
             })
         }
+
         function product_search() {
             var search = $('#search').val();
             $.ajax({
@@ -55,6 +61,7 @@
                 }
             })
         }
+
         function add_product(id) {
 
             $.ajax({
@@ -66,6 +73,7 @@
                 }
             })
         }
+
         function delete_product(id) {
 
             $.ajax({
@@ -77,6 +85,7 @@
                 }
             })
         }
+
         $(function () {
             $("#example1").DataTable();
         })
