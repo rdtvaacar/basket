@@ -60,8 +60,8 @@ class AcrSepetController extends Controller
             if ($pr->son <= $pr->ilk) {
                 return redirect()->back()->with('msg', $this->uyariMsj('Bu promosyon kodu kullanım limitine ulaşmıştır, ilginize teşekkür ederiz.'));
             }
-            if (strtotime($pr->last_date) > time()) {
-                return redirect()->back()->with('msg', $this->uyariMsj('Bu promosyon kodu süresi bitmiştir son tarihi' . date('d/m/Y', strtotime($pr->last_date)) . ', ilginize teşekkür ederiz.'));
+            if (strtotime($pr->last_date) < time()) {
+                return redirect()->back()->with('msg', $this->uyariMsj('Bu promosyon kodu süresi bitmiştir son tarihi ' . date('d/m/Y', strtotime($pr->last_date)) . ', ilginize teşekkür ederiz.'));
             }
             self::create($request, $pr->product_id);
             return redirect()->to('/acr/ftr/card/sepet');
