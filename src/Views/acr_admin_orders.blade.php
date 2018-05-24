@@ -53,7 +53,7 @@
                                 <td><?php echo $order_result?></td>
                                 <td>{{@$order->user->id}}</td>
                                 <td>{{@$order->user->name}}<br>
-                                <td>{{@$order->user->tc}}<br>
+                                    {{@$order->adress->tc}}/{{@$order->user->tc}}<br>
                                     {{@$order->user->$email}}<br>
                                     {{@$order->user->tel}}</td>
                                 <td><?php echo $payment_type ?></td>
