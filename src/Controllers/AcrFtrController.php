@@ -54,7 +54,7 @@ class AcrFtrController extends Controller
     {
         $pr_model = new Promotion();
         $id       = $request->id;
-        $code     = 'product.' . uniqid(rand(1000000, 9999999));
+        $code     = 'product' . uniqid(rand(1000000, 9999999));
         $data     = [
             'code' => $code
         ];
