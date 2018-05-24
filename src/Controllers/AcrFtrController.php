@@ -70,7 +70,7 @@ class AcrFtrController extends Controller
         $id         = $request->id;
 
         if (empty($id)) {
-            $code = 'product.' . uniqid(rand(1000000, 9999999));
+            $code = 'product' . uniqid(rand(1000000, 9999999));
             $data = [
                 'id'         => $id,
                 'son'        => $son,

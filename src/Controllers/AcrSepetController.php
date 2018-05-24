@@ -53,12 +53,12 @@ class AcrSepetController extends Controller
         $code              = $request->code;
         $pr_model          = new Promotion_user();
         $sayi              = $pr_model->where('code', $code)->where('active', 1)->count();
-        preg_match('/product./', $code, $deger);
+        preg_match('/product/', $code, $deger);
         if (count($deger) > 0) {
             $promo_model = new Promotion();
             $pr          = $promo_model->where('code', $code)->first();
             if ($pr->son <= $pr->ilk) {
-                return redirect()->back()->with('msg', $this->uyariMsj('Bu promosyon kodu kullanıcı limitine ulaşmıştır, ilginize teşekkür ederiz.'));
+                return redirect()->back()->with('msg', $this->uyariMsj('Bu promosyon kodu kullanım limitine ulaşmıştır, ilginize teşekkür ederiz.'));
             }
             self::create($request, $pr->product_id);
             return redirect()->to('/acr/ftr/card/sepet');
