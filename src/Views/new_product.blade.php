@@ -38,6 +38,7 @@
 @stop
 @section('footer')
     <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="/plugins/datatables/dataTables.bootstrap.min.js"></script>
     <script>
         function product_sort_edit(product_id) {
             var sira = $('#product_sira_' + product_id).val();
