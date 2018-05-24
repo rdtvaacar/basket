@@ -60,6 +60,9 @@ class AcrSepetController extends Controller
             if ($pr->son <= $pr->ilk) {
                 return redirect()->back()->with('msg', $this->uyariMsj('Bu promosyon kodu kullanım limitine ulaşmıştır, ilginize teşekkür ederiz.'));
             }
+            if (strtotime($pr->last_date) > time()) {
+                return redirect()->back()->with('msg', $this->uyariMsj('Bu promosyon kodu süresi bitmiştir son tarihi' . date('d/m/Y', strtotime($pr->last_date)) . ', ilginize teşekkür ederiz.'));
+            }
             self::create($request, $pr->product_id);
             return redirect()->to('/acr/ftr/card/sepet');
         }
@@ -390,10 +393,10 @@ class AcrSepetController extends Controller
     {
         $sepet_model = new Sepet();
         $product_id  = $request->input('product_id');
-        $pr_model = new Promotion();
-        $pr_sayi = $pr_model->where('product_id',$product_id)->count();
-        if($pr_sayi>0) {
-          return  redirect()->back()->with('msg',$this->uyariMsj('Bu ürün yalnızca promosyon kodu ile satın alınabilir.'));
+        $pr_model    = new Promotion();
+        $pr_sayi     = $pr_model->where('product_id', $product_id)->count();
+        if ($pr_sayi > 0) {
+            return redirect()->back()->with('msg', $this->uyariMsj('Bu ürün yalnızca promosyon kodu ile satın alınabilir.'));
         }
         if (!empty($product_id)) {
             self::create($request, $product_id);

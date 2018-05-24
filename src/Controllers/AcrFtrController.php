@@ -102,15 +102,16 @@ class AcrFtrController extends Controller
 
     function promotion()
     {
-        $pr_model = new Promotion_user();
-        $prs      = $pr_model->where('user_id', Auth::user()->id)->with([
+        $pr_model  = new Promotion_user();
+        $prs       = $pr_model->where('user_id', Auth::user()->id)->with([
             'ps' => function ($q) {
                 $q->with('product');
             }
         ])->orderBy('active')->get();
-        $msg      = session('msg');
-
-        return view('acr_ftr::promotion', compact('prs', 'msg'));
+        $msg       = session('msg');
+        $prv_model = new Promotion();
+        $prvs      = $prv_model->whereColumn('son', '>', 'ilk')->whereDate('last_date', '>', date('Y-m-d 23:59'))->get();
+        return view('acr_ftr::promotion', compact('prs', 'msg', 'prvs'));
     }
 
     function urun_sergi($kat_id)
