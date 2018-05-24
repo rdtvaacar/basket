@@ -390,6 +390,11 @@ class AcrSepetController extends Controller
     {
         $sepet_model = new Sepet();
         $product_id  = $request->input('product_id');
+        $pr_model = new Promotion();
+        $pr_sayi = $pr_model->where('product_id',$product_id)->count();
+        if($pr_sayi>0) {
+          return  redirect()->back()->with('msg',$this->uyariMsj('Bu ürün yalnızca promosyon kodu ile satın alınabilir.'));
+        }
         if (!empty($product_id)) {
             self::create($request, $product_id);
             return redirect()->to('/acr/ftr/card/sepet');
