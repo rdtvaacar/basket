@@ -7,6 +7,7 @@
                 <div class="box box-primary">
                     <div class="box-header with-border">PROMOSYONLARINIZ</div>
                     <div class="box-body">
+                        <div>Burada promosyon ürünlerinizi oluşburabilirsiniz, oluşturulan promosyon ürünleri promosyon kodu ile ve markete eklenmişse kullanılabilir. Doğrudan baplantıyla kullanılamazlar. </div>
                         <table class="table table-hover">
                             <tr>
                                 <th>P.Kodu</th>

@@ -1,4 +1,7 @@
 @extends('acr_ftr.index')
+@section('header')
+    <link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
+@stop
 @section('acr_ftr')
     <section class="content">
         <div class="row">
@@ -27,9 +30,6 @@
             </div>
         </div>
     </section>
-@stop
-@section('header')
-    <link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
 @stop
 @section('footer')
     <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
