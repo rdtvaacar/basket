@@ -17,13 +17,17 @@
                                 <th></th>
                             </tr>
                             @foreach ($prs as $pr)
-                                <tr>
+                                <tr id="code_tr_{{$pr->id}}">
                                     <td id="code_{{$pr->id}}">{{$pr->code}}</td>
-                                    <td><div onclick="kod_yenile({{$pr->id}})" class="btn btn-danger btn-sm">KOD YENİLE</div></td>
+                                    <td>
+                                        <div onclick="kod_yenile({{$pr->id}})" class="btn btn-danger btn-sm">KOD YENİLE</div>
+                                    </td>
                                     <td>{{$pr->product->product_name}}</td>
                                     <td>{{$pr->created_at}}</td>
-                                    <td><a class="btn btn-warning btn-sm" href="/acr/ftr/admin/promotions?id={{$pr->id}}">DÜZENLE</a> </td>
-                                    <td><div class="btn btn-danger btn-sm" onclick="sil({{$pr->id}})">SİL</div></td>
+                                    <td><a class="btn btn-warning btn-sm" href="/acr/ftr/admin/promotions?id={{$pr->id}}">DÜZENLE</a></td>
+                                    <td>
+                                        <div class="btn btn-danger btn-sm" onclick="sil({{$pr->id}})">SİL</div>
+                                    </td>
                                 </tr>
                             @endforeach
                         </table>
@@ -50,7 +54,7 @@
 @stop
 @section('footer')
     <script>
-        function sil(id) {
+        function kod_yenile(id) {
             if (confirm('Kodu güncellemek mevcut kodun geçirsiz olmasını sebep olur, emin misiniz?') == true) {
                 $.ajax({
                     type: 'post',
@@ -63,5 +67,18 @@
             }
         }
 
+        function sil(id) {
+            if (confirm('Kodu güncellemek mevcut kodun geçirsiz olmasını sebep olur, emin misiniz?') == true) {
+                $.ajax({
+                    type: 'post',
+                    url: '/acr/ftr/admin/promotion/kod/delete',
+                    data: 'id=' + id,
+                    success: function (veri) {
+                        $('#code_tr_' + id).hide();
+                    }
+                });
+            }
+        }
+
     </script>
-    @stop
+@stop

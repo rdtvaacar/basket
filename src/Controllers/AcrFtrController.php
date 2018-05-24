@@ -24,7 +24,6 @@ use App\Eski_faturalar;
 use Auth;
 use Session;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 
 class AcrFtrController extends Controller
 {
@@ -41,18 +40,28 @@ class AcrFtrController extends Controller
         $conf_table         = $conf_table_model->first();
         $this->config_name  = @$conf_table->name;
         $this->config_email = @$conf_table->email;
+
     }
 
-    function promotion_kod_refresh(Request $request) {
-        $pr_model   = new Promotion();
-        $id         = $request->id;
-        $code       = 'product.' . uniqid(rand(1000000, 9999999));
-        $data       = [
-            'code'       => $code
+    function admin_promotion_kod_delete(Request $request)
+    {
+        $pr_model = new Promotion();
+        $id       = $request->id;
+        $pr_model->where('id', $id)->delete();
+    }
+
+    function promotion_kod_refresh(Request $request)
+    {
+        $pr_model = new Promotion();
+        $id       = $request->id;
+        $code     = 'product.' . uniqid(rand(1000000, 9999999));
+        $data     = [
+            'code' => $code
         ];
         $pr_model->where('id', $id)->update($data);
         return $code;
     }
+
     function admin_promotion_create(Request $request)
     {
         $pr_model   = new Promotion();
@@ -61,8 +70,8 @@ class AcrFtrController extends Controller
         $id         = $request->id;
 
         if (empty($id)) {
-            $code       = 'product.' . uniqid(rand(1000000, 9999999));
-            $data       = [
+            $code = 'product.' . uniqid(rand(1000000, 9999999));
+            $data = [
                 'id'         => $id,
                 'son'        => $son,
                 'product_id' => $produck_id,
@@ -70,7 +79,7 @@ class AcrFtrController extends Controller
             ];
             $pr_model->insert($data);
         } else {
-            $data       = [
+            $data = [
                 'son'        => $son,
                 'product_id' => $produck_id,
             ];
@@ -79,15 +88,16 @@ class AcrFtrController extends Controller
         return redirect()->back()->with('msg', $this->basarili());
     }
 
-    function admin_promotions()
+    function admin_promotions(Request $request)
     {
         $pr_model = new Promotion();
         $prs      = $pr_model->with([
             'product'
         ])->get();
         $msg      = session('msg');
-
-        return view('acr_ftr::admin_promotions', compact('prs', 'msg'));
+        $id       = $request->id;
+        $prd      = $pr_model->where('id', $id)->first();
+        return view('acr_ftr::admin_promotions', compact('prs', 'msg', 'prd'));
     }
 
     function promotion()
