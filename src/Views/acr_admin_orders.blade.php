@@ -67,8 +67,8 @@
                                         @foreach ($order->products as $e_product)
                                             <tr>
                                                 <td>{{$e_product->adet}}</td>
-                                                <td>{{$e_product->lisans_ay}}</td>
-                                                <td>{{$e_product->product->product_name}}</td>
+                                                <td>{{@$e_product->lisans_ay}}</td>
+                                                <td>{{@$e_product->product->product_name}}</td>
                                             </tr>
                                         @endforeach
                                     </table>
