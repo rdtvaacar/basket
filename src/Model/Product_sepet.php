@@ -70,4 +70,8 @@ class Product_sepet extends Model
     {
         return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'product_id', 'product_id');
     }
+    function note()
+    {
+        return $this->hasOne('Acr\Ftr\Model\Product_sepet_notes', 'product_id', 'product_id');
+    }
 }
