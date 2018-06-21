@@ -290,7 +290,7 @@
                         <div class=" col-md-10">
                             <div id="product_img">
                                 @if(!empty($product->file))
-                                    <img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$product->file->acr_file_id}}/medium/{{$product->file->file_name}}.{{$product->file->file_type}}"
+                                    <img width="100%" class="img-thumbnail" src="http://eticaret.webuldum.com/acr_files/{{$product->file->acr_file_id}}/medium/{{$product->file->file_name}}.{{$product->file->file_type}}"
                                          alt="{{$product->file->file_name_org}}"/>
                                     @if(count($product->files)>1)
                                         <img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="next_image()" src="/icon/right-arrow.png"/>
@@ -304,7 +304,7 @@
                                 @foreach($product->files as $file)
                                     <?php $file_ids[] = $file->id ?>
                                     <div onclick="product_image({{$product->id}},{{$file->id}})" style="float: left; cursor:pointer;">
-                                        <img class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$file->acr_file_id}}/thumbnail/{{$file->file_name}}.{{$file->file_type}}" alt="{{$file->org_file_name}}"/>
+                                        <img class="img-thumbnail" src="http://eticaret.webuldum.com/acr_files/{{$file->acr_file_id}}/thumbnail/{{$file->file_name}}.{{$file->file_type}}" alt="{{$file->org_file_name}}"/>
                                     </div>
                                 @endforeach
                                 <?php if (count($file_ids) > 1) {

@@ -14,7 +14,7 @@ if(!empty($product->product)) {
             @if(!empty($product->product->file))
                 <a href="/acr/ftr/product/detail?product_id={{$product->product->id}}"> <img class="img-rounded"
                                                                                              style="cursor:pointer; margin-top: 10px;"
-                                                                                             src="https://eticaret.webuldum.com/acr_files/{{$product->product->file->acr_file_id}}/thumbnail/{{$product->product->file->file_name}}.{{$product->product->file->file_type}}"/>
+                                                                                             src="http://eticaret.webuldum.com/acr_files/{{$product->product->file->acr_file_id}}/thumbnail/{{$product->product->file->file_name}}.{{$product->product->file->file_type}}"/>
                 </a>
                 <hr style="padding: 0;">
             @endif

@@ -23,7 +23,7 @@
                                     <div class="box-header with-border">{{$product->product_name}}</div>
                                     <div style="margin-right: auto; margin-bottom: 10px; margin-left: auto;" class="img-thumbnail">
                                         <a href="/acr/ftr/product/detail?product_id={{$product->id}}"> <img
-                                                    src="https://eticaret.webuldum.com/acr_files/{{@$product->file->acr_file_id}}/thumbnail//{{@$product->file->file_name}}.{{@$product->file->file_type}}"/>
+                                                    src="http://eticaret.webuldum.com/acr_files/{{@$product->file->acr_file_id}}/thumbnail//{{@$product->file->file_name}}.{{@$product->file->file_type}}"/>
                                         </a>
                                         <div style=" width: 50px;  position: absolute; right: -10px; top:50px;">
                                             <a target="_blank" class="saga_yasla sola_cek" href="https://www.facebook.com/sharer/sharer.php?u={{$web}}/acr/ftr/product/detail?product_id={{$product->id}}"><img width="40"
