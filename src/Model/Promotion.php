@@ -19,5 +19,8 @@ class Promotion extends Model
     {
         return $this->hasMany('Acr\Ftr\Model\Promotion_user', 'promotion_id', 'id');
     }
-
+    function pr_products()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Promotion_product', 'promotion_id', 'id');
+    }
 }

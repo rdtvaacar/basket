@@ -36,10 +36,19 @@ class Sepet extends Model
             }
         }
         if (Auth::check()) {
-            $data_1     = ['product_id' => $product_id, 'user_id' => Auth::user()->id, 'sepet_id' => $sepet_id, 'type' => $product->type];
+            $data_1     = [
+                'product_id' => $product_id,
+                'user_id'    => Auth::user()->id,
+                'sepet_id'   => $sepet_id,
+                'type'       => $product->type
+            ];
             $data_merge = array_merge($data_1, $data);
         } else {
-            $data_1     = ['product_id' => $product_id, 'sepet_id' => $sepet_id, 'type' => $product->type];
+            $data_1     = [
+                'product_id' => $product_id,
+                'sepet_id'   => $sepet_id,
+                'type'       => $product->type
+            ];
             $data_merge = array_merge($data_1, $data);
         }
         $ps_id = Product_sepet::insert($data_merge);
@@ -48,7 +57,12 @@ class Sepet extends Model
             $ps_notes->where('product_id', $product_id)->where('sepet_id', $sepet_id)->delete();
             $ps_notes->insert($data_notes);
         }
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Ürün başarıyla sepete eklendi.', 'data' => $sepet_id]);
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Ürün başarıyla sepete eklendi.',
+            'data'   => $sepet_id
+        ]);
 
     }
 

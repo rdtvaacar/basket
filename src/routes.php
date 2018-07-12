@@ -23,6 +23,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::post('/product/image/modal', 'AcrFtrController@image_modal');
         Route::post('/product/img', 'AcrFtrController@product_img');
         Route::post('/product/sepet/ekle', 'AcrSepetController@product_sepet_ekle');
+        Route::get('/product/sepet/ekle', 'AcrSepetController@product_sepet_ekle');
         Route::post('/product/categories', 'AcrFtrController@categories');
         // paraşüt
         Route::get('/parasut', 'ParasutController@index');

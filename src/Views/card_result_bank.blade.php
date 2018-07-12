@@ -71,7 +71,10 @@
                     <tbody>
                     @foreach($ps as $key=> $pss)
                         <?php
-                        $toplam = $sepetController->price_set($pss);
+                        if (in_array($pss->product_id, $promo_user_ids)) {
+                            $indirim = $promo_user[$pss->product_id]['price'];
+                        }
+                        $toplam = $sepetController->price_set($pss, $indirim);
                         $fiyat = $toplam * 100 / ($pss->product->kdv + 100);
                         $toplamKdv[] = $toplam - $fiyat;
                         $araToplam[] = $fiyat;
@@ -102,7 +105,11 @@
                             <td>{{round($toplam,2)}}₺</td>
                         </tr>
                     @endforeach
-
+                    @if($indirim>0)
+                        <tr>
+                            <td colspan="10">ÜRÜN NOTU : Bu ürüne ait <span class="text-red">{{$indirim}}₺ </span> değerindeki  promosyonunuz otomatik olarak tanımlandı.</td>
+                        </tr>
+                    @endif
                     </tbody>
                 </table>
             </div>

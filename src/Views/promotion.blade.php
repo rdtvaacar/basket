@@ -19,12 +19,21 @@
                                     <th>Oluşturma Tarihi</th>
                                 </tr>
                                 @foreach ($prvs as $pr)
-                                    <tr>
-                                        <td>{{$pr->code}}</td>
-                                        <td>{{$pr->product->product_name}}</td>
-                                        <td>{{date('d/m/Y',strtotime($pr->last_date))}}</td>
-                                        <td>{{date('d/m/Y',strtotime($pr->created_at))}}</td>
-                                    </tr>
+                                    @if($pr->type ==2)
+                                        <tr>
+                                            <td>{{$pr->code}}</td>
+                                            <td>{{$pr->pr_products}}</td>
+                                            <td>{{date('d/m/Y',strtotime($pr->last_date))}}</td>
+                                            <td>{{date('d/m/Y',strtotime($pr->created_at))}}</td>
+                                        </tr>
+                                    @else
+                                        <tr>
+                                            <td>{{$pr->code}}</td>
+                                            <td>{{$pr->product->product_name}}</td>
+                                            <td>{{date('d/m/Y',strtotime($pr->last_date))}}</td>
+                                            <td>{{date('d/m/Y',strtotime($pr->created_at))}}</td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                             </table>
                         @endif
@@ -53,18 +62,21 @@
                         @else
                             <table class="table table-hover">
                                 <tr>
-                                    <th>P.Kodu</th>
                                     <th>Ürün</th>
+                                    <td>Satın Al</td>
                                     <th>Oluşturma Tarihi</th>
                                     <th>Durumu</th>
                                 </tr>
                                 @foreach ($prs as $pr)
-                                    <tr>
-                                        <td>{{$pr->code}}</td>
-                                        <td>{{$pr->ps->product->product_name}}</td>
-                                        <td>{{$pr->created_at}}</td>
-                                        <td>{!! $pr->active==1?'<span class="text-success">AKTİF</span>':'<span class="text-danger">KULLANILDI</span>' !!}</td>
-                                    </tr>
+                                    @foreach ($pr->promotion->pr_products as $product)
+                                        <tr>
+                                            <td>{{@$product->product->product_name}}</td>
+                                            <td><a href="/acr/ftr/product/sepet/ekle?product_id={{@$product->product->id}}&min_ay={{$pr->promotion->min_ay}}&promotion_user_id={{$pr->promotion->id}}&min_adet={{$pr->promotion->min_adet
+                                            }}">Satın Al</a></td>
+                                            <td>{{$pr->created_at}}</td>
+                                            <td>{!! $pr->active==1?'<span class="text-success">AKTİF</span>':'<span class="text-danger">KULLANILDI</span>' !!}</td>
+                                        </tr>
+                                    @endforeach
                                 @endforeach
 
                             </table>

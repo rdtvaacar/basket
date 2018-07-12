@@ -80,7 +80,10 @@
                                     <tbody>
                                     @foreach($ps as $key=> $pss)
                                         <?php
-                                        $toplam = $sepetController->price_set($pss);
+                                        if (in_array($pss->product_id, $promo_user_ids)) {
+                                            $indirim = $promo_user[$pss->product_id]['price'];
+                                        }
+                                        $toplam = $sepetController->price_set($pss, $indirim);
                                         $fiyat = $toplam * 100 / ($pss->product->kdv + 100);
                                         $toplamKdv[] = $toplam - $fiyat;
                                         $araToplam[] = $fiyat;
@@ -95,8 +98,7 @@
                                             <td>{{$pss->adet}}</td>
                                             <td>{{$pss->lisans_ay}}</td>
                                             <td>
-                                                <?php echo empty($pss->product->dis_price) || ($pss->adet == 1 && $pss->lisans_ay == 1) || $pss->product->dis_price == 0 || $pss->product->price == $pss->product->dis_price ? $pss->product->price :
-                                                    '<strike style="font-size: 10pt;">' . $pss->product->price . ' </strike> ' . $pss->product->dis_price ?>
+                                                <?php echo empty($pss->product->dis_price) || ($pss->adet == 1 && $pss->lisans_ay == 1) || $pss->product->dis_price == 0 || $pss->product->price == $pss->product->dis_price ? $pss->product->price : '<strike style="font-size: 10pt;">' . $pss->product->price . ' </strike> ' . $pss->product->dis_price ?>
                                                 ₺
                                             </td>
                                             <td>%{{round($pss->dis_rate,2) * 100}}</td>
@@ -111,7 +113,11 @@
                                             <td>{{round($toplam,2)}}₺</td>
                                         </tr>
                                     @endforeach
-
+                                    @if($indirim>0)
+                                        <tr>
+                                            <td colspan="10"><span class="text-red">{{$indirim}}₺ değerindeki indirim promosyonunuz otomatik olarak tanımlandı.</span></td>
+                                        </tr>
+                                    @endif
                                     </tbody>
                                 </table>
                             </div>

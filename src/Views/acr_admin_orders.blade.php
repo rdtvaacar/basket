@@ -72,6 +72,7 @@
                                             </tr>
                                         @endforeach
                                     </table>
+
                                 </td>
                                 <td>{{$order->price}}</td>
                                 <td>{{$order->created_at}}</td>

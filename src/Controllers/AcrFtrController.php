@@ -17,6 +17,7 @@ use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\Product_sepet;
 use Acr\Ftr\Model\Promotion;
+use Acr\Ftr\Model\Promotion_product;
 use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
 use Acr\Ftr\Model\U_kat;
@@ -64,26 +65,71 @@ class AcrFtrController extends Controller
 
     function admin_promotion_create(Request $request)
     {
-        $pr_model   = new Promotion();
-        $produck_id = $request->product_id;
-        $son        = $request->son;
-        $id         = $request->id;
+        $pr_model    = new Promotion();
+        $product_id  = $request->product_id;
+        $son         = $request->son;
+        $id          = $request->id;
+        $product_ids = explode(",", $product_id);
+        $type        = $request->type;
+        if ($type == 1) {
+            if (empty($id)) {
+                $code = 'product' . uniqid(rand(1000000, 9999999));
+                $data = [
+                    'id'         => $id,
+                    'son'        => $son,
+                    'price'      => $request->price,
+                    'type'       => $type,
+                    'code'       => $code,
+                    'product_id' => $product_id,
 
-        if (empty($id)) {
-            $code = 'product' . uniqid(rand(1000000, 9999999));
-            $data = [
-                'id'         => $id,
-                'son'        => $son,
-                'product_id' => $produck_id,
-                'code'       => $code
-            ];
-            $pr_model->insert($data);
+                ];
+                $pr_model->insert($data);
+            } else {
+                $data = [
+                    'son'        => $son,
+                    'price'      => $request->price,
+                    'type'       => $type,
+                    'product_id' => $product_id,
+                ];
+                $pr_model->where('id', $id)->update($data);
+            }
         } else {
-            $data = [
-                'son'        => $son,
-                'product_id' => $produck_id,
-            ];
-            $pr_model->where('id', $id)->update($data);
+            $pr_prd_model = new Promotion_product();
+            if (empty($id)) {
+                $code  = 'product' . uniqid(rand(1000000, 9999999));
+                $data  = [
+                    'id'    => $id,
+                    'son'   => $son,
+                    'price' => $request->price,
+                    'type'  => $type,
+                    'code'  => $code,
+                ];
+                $pr_id = $pr_model->insertGetId($data);
+                foreach ($product_ids as $product_id) {
+                    $data_pr_products[] = [
+                        'product_id'   => $product_id,
+                        'promotion_id' => $pr_id
+                    ];
+                }
+                $pr_prd_model->insert($data_pr_products);
+            } else {
+                $data = [
+                    'son'        => $son,
+                    'price'      => $request->price,
+                    'type'       => $type,
+                    'product_id' => $product_id,
+                ];
+
+                foreach ($product_ids as $product_id) {
+                    $data_pr_products[] = [
+                        'product_id'   => $product_id,
+                        'promotion_id' => $id
+                    ];
+                }
+                $pr_prd_model->where('promotion_id', $id)->delete();
+                $pr_prd_model->insert($data_pr_products);
+                $pr_model->where('id', $id)->update($data);
+            }
         }
         return redirect()->back()->with('msg', $this->basarili());
     }
@@ -92,7 +138,10 @@ class AcrFtrController extends Controller
     {
         $pr_model = new Promotion();
         $prs      = $pr_model->with([
-            'product'
+            'product',
+            'pr_products' => function ($q) {
+                $q->with('product');
+            }
         ])->get();
         $msg      = session('msg');
         $id       = $request->id;
@@ -104,9 +153,17 @@ class AcrFtrController extends Controller
     {
         $pr_model  = new Promotion_user();
         $prs       = $pr_model->where('user_id', Auth::user()->id)->with([
-            'ps' => function ($q) {
+            'promotion' => function ($q) {
+                $q->with([
+                    'pr_products' => function ($q) {
+                        $q->with('product');
+                    }
+                ]);
+            },
+            'ps'        => function ($q) {
                 $q->with('product');
-            }
+            },
+
         ])->orderBy('active')->get();
         $msg       = session('msg');
         $prv_model = new Promotion();

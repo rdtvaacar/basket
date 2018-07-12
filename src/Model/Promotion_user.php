@@ -32,10 +32,16 @@ class Promotion_user extends Model
             $pr_model->insert($data);
         }
     }
-
+    function pr_products()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Promotion_product', 'promotion_id', 'id');
+    }
     function user()
     {
         return $this->hasOne('App\User', 'id', 'user_id');
+    }
+    function promotion() {
+        return $this->hasOne('Acr\Ftr\Model\Promotion', 'id', 'promotion_id');
     }
 
 }

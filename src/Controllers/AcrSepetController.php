@@ -47,6 +47,35 @@ class AcrSepetController extends Controller
         return View('acr_ftr::anasayfa');
     }
 
+    function indirim()
+    {
+        $promotion_user_model = new Promotion_user();
+        $promotion_users      = $promotion_user_model->where('user_id', Auth::user()->id)->with([
+            'promotion' => function ($q) {
+                $q->with([
+                    'pr_products' => function ($q) {
+                        $q->with('product');
+                    }
+                ]);
+            },
+            'ps'        => function ($q) {
+                $q->with('product');
+            },
+        ])->get();
+        $promo_user_ids       = [];
+        $promo_user           = [];
+        foreach ($promotion_users as $promotion_user) {
+            foreach ($promotion_user->promotion->pr_products as $item) {
+                $promo_user[$item->product_id] = $promotion_user->promotion;
+                $promo_user_ids[]              = $item->product_id;
+            }
+        }
+        return [
+            $promo_user,
+            $promo_user_ids
+        ];
+    }
+
     function promotion_code_active(Request $request)
     {
         $market_controller = new MarketController();
@@ -65,6 +94,7 @@ class AcrSepetController extends Controller
             }
             self::create($request, $pr->product_id);
             return redirect()->to('/acr/ftr/card/sepet');
+
         }
         if ($sayi < 1) {
             return redirect()->back()->with('msg', $this->uyariMsj('Pormosyon Kodu Geçersizdir!!!'));
@@ -126,9 +156,11 @@ class AcrSepetController extends Controller
         }
         $notes = $request->notes;
         $data  = [
-            'yaka_id' => $request->yaka_id,
-            'kol_id'  => $request->kol_id,
-            'size_id' => $request->size_id
+            'adet'      => $request->min_adet,
+            'lisans_ay' => $request->min_ay,
+            'yaka_id'   => $request->yaka_id,
+            'kol_id'    => $request->kol_id,
+            'size_id'   => $request->size_id
         ];
         if (Auth::check()) {
             $sepet_id = $sepet_model->product_sepet_id();
@@ -205,7 +237,7 @@ class AcrSepetController extends Controller
         return self::sepet_row($products);
     }
 
-    function price_set($product)
+    function price_set($product, $indirim = 0)
     {
         $price_not_dis = $product->product->price * $product->adet * $product->lisans_ay;
         if ($price_not_dis == 0) {
@@ -240,7 +272,7 @@ class AcrSepetController extends Controller
         } else {
             $price = $dis_price;
         }
-        return $price;
+        return $price - $indirim;
     }
 
     function discount($price = null, $dis_price = null)
@@ -272,7 +304,7 @@ class AcrSepetController extends Controller
         $total_price = [];
         foreach ($products as $product) {
             $price     = $product->product->price * $product->adet * $product->lisans_ay;
-            $dis_price = self::price_set($product);
+            $dis_price = self::price_set($product, $indirim);
             $veri      .= '<tr class="sepet_row" id="sapet_row_' . $product->id . '">
                             <td>' . $product->product->product_name . '</td>
                             <td>
@@ -302,60 +334,13 @@ class AcrSepetController extends Controller
 
     function sepet_row_detail($products)
     {
-        $ps_model    = new Product_sepet();
-        $veri        = '';
-        $total_price = [];
-        foreach ($products as $product) {
-            //$ay_baz    = 7 > date('n') ? 7 - date('n') : 19 - date('n');
-            // $ay_lisans = $product->created_at == $product->updated_at ? $ay_baz : $product->lisans_ay;
-            $sepet_id  = $product->sepet_id;
-            $price     = $product->product->price * $product->adet * $product->lisans_ay;
-            $dis_price = self::price_set($product);
-            $dis_rate  = self::dis_rate($price, $dis_price);
-            if ($product->dis_rate != $dis_rate) {
-                $ps_model->where('id', $sepet_id)->update(['dis_rate' => $dis_rate]);
-            }
-            $type = $product->product->type == 1 ? 'Lisans' : 'Ürün';
-            $veri .= '<tr class="sepet_row" id="sapet_row_' . $product->id . '">
-                            <td>' . $product->product->product_name . '</td>
-                            <td>' . $type . '</td>
-                            <td>
-                            <div class="col-md-6 col-xs-12" >
-                            <input class="form-control" onchange="sepet_adet_guncelle(' . $product->id . ')" onkeyup="sepet_adet_guncelle(' . $product->id . ')" style="width: 70px;"  id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
-                             </div>';
-            if ($product->product->type == 1) {
-                $veri .= '<div class="col-md-6 col-xs-12">
-<div class="col-md-6 col-xs-12">Kaç Aylık</div>
-                            <div class="col-md-6 col-xs-12">
-                            <input size="3" class="form-control" onchange="sepet_lisans_ay_guncelle(' . $product->id . ')"  onkeyup="sepet_lisans_ay_guncelle(' . $product->id . ')"  style="width: 70px;"   id="sepet_lisans_ay_' . $product->id . '" value="' . $product->lisans_ay . '"/> 
-                            </div>
-                            </div>';
-            }
-            $veri .= '</td>';
-            $veri .= '<td>';
-            $veri .= $product->product->price . '₺';
-            $veri .= '</td>';
-            $veri .= '<td>';
-            if ($price > $dis_price) {
-                $total_price[] = round($dis_price, 2);
-                $veri          .= ' <span  id="product_dis_' . $product->id . '"><strike style="color: #be3946; font-size: 9pt;">' . round($price, 2) . '</strike> ' . self::discount($price, $dis_price) . '<br></span> ';
-                $veri          .= ' <span id="product_price_' . $product->id . '" style="color: #2d7c32; font-size: 12pt;">' . round($dis_price, 2) . '₺</span> ';
-            } else {
-                $total_price[] = round($price, 2);
-                $veri          .= ' <span id="product_price_' . $product->id . '"  style="color: #2d7c32; font-size: 12pt;">' . round($price, 2) . '₺</span>';
-            }
-            $veri .= '</td>';
-            $veri .= '<td style="text-align: right"><span style="font-size:14pt; padding-top: 6px; cursor:pointer;" onclick="sepet_delete(' . $product->id . ')" class="fa fa-trash"></span></td>
-                        </tr>';
-        }
-        $veri .= '<tr>
-                    <td></td>
-                    <td></td>
-                     <td></td>
-                      <td></td>';
-        $veri .= '<td id="acr_sepet_total_price" colspan="2">' . array_sum($total_price) . '₺</td>';
-        $veri .= '</tr>';
-        return $veri;
+        $ps_model       = new Product_sepet();
+        $spc            = new AcrSepetController();
+        $ps_model       = new Product_sepet();
+        $promo          = self::indirim();
+        $promo_user     = $promo[0];
+        $promo_user_ids = $promo[1];
+        return view('acr_ftr::sepet_row', compact('ps_model', 'products', 'spc', 'promo_user', 'promo_user_ids'))->render();
     }
 
     function sepet_adet_guncelle(Request $request)
@@ -394,7 +379,7 @@ class AcrSepetController extends Controller
         $sepet_model = new Sepet();
         $product_id  = $request->input('product_id');
         $pr_model    = new Promotion();
-        $pr_sayi     = $pr_model->where('product_id', $product_id)->count();
+        $pr_sayi     = $pr_model->where('product_id', $product_id)->where('type', 1)->count();
         if ($pr_sayi > 0) {
             return redirect()->back()->with('msg', $this->uyariMsj('Bu ürün yalnızca promosyon kodu ile satın alınabilir.'));
         }
@@ -539,7 +524,7 @@ class AcrSepetController extends Controller
         return $prices;
     }
 
-    function product_sepet_total_price($sepet_id = null, Request $request)
+    function product_sepet_total_price($sepet_id = null, Request $request, $indirim = 0)
     {
         $ps_model    = new Product_sepet();
         $sepet_id    = empty($sepet_id) ? $request->sepet_id : $sepet_id;
@@ -547,7 +532,7 @@ class AcrSepetController extends Controller
         $products    = $ps_model->where('sepet_id', $productData->sepet_id)->with('product')->get();
         $price       = [];
         foreach ($products as $product) {
-            $price[] = self::price_set($product);;
+            $price[] = self::price_set($product, $indirim);;
         }
         $prices = array_sum($price);
         $prices = round($prices, 2);
@@ -570,20 +555,33 @@ class AcrSepetController extends Controller
         $ps              = $veri->original['data']['ps'];
         $user_adress     = $veri->original['data']['user_adress'];
         $company         = $veri->original['data']['company'];
-        return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank', 'ps', 'user_adress', 'company', 'sepetController'));
+        $promo           = self::indirim();
+        $promo_user      = $promo[0];
+        $promo_user_ids  = $promo[1];
+        return View('acr_ftr::card_result_bank', compact('sepet_nav', 'siparis', 'bank', 'ps', 'user_adress', 'company', 'sepetController', 'promo_user', 'promo_user_ids'));
     }
 
     function payment_havale_eft_api(Request $request)
     {
-        $sepet_model   = new Sepet();
-        $bank_id       = $request->input('bank_id');
-        $bank_model    = new Bank();
-        $order_id      = $request->input('order_id');
-        $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
-        $ps_model      = new Product_sepet();
-        $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price         = round(self::product_sepet_total_price($ps->id, $request), 2);
-        $not_dis_price = round(self::not_dis_price($ps->id, $request), 2);
+        $promo          = self::indirim();
+        $promo_user     = $promo[0];
+        $promo_user_ids = $promo[1];
+        $sepet_model    = new Sepet();
+        $bank_id        = $request->input('bank_id');
+        $bank_model     = new Bank();
+        $order_id       = $request->input('order_id');
+        $sepet_id       = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $ps_model       = new Product_sepet();
+        $ps             = $ps_model->where('sepet_id', $sepet_id)->first();
+
+        if (in_array($ps->product_id, $promo_user_ids)) {
+            $indirim = $promo_user[$ps->product_id]['price'];
+        } else {
+            $indirim = 0;
+        }
+
+        $price         = round(self::product_sepet_total_price($ps->id, $request), 2) - $indirim;
+        $not_dis_price = round(self::not_dis_price($ps->id, $request), 2) - $indirim;
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         $data_sepet    = [
             'siparis'      => 1,
@@ -629,20 +627,33 @@ class AcrSepetController extends Controller
         $user_adress      = $veri->original['data']['user_adress'];
         $company          = $veri->original['data']['company'];
         $iyzicoController = new iyzicoController();
+        $promo            = self::indirim();
+        $promo_user       = $promo[0];
+        $promo_user_ids   = $promo[1];
         $odemeForm        = $iyzicoController->odemeForm(1, $siparis->price, $siparis->id);
-        return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company', 'sepetController'));
+        return View('acr_ftr::card_result_bank_card', compact('sepet_nav', 'siparis', 'odemeForm', 'ps', 'user_adress', 'company', 'sepetController', 'promo_user', 'promo_user_ids'));
 
     }
 
     function payment_bank_card_api(Request $request)
     {
-        $sepet_model   = new Sepet();
-        $order_id      = $request->input('order_id');
-        $sepet_id      = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
-        $ps_model      = new Product_sepet();
-        $ps            = $ps_model->where('sepet_id', $sepet_id)->first();
-        $price         = round(self::product_sepet_total_price($ps->id, $request), 2);
-        $not_dis_price = round(self::not_dis_price($ps->id, $request), 2);
+        $promo          = self::indirim();
+        $promo_user     = $promo[0];
+        $promo_user_ids = $promo[1];
+        $sepet_model    = new Sepet();
+        $order_id       = $request->input('order_id');
+        $sepet_id       = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $ps_model       = new Product_sepet();
+        $ps             = $ps_model->where('sepet_id', $sepet_id)->first();
+
+        if (in_array($ps->product_id, $promo_user_ids)) {
+            $indirim = $promo_user[$ps->product_id]['price'];
+        } else {
+            $indirim = 0;
+        }
+
+        $price         = round(self::product_sepet_total_price($ps->id, $request), 2) - $indirim;
+        $not_dis_price = round(self::not_dis_price($ps->id, $request), 2) - $indirim;
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         $data_sepet    = [
             'siparis'      => 1,
@@ -1072,18 +1083,25 @@ class AcrSepetController extends Controller
             } else {
                 $parasut_contact_id = $adress_row->parasut_id;
             }
-            $orders = $ps_model->where('sepet_id', $order_id)->with([
+            $orders         = $ps_model->where('sepet_id', $order_id)->with([
                 'product',
                 'acr_product',
                 'sepet'
             ])->get();
-
+            $promo          = self::indirim();
+            $promo_user     = $promo[0];
+            $promo_user_ids = $promo[1];
             foreach ($orders as $order) {
+                if (in_array($ps->product_id, $promo_user_ids)) {
+                    $indirim = $promo_user[$order->product_id]['price'];
+                } else {
+                    $indirim = 0;
+                }
                 if ($order->product->fatura_bas == 1 && $sepet_row->fatura_active == 1) {
                     $urun_names [] = $order->product->product_name;
                     if (empty($order->product->collection) || $order->product->collection == '0.00') {
                         $kdv                    = $order->product->kdv;
-                        $ps_price               = self::sepet_total_price($order->id, $request);
+                        $ps_price               = self::sepet_total_price($order->id, $request, $indirim);
                         $fiyat                  = round(((($ps_price * ((100) / (100 + $kdv)))) / $order->adet), 4);
                         $parasut_product_data[] = [
                             'product_id'    => $order->acr_product->parasut_id,
