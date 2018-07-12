@@ -76,6 +76,19 @@ class AcrSepetController extends Controller
         ];
     }
 
+    function admin_orders_cleaner()
+    { // ödenmeyen ve aktif edilmeyen siparişleri sistemden tamamen siler.
+        $sepet_mdel     = new Sepet();
+        $pr_sepet_model = new Product_sepet();
+        $sepets         = $sepet_mdel->where('active', 0)->where('order_result', 1)->get();
+        foreach ($sepets as $sepet) {
+            $sepet_ids[] = $sepet->id;
+        }
+        $pr_sepet_model->whereIn('sepet_id', $sepet_ids)->delete();
+        $sepet_mdel->whereIn('id', $sepet_ids)->delete();
+        return redirect()->back()->with('msg', $this->basarili());
+    }
+
     function promotion_code_active(Request $request)
     {
         $market_controller = new MarketController();
@@ -94,7 +107,6 @@ class AcrSepetController extends Controller
             }
             self::create($request, $pr->product_id);
             return redirect()->to('/acr/ftr/card/sepet');
-
         }
         if ($sayi < 1) {
             return redirect()->back()->with('msg', $this->uyariMsj('Pormosyon Kodu Geçersizdir!!!'));
@@ -128,6 +140,7 @@ class AcrSepetController extends Controller
 
     function admin_orders(Request $request)
     {
+        $siparis                     = $request->siparis;
         $sepet_model                 = new Sepet();
         $orders                      = $sepet_model->where('siparis', 1)->with([
             'user',
@@ -138,7 +151,7 @@ class AcrSepetController extends Controller
         $acr_user_table_config_model = new Acr_user_table_conf();
         $config                      = $acr_user_table_config_model->first();
         $email                       = $config->email;
-        return View('acr_ftr::acr_admin_orders', compact('orders', 'email'));
+        return View('acr_ftr::acr_admin_orders', compact('orders', 'email', 'siparis'));
     }
 
     function product_sepet_ekle(Request $request)
@@ -154,10 +167,12 @@ class AcrSepetController extends Controller
         if (empty($product_id)) {
             $product_id = $request->input('product_id');
         }
-        $notes = $request->notes;
-        $data  = [
-            'adet'      => $request->min_adet,
-            'lisans_ay' => $request->min_ay,
+        $notes  = $request->notes;
+        $adet   = empty($request->min_adet) ? 1 : $request->min_adet;
+        $min_ay = empty($request->min_ay) ? 1 : $request->min_ay;
+        $data   = [
+            'adet'      => $adet,
+            'lisans_ay' => $min_ay,
             'yaka_id'   => $request->yaka_id,
             'kol_id'    => $request->kol_id,
             'size_id'   => $request->size_id
@@ -302,7 +317,15 @@ class AcrSepetController extends Controller
     {
         $veri        = '';
         $total_price = [];
+        $promo          = self::indirim();
+        $promo_user     = $promo[0];
+        $promo_user_ids = $promo[1];
         foreach ($products as $product) {
+            if (in_array($product->product_id, $promo_user_ids)) {
+                $indirim = $promo_user[$product->product_id]['price'];
+            } else {
+                $indirim = 0;
+            }
             $price     = $product->product->price * $product->adet * $product->lisans_ay;
             $dis_price = self::price_set($product, $indirim);
             $veri      .= '<tr class="sepet_row" id="sapet_row_' . $product->id . '">
@@ -1092,7 +1115,7 @@ class AcrSepetController extends Controller
             $promo_user     = $promo[0];
             $promo_user_ids = $promo[1];
             foreach ($orders as $order) {
-                if (in_array($ps->product_id, $promo_user_ids)) {
+                if (in_array($order->product_id, $promo_user_ids)) {
                     $indirim = $promo_user[$order->product_id]['price'];
                 } else {
                     $indirim = 0;
@@ -1207,7 +1230,7 @@ class AcrSepetController extends Controller
                 self::e_arsiv_create($sepet_row->payment_type, $user_email, $invoice->id);
             }
         }
-        if ($fatura_bas == 1) {
+        if (@$fatura_bas == 1) {
             $mesaj = 'Ödeme Bilgileri<br>';
             $mesaj .= $adress_row->invoice_name . '<br>';
             $mesaj .= $adress_row->tel . '<br>';

@@ -73,6 +73,8 @@
                         <?php
                         if (in_array($pss->product_id, $promo_user_ids)) {
                             $indirim = $promo_user[$pss->product_id]['price'];
+                        }else {
+                            $indirim = 0;
                         }
                         $toplam = $sepetController->price_set($pss, $indirim);
                         $fiyat = $toplam * 100 / ($pss->product->kdv + 100);

@@ -117,7 +117,7 @@
             }
         });
 
-        function sepet_adet_guncelle(sepet_id) {
+        function sepet_adet_guncelle (sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
                 type: 'post',
@@ -129,7 +129,7 @@
             });
         }
 
-        function sepet_lisans_ay_guncelle(sepet_id) {
+        function sepet_lisans_ay_guncelle (sepet_id) {
 
             var lisans_ay = $('#sepet_lisans_ay_' + sepet_id).val();
             $.ajax({
@@ -142,7 +142,7 @@
             });
         }
 
-        function sepet_delete(sepet_id) {
+        function sepet_delete (sepet_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/delete',
@@ -154,7 +154,7 @@
             });
         }
 
-        function sepet_delete_all() {
+        function sepet_delete_all () {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/delete_all',
@@ -165,7 +165,7 @@
             });
         }
 
-        function order_active(id) {
+        function order_active (id) {
             var order_id = id;
             if ($('#order_input_' + id).is(':checked')) {
 
@@ -187,7 +187,7 @@
             }
         }
 
-        function fatura_active(id) {
+        function fatura_active (id) {
             var order_id = id;
             $.ajax({
                 type: 'post',
