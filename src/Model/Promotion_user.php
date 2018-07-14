@@ -51,12 +51,12 @@ class Promotion_user extends Model
         $data_user = [
             'user_id'      => $user_id,
             'promotion_id' => $promotion_id,
+            'code'       => uniqid(rand(100000, 999999)),
         ];
         $promotion_user_model->insert($data_user);
         foreach ($product_ids as $product_id) {
             $data_product[] = [
-                'product_id'   => $product_id,
-                'user_id'      => $user_id,
+                'product_id' => $product_id,
                 'promotion_id' => $promotion_id,
             ];
         }

@@ -304,6 +304,9 @@ class AcrSepetController extends Controller
 
     function dis_rate($price, $dis_price)
     {
+        if ($price == 0) {
+            return 0.1;
+        };
         $discount = 100 - ($dis_price / $price * 100);
         if ($discount > 0) {
             $discount = $discount;
@@ -315,13 +318,13 @@ class AcrSepetController extends Controller
 
     function sepet_row($products)
     {
-        $veri        = '';
-        $total_price = [];
+        $veri           = '';
+        $total_price    = [];
         $promo          = self::indirim();
         $promo_user     = $promo[0];
         $promo_user_ids = $promo[1];
         foreach ($products as $product) {
-            if (in_array($product->product_id, $promo_user_ids)) {
+            if (in_array($product->product_id, $promo_user_ids && $promo_user[$product->product_id]['min_ay'] <= $product->lisans_ay && $promo_user[$product->product_id]['min_adet'] <= $product->adet)) {
                 $indirim = $promo_user[$product->product_id]['price'];
             } else {
                 $indirim = 0;
@@ -363,6 +366,7 @@ class AcrSepetController extends Controller
         $promo          = self::indirim();
         $promo_user     = $promo[0];
         $promo_user_ids = $promo[1];
+
         return view('acr_ftr::sepet_row', compact('ps_model', 'products', 'spc', 'promo_user', 'promo_user_ids'))->render();
     }
 
@@ -597,7 +601,7 @@ class AcrSepetController extends Controller
         $ps_model       = new Product_sepet();
         $ps             = $ps_model->where('sepet_id', $sepet_id)->first();
 
-        if (in_array($ps->product_id, $promo_user_ids)) {
+        if (in_array($ps->product_id, $promo_user_ids) && $promo_user[$ps->product_id]['min_ay'] <= $ps->lisans_ay && $promo_user[$ps->product_id]['min_adet'] <= $ps->adet) {
             $indirim = $promo_user[$ps->product_id]['price'];
         } else {
             $indirim = 0;
@@ -669,7 +673,7 @@ class AcrSepetController extends Controller
         $ps_model       = new Product_sepet();
         $ps             = $ps_model->where('sepet_id', $sepet_id)->first();
 
-        if (in_array($ps->product_id, $promo_user_ids)) {
+        if (in_array($ps->product_id, $promo_user_ids) && $promo_user[$ps->product_id]['min_ay'] <= $ps->lisans_ay && $promo_user[$ps->product_id]['min_adet'] <= $ps->adet) {
             $indirim = $promo_user[$ps->product_id]['price'];
         } else {
             $indirim = 0;
@@ -908,8 +912,8 @@ class AcrSepetController extends Controller
             $e_fatura         = empty($request->input('e_fatura')) ? 1 : $request->input('e_fatura');
             $adress_model     = new AcrFtrAdress();
             $invoice_name_exp = explode(' ', $request->input('invoice_name'));
-            if (count($invoice_name_exp) < 2) {
-                $invoice_name = $request->invoice_name . ' ' . invoice_name;
+            if (empty($invoice_name_exp)) {
+                $invoice_name = $request->invoice_name . ' invoice_name';
             } else {
                 $invoice_name = $request->invoice_name;
             }
@@ -1115,7 +1119,7 @@ class AcrSepetController extends Controller
             $promo_user     = $promo[0];
             $promo_user_ids = $promo[1];
             foreach ($orders as $order) {
-                if (in_array($order->product_id, $promo_user_ids)) {
+                if (in_array($order->product_id, $promo_user_ids && $promo_user[$order->product_id]['min_ay'] <= $order->lisans_ay && $promo_user[$order->product_id]['min_adet'] <= $order->adet)) {
                     $indirim = $promo_user[$order->product_id]['price'];
                 } else {
                     $indirim = 0;

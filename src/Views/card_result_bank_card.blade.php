@@ -80,9 +80,9 @@
                                     <tbody>
                                     @foreach($ps as $key=> $pss)
                                         <?php
-                                        if (in_array($pss->product_id, $promo_user_ids)) {
+                                        if (in_array($pss->product_id, $promo_user_ids) && $promo_user[$pss->product_id]['min_ay'] <= $pss->lisans_ay && $promo_user[$pss->product_id]['min_adet'] <= $pss->adet) {
                                             $indirim = $promo_user[$pss->product_id]['price'];
-                                        }else {
+                                        } else {
                                             $indirim = 0;
                                         }
                                         $toplam = $sepetController->price_set($pss, $indirim);
