@@ -50,7 +50,7 @@ class AcrSepetController extends Controller
     function indirim()
     {
         $promotion_user_model = new Promotion_user();
-        $promotion_users      = $promotion_user_model->where('user_id', Auth::user()->id)->with([
+        $promotion_users      = $promotion_user_model->where('user_id', @Auth::user()->id)->with([
             'promotion' => function ($q) {
                 $q->with([
                     'pr_products' => function ($q) {
@@ -1119,8 +1119,12 @@ class AcrSepetController extends Controller
             $promo_user     = $promo[0];
             $promo_user_ids = $promo[1];
             foreach ($orders as $order) {
-                if (in_array($order->product_id, $promo_user_ids && $promo_user[$order->product_id]['min_ay'] <= $order->lisans_ay && $promo_user[$order->product_id]['min_adet'] <= $order->adet)) {
-                    $indirim = $promo_user[$order->product_id]['price'];
+                if (is_array($promo_user_ids)) {
+                    if (in_array($order->product_id, $promo_user_ids) && $promo_user[$order->product_id]['min_ay'] <= $order->lisans_ay && $promo_user[$order->product_id]['min_adet'] <= $order->adet) {
+                        $indirim = $promo_user[$order->product_id]['price'];
+                    } else {
+                        $indirim = 0;
+                    }
                 } else {
                     $indirim = 0;
                 }

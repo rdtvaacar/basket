@@ -8,14 +8,17 @@
         .scroll::-webkit-scrollbar {
             width: 5px;
         }
+
         .scroll::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
             border-radius: 5px;
         }
+
         .scroll::-webkit-scrollbar-thumb {
             border-radius: 10px;
             -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
         }
+
         .kisiKarti ul {
             margin: 0;
             padding: 0;
@@ -24,60 +27,76 @@
             margin: 10px 0 10px 5px;
             font-size: 10pt;
         }
+
         .kisiKarti li {
             padding: 0;
             font-size: 16pt;
             margin: 0;
         }
+
         .kisiKarti h4, h3 {
             padding: 4px;
         }
+
         .tablo {
             width: 100%;
         }
+
         .tablo td {
             padding: 6px;
         }
+
         .stun {
             border-bottom: rgba(39, 41, 47, 1) 1px dotted;
         }
+
         .stun_1 {
         }
+
         .stun_2 {
         }
+
         .price-table .col-md-2, .price-table .col-md-4, .price-table .col-md-6 {
             padding: 0 1px;
             margin: 4px 0 2px 0;
         }
+
         @media (min-width: 768px) and (max-width: 991px) {
             .price-table .col-md-3, .price-table .col-md-4, .price-table .col-md-6 {
                 padding: 0 15px;
             }
         }
+
         @media (min-width: 1200px) {
             .price-table .col-md-3, .price-table .col-md-4, .price-table .col-md-6 {
                 padding: 0 1px;
             }
         }
+
         /* Pricing Tables - Boxes */
         .price-table .peice-list {
             background: none repeat scroll 0 0 transparent;
             border: 0;
             padding: 0;
         }
+
         .price-table .price-col1 .peice-list {
             background-color: transparent;
         }
+
         .price-table .price-col2 .peice-list {
             background-color: #343844;
         }
+
         .price-table .price-col3 .peice-list {
             background-color: #3451c6;
         }
+
         .peice-list * {
             list-style: none;
             line-height: 1;
         }
+
         .peice-list .pack-price {
             background: none repeat scroll 0 0 rgba(255, 255, 255, 0.1);
             text-align: center;
@@ -86,6 +105,7 @@
             font-weight: 500;
             font-size: 15px;
         }
+
         .peice-list .pack-price span {
             color: #fff;
             font-weight: 900;
@@ -93,6 +113,7 @@
             display: block;
             padding: 10px 0;
         }
+
         .peice-list li {
             padding: 0.9375em;
             text-align: left;
@@ -103,6 +124,7 @@
             line-height: 27px;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
         }
+
         .peice-list .price-table-btn {
             background: none repeat scroll 0 0 rgba(0, 0, 0, 0.1);
             text-align: center;
@@ -111,9 +133,11 @@
             -moz-border-radius: 0 0 6px 6px;
             border-radius: 0 0 6px 6px;
         }
+
         .peice-list .price-table-btn p {
             padding: 36px 0 31px;
         }
+
         .peice-list .price-table-btn a {
             color: #333;
             font-size: 16px;
@@ -129,19 +153,23 @@
             -o-transition: all 0.3s ease; /* Opera 10.5-12.00 */
             transition: all 0.3s ease; /* Firefox 16+, Opera 12.50+ */
         }
+
         .peice-list .price-table-btn a:hover {
             background: #000;
             color: #fff;
             text-decoration: none;
         }
+
         .price-table {
             padding: 0;
             overflow: hidden;
             margin: 0 2px;
         }
+
         .price-table p {
             text-align: center;
         }
+
         .price-table .title-2 {
             background: none repeat scroll 0 0 #3451c6;
             padding: 21px 0;
@@ -153,18 +181,22 @@
             margin: 20px 0 2px 0;
             position: relative;
         }
+
         .price-table .price-col2 .title-2 {
             background-color: #343844;
         }
+
         .price-table .price-col3 .title-2 {
             background-color: #3451c6;
             font-size: 21px;
             margin: 0 0 2px;
             padding: 31px 0;
         }
+
         .price-table .price-col3 .price-table-btn {
             padding: 14px 0;
         }
+
         .price-table .price-col1 .peice-list li {
             text-align: left;
             color: #333;
@@ -172,15 +204,19 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.03);
             text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
         }
+
         .price-table .price-col1 .title-2 {
             background-color: #343844;
         }
+
         .peice-list .pack-price {
             padding: 14px 0 20px;
         }
+
         .peice-list .pack-price span {
             font-size: 33px;
         }
+
         .peice-list .pack-price span sub {
             font-size: 14px;
             padding-left: 2px;
@@ -190,10 +226,12 @@
             vertical-align: baseline;
             position: relative;
         }
+
         @media only screen and (min-width: 720px) and (max-width: 959px) {
             .peice-list .pack-price span {
                 font-size: 33px;
             }
+
             .peice-list .price-table-btn a {
                 font-size: 14px;
                 padding: 9px 17px;
@@ -353,19 +391,43 @@
             </div>
         </div>
     </section>
+    @if(!empty($product->uyari))
+        <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="/icon/close.png"></span></button>
+                        <h4 class="modal-title"><span class="text-red"><b>UYARI!!!</b></span></h4>
+                    </div>
+                    <div class="modal-body">
+                        {{$product->uyari}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">KAPAT</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    @endif
 @stop
 @section('footer')
     <script src="/blueimp/js/blueimp-gallery.min.js"></script>
     <script>
+        @if(!empty($product->uyari))
+        $(document).ready(function () {
+            $('#myModal').modal('show')
+        });
+        @endif
         document.getElementById('links').onclick = function (event) {
             event = event || window.event;
             var target = event.target || event.srcElement,
                 link = target.src ? target.parentNode : target,
-                options = {index: link, event: event},
+                options = { index: link, event: event },
                 links = this.getElementsByTagName('a');
             blueimp.Gallery(links, options);
         };
-        function product_image(product_id, img_id) {
+
+        function product_image (product_id, img_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/img',
@@ -375,10 +437,12 @@
                 }
             });
         }
-        function next_image() {
+
+        function next_image () {
             product_image({{$product->id}},{{$next_id}})
         }
-        function urunGoster(att_id, product_id) {
+
+        function urunGoster (att_id, product_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/attribute/modal',
@@ -390,7 +454,8 @@
                 }
             });
         }
-        function sepete_ekle(product_id) {
+
+        function sepete_ekle (product_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/create',
@@ -401,7 +466,8 @@
                 }
             });
         }
-        function sepet_goster() {
+
+        function sepet_goster () {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/products',
@@ -412,10 +478,12 @@
                 }
             });
         }
-        function sepet_gizle() {
+
+        function sepet_gizle () {
             $('#sepet_row').hide();
         }
-        function sepet_adet_guncelle(sepet_id) {
+
+        function sepet_adet_guncelle (sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
                 type: 'post',
@@ -443,7 +511,8 @@
                 }
             });
         }
-        function sepet_delete(sepet_id) {
+
+        function sepet_delete (sepet_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/delete',
@@ -454,7 +523,8 @@
                 }
             });
         }
-        function image_viewer(product_id, image_id) {
+
+        function image_viewer (product_id, image_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/image/modal',
@@ -465,7 +535,8 @@
                 }
             });
         }
-        function sepet_delete_all() {
+
+        function sepet_delete_all () {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/delete_all',
