@@ -65,9 +65,11 @@ class AcrSepetController extends Controller
         $promo_user_ids       = [];
         $promo_user           = [];
         foreach ($promotion_users as $promotion_user) {
-            foreach ($promotion_user->promotion->pr_products as $item) {
-                $promo_user[$item->product_id] = $promotion_user->promotion;
-                $promo_user_ids[]              = $item->product_id;
+            if (!empty($promotion_user->promotion->pr_products)) {
+                foreach ($promotion_user->promotion->pr_products as $item) {
+                    $promo_user[$item->product_id] = $promotion_user->promotion;
+                    $promo_user_ids[]              = $item->product_id;
+                }
             }
         }
         return [
@@ -120,16 +122,15 @@ class AcrSepetController extends Controller
         ]);
         return $market_controller->order_result($request, $pr->ps->sepet_id, [$pr->ps->product_id], Auth::user()->id);
     }
-
-    function order_fatura_active(Request $request, $order_id = null)
+    function order_cancel(Request $request, $order_id = null)
     {
         $order_id             = empty($order_id) ? $request->input('order_id') : $order_id;
         $sepet_model          = new Sepet();
         $sepet                = $sepet_model->find($order_id);
-        $active               = $sepet->fatura_active == 1 ? 0 : 1;
-        $sepet->fatura_active = $active;
+        $sepet->fatura_active = $request->order_active;
         $sepet->save();
     }
+
 
     function orders(Request $request)
     {
@@ -170,6 +171,8 @@ class AcrSepetController extends Controller
         $notes  = $request->notes;
         $adet   = empty($request->min_adet) ? 1 : $request->min_adet;
         $min_ay = empty($request->min_ay) ? 1 : $request->min_ay;
+        $adet   = empty($request->tavsiye_adet) ? 1 : $request->tavsiye_adet;
+        $min_ay = empty($request->tavsiye_ay) ? 1 : $request->tavsiye_ay;
         $data   = [
             'adet'      => $adet,
             'lisans_ay' => $min_ay,
@@ -1796,12 +1799,11 @@ class AcrSepetController extends Controller
         $user_model          = new AcrUser();
         $sepet               = $sepet_model->find($order_id);
         $sepet->active       = 0;
-        $sepet->order_result = 1;
+        $sepet->order_result = 3;
         $sepet->save();
         $sepet_row = $sepet_model->where('id', $order_id)->first();
         $orders    = $ps_model->where('sepet_id', $order_id)->get();
         foreach ($orders as $order) {
-
             if ($order->type == 2) {
                 $user               = $user_model->find($sepet_row->user_id);
                 $user_row           = $user_model->where('id', $sepet_row->user_id)->first();

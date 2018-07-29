@@ -3,7 +3,14 @@
     <section class="content">
         <div class="row">
             {!! $msg !!}
-
+            <div class=" col-md-12">
+                <div class="box box-danger">
+                    <div class="box-header with-border">BİLGİLENDİRME</div>
+                    <div class="box-body">
+                        Promosyon kodları, sizin yada arkadaşlarınızın kullanabileceği şekilde tasarlanmıştır. Arkadaşlarınızın kullanabilmesi için kodu kopyalayıp arkadaşınıza göndermeniz gerekir.
+                    </div>
+                </div>
+            </div>
             <div class=" col-md-8">
                 <div class="box box-primary">
                     <div class="box-header with-border">SİSTEM PORMOSYONLARI</div>
@@ -63,20 +70,31 @@
                             <table class="table table-hover">
                                 <tr>
                                     <th>Ürün</th>
-                                    <td>Satın Al</td>
+                                    <th>Pormosyon Kodu</th>
+                                    <th>Satın Al</th>
                                     <th>Oluşturma Tarihi</th>
                                     <th>Durumu</th>
                                 </tr>
                                 @foreach ($prs as $pr)
-                                    @foreach ($pr->promotion->pr_products as $product)
-                                        <tr>
-                                            <td>{{@$product->product->product_name}}</td>
-                                            <td><a href="/acr/ftr/product/sepet/ekle?product_id={{@$product->product->id}}&min_ay={{$pr->promotion->min_ay}}&promotion_user_id={{$pr->promotion->id}}&min_adet={{$pr->promotion->min_adet
+                                    <tr>
+                                        <td>{{@$pr->ps->product->product_name}}</td>
+                                        <td>{{$pr->code}}</td>
+                                        <td></td>
+                                        <td>{{@$pr->created_at}}</td>
+                                        <td>{!! @$pr->active==1?'<span class="text-success">AKTİF</span>':'<span class="text-danger">KULLANILDI</span>' !!}</td>
+                                    </tr>
+                                    @if(!empty($pr->promotion->pr_products))
+                                        @foreach ($pr->promotion->pr_products as $product)
+                                            <tr>
+                                                <td>{{@$product->product->product_name}}</td>
+                                                <td></td>
+                                                <td><a href="/acr/ftr/product/sepet/ekle?product_id={{@$product->product->id}}&min_ay={{@$pr->promotion->min_ay}}&promotion_user_id={{@$pr->promotion->id}}&min_adet={{@$pr->promotion->min_adet
                                             }}">Satın Al</a></td>
-                                            <td>{{$pr->created_at}}</td>
-                                            <td>{!! $pr->active==1?'<span class="text-success">AKTİF</span>':'<span class="text-danger">KULLANILDI</span>' !!}</td>
-                                        </tr>
-                                    @endforeach
+                                                <td>{{@$pr->created_at}}</td>
+                                                <td>{!! @$pr->active==1?'<span class="text-success">AKTİF</span>':'<span class="text-danger">KULLANILDI</span>' !!}</td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
                                 @endforeach
 
                             </table>
@@ -85,5 +103,6 @@
                 </div>
             </div>
         </div>
+
     </section>
 @stop

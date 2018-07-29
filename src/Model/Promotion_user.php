@@ -19,18 +19,21 @@ class Promotion_user extends Model
     function promosyon($ps, $user_id)
     {
         $pr_model = new Promotion_user();
-        if ($ps->adet > 1) {
-            for ($i = 1; $i < $ps->adet; $i++) {
-                $data[] = [
-                    'user_id' => $user_id,
-                    'ps_id'   => $ps->id,
-                    'code'    => uniqid(rand(100000, 999999))
-                ];
+        if ($pr_model->where('ps_id', $ps->id)->count() < 1) {
+            if ($ps->adet > 1) {
+                for ($i = 1; $i < $ps->adet; $i++) {
+                    $data[] = [
+                        'user_id' => $user_id,
+                        'ps_id'   => $ps->id,
+                        'code'    => uniqid(rand(100000, 999999))
+                    ];
+                }
+            }
+            if (!empty($data)) {
+                $pr_model->insert($data);
             }
         }
-        if (!empty($data)) {
-            $pr_model->insert($data);
-        }
+
     }
 
     function promosyon_user($product_ids, $price, $user_id, $min_ay, $min_adet)
@@ -51,12 +54,12 @@ class Promotion_user extends Model
         $data_user = [
             'user_id'      => $user_id,
             'promotion_id' => $promotion_id,
-            'code'       => uniqid(rand(100000, 999999)),
+            'code'         => uniqid(rand(100000, 999999)),
         ];
         $promotion_user_model->insert($data_user);
         foreach ($product_ids as $product_id) {
             $data_product[] = [
-                'product_id' => $product_id,
+                'product_id'   => $product_id,
                 'promotion_id' => $promotion_id,
             ];
         }

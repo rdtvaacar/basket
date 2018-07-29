@@ -15,7 +15,7 @@
                                 <th>Son Güncelleme</th>
                                 <th>S. NO</th>
                                 <th>Fatura</th>
-                                <th>Sipariş Onayla</th>
+                                <th>Onayla/İptal</th>
                                 <th>Ödeme Sonucu</th>
                                 <th>UserID</th>
                                 <th>Email</th>
@@ -168,7 +168,6 @@
         function order_active (id) {
             var order_id = id;
             if ($('#order_input_' + id).is(':checked')) {
-
                 $.ajax({
                     type: 'post',
                     url: '/acr/ftr/order/active/admin',
@@ -197,5 +196,6 @@
                 }
             });
         }
+
     </script>
 @stop

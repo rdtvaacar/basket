@@ -22,12 +22,19 @@
                             <tbody id="sepet_tbody">
                             <?php foreach ($orders as $order) {
                             $payment_type = $order->payment_type == 1 ? '<span style="color: #3a7c67;">HAVALE / EFT</span>' : '<span style="color: #7c3108;">KREDİ KARTI</span>';
-                            $order_result = $order->order_result == 1 ? '
-<span style="color: #7c3422;">ÖDENMEDİ</span>
-<br>
-<a class="btn btn-xs btn-warning" href="/acr/ftr/card/payment?order_id=' . $order->id . '">ŞİMDİ ÖDE</a>
-' : '<span style="color: #357c14;"> ÖDENDİ</span>';
+                            switch ($order->order_result) {
+                                case 1:
+                                    $order_result = '<span style="color: #7c3422;">ÖDENMEDİ</span> <a class="btn btn-xs btn-warning" href="/acr/ftr/card/payment?order_id=' . $order->id . '">ŞİMDİ ÖDE</a>';
+                                    break;
+                                case 2:
+                                    $order_result ='<span style="color: #357c14;"> ÖDENDİ</span>';
+                                    break;
+                                case 3:
+                                    $order_result ='<span class="text-orange">İPTAL EDİLDİ</span>';
+                                    break;
+                            }
                             ?>
+
                             <tr>
                                 <td>{{$order->id}}</td>
                                 <td><?php echo $payment_type ?></td>
