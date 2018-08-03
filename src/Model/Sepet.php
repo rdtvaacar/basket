@@ -82,6 +82,11 @@ class Sepet extends Model
 
     }
 
+    function notes()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'id');
+    }
+
     function sepet_birle($session_id)
     {
         Sepet::where('session_id', $session_id)->where('siparis', 0)->update(['user_id' => Auth::user()->id]);

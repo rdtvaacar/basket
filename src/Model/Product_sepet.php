@@ -45,7 +45,6 @@ class Product_sepet extends Model
         $data_merge = array_merge($data_1, $data);
         $sorgu->update($data_merge);
     }
-
     function product_notes()
     {
         return $this->hasMany('Acr\Ftr\Model\Product_note', 'product_id');
@@ -68,10 +67,10 @@ class Product_sepet extends Model
 
     function notes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'product_id', 'product_id');
+        return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');
     }
     function note()
     {
-        return $this->hasOne('Acr\Ftr\Model\Product_sepet_notes', 'product_id', 'product_id');
+        return $this->hasOne('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');
     }
 }
