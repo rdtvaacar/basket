@@ -122,6 +122,7 @@ class AcrSepetController extends Controller
         ]);
         return $market_controller->order_result($request, $pr->ps->sepet_id, [$pr->ps->product_id], Auth::user()->id);
     }
+
     function order_cancel(Request $request, $order_id = null)
     {
         $order_id             = empty($order_id) ? $request->input('order_id') : $order_id;
@@ -781,12 +782,16 @@ class AcrSepetController extends Controller
         $row .= '<div class="form-group">';
         $row .= '<label>Şehir</label>';
         $row .= '<select required name="city" id="city" class="form-control">';
-        $row .= '<option value="">Şehir Seçiniz</option>';
+        $row .= '<option  value="">Şehir Seçiniz</option>';
         foreach ($cities as $city) {
-            $select = $city->id == @$adress->city_id ? 'selected="selected"' : '';
-            $row    .= '<option ' . $select . ' value="' . $city->id . '">';
-            $row    .= $city->name;
-            $row    .= '</option>';
+            if ($city->id != 0) {
+                $select = $city->id == @$adress->city_id ? 'selected="selected"' : '';
+            } else {
+                $select = '';
+            }
+            $row .= '<option ' . $select . ' value="' . $city->id . '">';
+            $row .= $city->name;
+            $row .= '</option>';
         }
         $row .= '</select>';
         $row .= '</div>';
