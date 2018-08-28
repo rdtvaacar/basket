@@ -332,6 +332,8 @@
                             @endif
                             <button type="submit" style="float: right" class="btn bg-orange btn-lg btn-block">SEPETE EKLE</button>
                             <input type="hidden" name="product_id" value="{{$product->id}}">
+                            <input type="hidden" name="tavsiye_adet" value="{{$product->tavsiye_adet}}">
+                            <input type="hidden" name="tavsiye_ay" value="{{$product->tavsiye_ay}}">
                         </div>
                         <div class="box-footer">
                             <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
