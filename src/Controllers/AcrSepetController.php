@@ -147,7 +147,7 @@ class AcrSepetController extends Controller
         $orders                      = $sepet_model->where('siparis', 1)->with([
             'user',
             'products' => function ($query) {
-                $query->with('product');
+                $query->with('product', 'notes');
             }
         ])->get();
         $acr_user_table_config_model = new Acr_user_table_conf();
@@ -181,12 +181,12 @@ class AcrSepetController extends Controller
             'kol_id'    => $request->kol_id,
             'size_id'   => $request->size_id
         ];
+
         if (Auth::check()) {
             $sepet_id = $sepet_model->product_sepet_id();
             if (!empty($notes)) {
                 foreach ($notes as $key => $note) {
                     $data_notes[] = [
-                        'sepet_id'   => $sepet_id,
                         'product_id' => $product_id,
                         'note_id'    => $request->note_ids[$key],
                         'name'       => $request->notes[$key]
@@ -209,7 +209,6 @@ class AcrSepetController extends Controller
             if (!empty($notes)) {
                 foreach ($notes as $key => $note) {
                     $data_notes[] = [
-                        'sepet_id'   => $sepet_id,
                         'product_id' => $product_id,
                         'note_id'    => $request->note_ids[$key],
                         'name'       => $request->notes[$key]
@@ -1264,11 +1263,11 @@ class AcrSepetController extends Controller
                 return redirect()->to('/admin/e_arsive/basarili');
             }
         }
+        // gülay duman mail gönderimi g.duman4043@gmail.com
         foreach ($sepet_row->products as $product) {
             if (!empty($product->product->user_product->user->email)) {
                 $view = '';
                 $view .= '<table class="table table-bordered">';
-
                 $view .= '<tr>';
                 $view .= '<td>';
                 $view .= 'Ürün';
@@ -1283,6 +1282,22 @@ class AcrSepetController extends Controller
                 $view .= $sepet_row->adress->incoice_name;
                 $view .= '</td>';
                 $view .= '</tr>';
+
+                $view .= '<tr>';
+                $view .= '<td>';
+                $view .= 'Telefon 1 ';
+                $view .= '</td>';
+                $view .= '<td>';
+                $view .= $sepet_row->adress->tel;
+                $view .= '</td>';
+                $view .= '<td>';
+                $view .= 'Telefon 2';
+                $view .= '</td>';
+                $view .= '<td>';
+                $view .= $sepet_row->user->tel;
+                $view .= '</td>';
+                $view .= '</tr>';
+
 
                 $view .= '<tr>';
                 $view .= '<td colspan="2">';

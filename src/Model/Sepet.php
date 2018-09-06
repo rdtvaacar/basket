@@ -53,6 +53,7 @@ class Sepet extends Model
         }
         $ps_id = Product_sepet::insert($data_merge);
         if (!empty($data_notes)) {
+            $data_notes = array_merge($data_notes[0],['sepet_id'=>$sepet_id]);
             $ps_notes = new Product_sepet_notes();
             $ps_notes->where('product_id', $product_id)->where('sepet_id', $sepet_id)->delete();
             $ps_notes->insert($data_notes);
@@ -81,7 +82,10 @@ class Sepet extends Model
     {
 
     }
-
+    function note()
+    {
+        return $this->hasOne('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');
+    }
     function notes()
     {
         return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'id');

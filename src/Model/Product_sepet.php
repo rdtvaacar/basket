@@ -38,13 +38,17 @@ class Product_sepet extends Model
         $satir    = $sorgu->first();
         $ps_notes = new Product_sepet_notes();
         if (!empty($data_notes)) {
+            $data_notess = array_merge($data_notes[0], [
+                'sepet_id' => $sepet_id
+            ]);
             $ps_notes->where('product_id', $satir->product_id)->where('sepet_id', $satir->sepet_id)->delete();
-            $ps_notes->insert($data_notes);
+            $ps_notes->insert($data_notess);
         }
         $data_1     = ['adet' => $satir->adet + 1];
         $data_merge = array_merge($data_1, $data);
         $sorgu->update($data_merge);
     }
+
     function product_notes()
     {
         return $this->hasMany('Acr\Ftr\Model\Product_note', 'product_id');
@@ -69,6 +73,7 @@ class Product_sepet extends Model
     {
         return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');
     }
+
     function note()
     {
         return $this->hasOne('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');

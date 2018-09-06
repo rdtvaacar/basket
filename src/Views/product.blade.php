@@ -418,7 +418,7 @@
         @if(!empty($product->uyari))
         $(document).ready(function () {
             $('#myModal').modal('show')
-        });
+        })
         @endif
         document.getElementById('links').onclick = function (event) {
             event = event || window.event;

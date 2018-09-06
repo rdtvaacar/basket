@@ -70,6 +70,13 @@
                                                 <td>{{@$e_product->lisans_ay}}</td>
                                                 <td>{{@$e_product->product->product_name}}</td>
                                             </tr>
+
+                                        @endforeach
+                                        @foreach ($order->notes as $note)
+                                            <tr>
+                                                <td class="text-red" colspan="3">{{$note->name}}</td>
+
+                                            </tr>
                                         @endforeach
                                     </table>
 

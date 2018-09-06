@@ -16,7 +16,9 @@
                     </div>
                     <div class="box-body">
                         <?php echo $adres_form ?>
-
+                        <div style="clear:both;"></div>
+                            <br>
+                        <a href="/acr/ftr/card/payment" class="btn btn-warning btn-lg">ÖDEME SEÇENEKLERİYLE DEVAM ET>></a>
                     </div>
                 </div>
             </div>
