@@ -242,7 +242,10 @@ class AcrFtrController extends Controller
 
     function product_detail(Request $request)
     {
-        $product_id    = $request->product_id;
+        $product_id = $request->product_id;
+        if (empty($product_id)) {
+            return redirect()->to('/acr/ftr/product');
+        }
         $product_model = new Product();
         $ps_model      = new Product_sepet();
         $product       = $product_model->where('id', $product_id)->with([

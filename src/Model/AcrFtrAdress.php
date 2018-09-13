@@ -34,6 +34,11 @@ class AcrFtrAdress extends Model
         return $this->belongsTo('Acr\Ftr\Model\County', 'county_id', 'id');
     }
 
+    function counties()
+    {
+        return $this->hasMany('Acr\Ftr\Model\County', 'city_id', 'city_id');
+    }
+
     function active_adress($adress_id)
     {
         AcrFtrAdress::where('user_id', Auth::user()->id)->update(['active' => 2]);
