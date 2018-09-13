@@ -15,6 +15,7 @@ use Acr\Ftr\Model\Product_sepet;
 use Acr\Ftr\Model\Promotion;
 use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
+use AcrMenu;
 use App\Handlers\Commands\my;
 use App\Http\Controllers\MarketController;
 use Auth;
@@ -132,6 +133,14 @@ class AcrSepetController extends Controller
         $sepet->save();
     }
 
+    function order_fatura_active(Request $request)
+    {
+        $order_id             = empty($order_id) ? $request->input('order_id') : $order_id;
+        $sepet_model          = new Sepet();
+        $sepet                = $sepet_model->find($order_id);
+        $sepet->fatura_active = $sepet->fatura_active == 1 ? 2 : 1;
+        $sepet->save();
+    }
 
     function orders(Request $request)
     {
@@ -759,7 +768,7 @@ class AcrSepetController extends Controller
         return $row;
     }
 
-    function adress_form(Request $request, $adress = null)
+    function adress_form(Request $request, $adress = null, $user_id = null)
     {
         $city_model = new City();
         $cities     = $city_model->get();
@@ -856,6 +865,7 @@ class AcrSepetController extends Controller
         $row .= '</label>';
         $row .= '</div>';
         $row .= '<input type="hidden" name="adress_id"  value="' . @$adress->id . '">';
+        $row .= '<input type="hidden" name="user_id"  value="' . @$user_id . '">';
         $row .= '<button type="submit" class="btn btn-primary">ADRES KAYDET <span class="fa fa-angle-double-right"></span> </button>';
         $row .= '</form>';
         $row .= '<div style="clear:both;"></div>';
@@ -893,6 +903,13 @@ class AcrSepetController extends Controller
 
     function adress_create_api(Request $request)
     {
+        $roles = AcrMenu::roles();
+        if (in_array(1, $roles)) {
+            $user_id = empty($request->user_id) ? Auth::user()->id : $request->user_id;
+
+        } else {
+            $user_id = Auth::user()->id;
+        }
         $rules   = array(
             'name'      => 'required',
             // make sure the email is an actual email
@@ -926,7 +943,7 @@ class AcrSepetController extends Controller
             }
             $tc        = strlen($request->input('tc')) < 11 ? '11111111111' : $request->input('tc');
             $data      = [
-                'user_id'      => Auth::user()->id,
+                'user_id'      => $user_id,
                 'name'         => $request->input('name'),
                 'invoice_name' => $invoice_name,
                 'tc'           => $tc,
@@ -944,7 +961,6 @@ class AcrSepetController extends Controller
 
             ];
             $adress_id = $request->input('adress_id') ? $request->input('adress_id') : 0;
-
             $adress_id = $adress_model->create($adress_id, $data);
             self::parasut_contact_update($adress_id);
             return response()->json([
@@ -977,8 +993,9 @@ class AcrSepetController extends Controller
         $sepet_id     = $request->input('sepet_id');
         $sepet_nav    = self::sepet_nav($sepet_id, 2);
         $adres_id     = $request->input('adres_id');
+        $user_id      = $request->user_id;
         $adress       = $adress_model->where('id', $adres_id)->with('city', 'county')->first();
-        $adres_form   = self::adress_form($request, $adress);
+        $adres_form   = self::adress_form($request, $adress, $user_id);
 
 
         return View('acr_ftr::card_adress_edit', compact('sepet_nav', 'adres_form', 'adress'));
@@ -988,16 +1005,22 @@ class AcrSepetController extends Controller
     {
         $adress_model = new AcrFtrAdress();
         $adres_id     = $request->input('adres_id');
+        $user_id      = $request->user_id;
         $adress       = $adress_model->where('id', $adres_id)->first();
-        return self::adress_form($request, $adress);
+        return self::adress_form($request, $adress, $user_id);
     }
 
     function adress_delete(Request $request)
     {
         $adress_model = new AcrFtrAdress();
         $adres_id     = $request->input('adres_id');
-        $adress_model->where('id', $adres_id)->update(['sil' => 1]);
+        $roles        = AcrMenu::roles();
+        if (in_array(1, $roles)) {
+            $adress_model->where('id', $adres_id)->update(['sil' => 1]);
 
+        } else {
+            $adress_model->where('id', $adres_id)->where('user_id', Auth::user()->id)->update(['sil' => 1]);
+        }
     }
 
     function parasut_contact_data($adress_row)
