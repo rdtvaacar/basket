@@ -4,7 +4,7 @@
 foreach ($products as $key =>$product) {
 if(!empty($product->product)) {
 ?>
-<div style="min-height:760px;" class="col-md-4 all_categories
+<div style="min-height:780px;" class="col-md-4 all_categories
                             @foreach($product->product->u_kats as $u_kat)
         kat_{{@$u_kat->id }}
 @endforeach">

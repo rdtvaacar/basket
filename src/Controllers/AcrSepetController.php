@@ -784,7 +784,7 @@ class AcrSepetController extends Controller
         $row        .= '</div>';
         $row        .= '<div class="form-group">';
         $row        .= '<label>T.C. Kimlik No (11 Hane olmalıdır.) </label>';
-        $row        .= '<input  required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranızı " value="' . @$adress->tc . '">';
+        $row        .= '<input  type="number"  required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranızı " value="' . @$adress->tc . '">';
         $row        .= '</div>';
         // citys
         $row .= '<div class="form-group">';
@@ -813,12 +813,12 @@ class AcrSepetController extends Controller
         $row .= '<textarea required name="adress"  class="form-control" placeholder="Açık Adres">' . @$adress->adress . '</textarea>';
         $row .= '</div>';
         $row .= '<div class="form-group">';
-        $row .= '<label>Posta Kodu</label>';
-        $row .= '<input required name="post_code"  class="form-control" placeholder="Posta Kodu" value="' . @$adress->post_code . '">';
+        $row .= '<label>Adres Posta Kodu</label>';
+        $row .= '<input required name="post_code" type="number" class="form-control" placeholder="Posta Kodu" value="' . @$adress->post_code . '">';
         $row .= '</div>';
         $row .= '<div class="form-group">';
         $row .= '<label>Telefon</label>';
-        $row .= '<input required name="tel"  class="form-control" placeholder="Telefon" value="' . @$adress->tel . '">';
+        $row .= '<input required name="tel" type="number"  class="form-control" placeholder="Telefon" value="' . @$adress->tel . '">';
         $row .= '</div>';
         // kurumsal
         if (@$adress->type == 1 || empty($adress->type)) {
@@ -847,7 +847,7 @@ class AcrSepetController extends Controller
         $row     .= '</div>';
         $row     .= '<div class="form-group">';
         $row     .= '<label>Kurum Vergi No</label>';
-        $row     .= '<input name="tax_number"  class="form-control" placeholder="Kurum Vergi No" value="' . @$adress->tax_number . '">';
+        $row     .= '<input name="tax_number" type="number"  class="form-control" placeholder="Kurum Vergi No" value="' . @$adress->tax_number . '">';
         $row     .= '</div>';
         $row     .= '<div class="form-group">';
         $row     .= '<label>Kurum Vergi Dairesi</label>';
