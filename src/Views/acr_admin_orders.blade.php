@@ -68,9 +68,24 @@
                                             <tr>
                                                 <td>{{$e_product->adet}}</td>
                                                 <td>{{@$e_product->lisans_ay}}</td>
-                                                <td>{{@$e_product->product->product_name}}</td>
-                                            </tr>
+                                                <td>
+                                                    {{@$e_product->product->product_name}}
+                                                    <?php $bagli_uruns = json_decode($e_product->product_ids);
+                                                    ?>
+                                                    @if(!empty($bagli_uruns))
+                                                        <ol>
+                                                            @foreach ($bagli_uruns as $urun_id)
+                                                                @if($urun_id !=1282)
+                                                                    <li>
+                                                                        {{$urun[$urun_id]->product_name}}
 
+                                                                    </li>
+                                                                @endif
+                                                            @endforeach
+                                                        </ol>
+                                                    @endif
+                                                </td>
+                                            </tr>
                                         @endforeach
                                         @foreach ($order->notes as $note)
                                             <tr>

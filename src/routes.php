@@ -4,6 +4,9 @@ Route::group(['middleware' => ['web']], function () {
         'namespace' => 'Acr\Ftr\Controllers',
         'prefix'    => 'acr/ftr'
     ], function () {
+        Route::get('/lisans/urunleri', 'AcrSepetController@lisans_urunleri');
+        Route::post('/lisans/urun/fiyat/hesapla', 'AcrSepetController@lisans_urun_fiyat_hesapla');
+        Route::post('/lisans/urun/sepete/ekle', 'AcrSepetController@lisans_urun_sepete_ekle');
         Route::get('/', 'AcrFtrController@index');
         Route::post('/product/ara/', 'AcrFtrController@product_search');
         Route::get('/product/detail', 'AcrFtrController@product_detail');

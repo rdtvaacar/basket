@@ -21,16 +21,25 @@ $type = $product->product->type == 1 ? 'Lisans' : 'Ürün' ?>
     <td>{{$type }}</td>
     <td>
         <div class="col-md-6 col-xs-12">
-            <input class="form-control" onchange="sepet_adet_guncelle({{$product->id}})" onkeyup="sepet_adet_guncelle({{$product->id}} )" style="width: 70px;" id="sepet_adet_{{$product->id}}" value="{{$product->adet}}"/>
+            @if($product->product->id ==1282)
+                1
+            @else
+
+                <input class="form-control" onchange="sepet_adet_guncelle({{$product->id}})" onkeyup="sepet_adet_guncelle({{$product->id}} )" style="width: 70px;" id="sepet_adet_{{$product->id}}" value="{{$product->adet}}"/>
+            @endif
+
         </div>
-        @if ($product->product->type == 1)
-            <div class="col-md-6 col-xs-12">
-                <div class="col-md-6 col-xs-12">Kaç Aylık</div>
+        @if($product->product->id ==1282)
+        @else
+            @if ($product->product->type == 1)
                 <div class="col-md-6 col-xs-12">
-                    <input size="3" class="form-control" onchange="sepet_lisans_ay_guncelle({{$product->id}})" onkeyup="sepet_lisans_ay_guncelle({{$product->id}})" style="width: 70px;" id="sepet_lisans_ay_{{$product->id}}"
-                           value="{{$product->lisans_ay}}"/>
+                    <div class="col-md-6 col-xs-12">Kaç Aylık</div>
+                    <div class="col-md-6 col-xs-12">
+                        <input size="3" class="form-control" onchange="sepet_lisans_ay_guncelle({{$product->id}})" onkeyup="sepet_lisans_ay_guncelle({{$product->id}})" style="width: 70px;" id="sepet_lisans_ay_{{$product->id}}"
+                               value="{{$product->lisans_ay}}"/>
+                    </div>
                 </div>
-            </div>
+            @endif
         @endif
     </td>
     <td>
