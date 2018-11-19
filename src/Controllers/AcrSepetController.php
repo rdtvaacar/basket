@@ -11,7 +11,9 @@ use Acr\Ftr\Model\Company_conf;
 use Acr\Ftr\Model\County;
 use Acr\Ftr\Model\Fatura;
 use Acr\Ftr\Model\Fatura_product;
+use Acr\Ftr\Model\Product;
 use Acr\Ftr\Model\Product_sepet;
+use Acr\Ftr\Model\Product_sepet_notes;
 use Acr\Ftr\Model\Promotion;
 use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
@@ -20,6 +22,7 @@ use App\Handlers\Commands\my;
 use App\Http\Controllers\MarketController;
 use Auth;
 use Redirect;
+use Session;
 use Validator;
 use Illuminate\Http\Request;
 
@@ -46,6 +49,126 @@ class AcrSepetController extends Controller
         $user_model = new AcrUser();
         $sepets     = $user_model->find(Auth::user()->id)->sepets()->get();
         return View('acr_ftr::anasayfa');
+    }
+
+    function lisans_urun_sepete_ekle(Request $request)
+    {
+        $urun_ids = explode("_", $request->product_ids);
+        $adet     = $request->adet;
+        $ay       = $request->ay;
+        array_pop($urun_ids);
+        $sepet      = new Sepet();
+        $fiyat_data = $this->lisans_urun_fiyat_hesapla($request, $adet, $ay, $request->product_ids);
+        $dis_rate   = number_format(str_replace('%', '', $fiyat_data[2])) / 100;
+        $sepet_data = [
+            'dis_rate' => $dis_rate,
+        ];
+        $ps_data    = [
+            'adet'        => $adet,
+            'product_ids' => json_encode($urun_ids),
+            'price'       => $fiyat_data[0],
+            'lisans_ay'   => $ay,
+            'dis_rate'    => $dis_rate,
+        ];
+        if (empty($request->session()->get('session_id'))) {
+            $session_id = rand(1000000, 99999999);
+            session()->put('session_id', $session_id);
+        } else {
+            $session_id = session()->get('session_id');
+        }
+        $result = $sepet->create($session_id, 1282, $ps_data, null, $sepet_data);
+        if (!empty($request->usb_note)) {
+            $veri     = (json_encode($result));
+            $cam      = json_decode($veri);
+            $sepet_id = $cam->original->data;
+            Product_sepet_notes::insert([
+                'sepet_id'   => $sepet_id,
+                'name'       => $request->usb_note,
+                'product_id' => 10
+            ]);
+        }
+
+    }
+
+    function lisans_urun_fiyat_hesapla(Request $request, $adet = null, $ay = null, $urun_id_data = null)
+    {
+        $urun_id_data = empty($urun_id_data) ? $request->product_ids : $urun_id_data;
+        $urun_ids     = explode("_", $urun_id_data);
+        $adet         = empty($adet) ? $request->adet : $adet;
+        $ay           = empty($ay) ? $request->ay : $ay;
+        array_pop($urun_ids);
+        $model  = new Product();
+        $lisans = $model->where('id', 1282)->first();
+
+        if (in_array(1282, $urun_ids)) {
+            $lisans_fiyat = self::price_set_lisans($lisans, 0, $adet, $ay);
+        }
+        $fiyat   = [];
+        $key_usb = array_search(10, $urun_ids);
+        unset($urun_ids[0]);
+        if (!empty($key_usb)) {
+            $fiyat_usb = 100;
+            unset($urun_ids[$key_usb]);
+        } else {
+            $fiyat_usb = 0;
+        }
+        switch (count($urun_ids)) {
+            case 1:
+                $fiyat[] = 2.2798;
+                break;
+            case 2:
+                $fiyat[] = 3.016;
+                break;
+            case 3:
+                $fiyat[] = 3.3841;
+                break;
+            case 4:
+                $fiyat[] = 3.752;
+                break;
+            case 5:
+                $fiyat[] = 5.959;
+                break;
+        }
+        $kat_sayi   = 1.359;
+        $sum_fiyat  = array_sum($fiyat) * $adet * $ay * $kat_sayi + $fiyat_usb;
+        $fiyat      = round($sum_fiyat + $lisans_fiyat, 2);
+        $dis_rate   = round($this->dis_rate(($lisans->price * $adet * $ay) + $sum_fiyat, $fiyat), 2);
+        $indirimsiz = round($fiyat * (1 + $dis_rate), 2);
+        $dis_rate   = '%' . $dis_rate * 100;
+        $kisi_basi  = round($fiyat / $adet, 2);
+        return [
+            $fiyat,
+            $indirimsiz,
+            $dis_rate,
+            $kisi_basi
+        ];
+    }
+
+    function lisans_urunleri()
+    {
+        $model    = new Product();
+        $products = $model->whereIn('id', [
+            1282,
+            1283,
+            1284,
+            1285,
+            1286,
+            1287,
+            10
+        ])->get();
+        foreach ($products as $product) {
+            $urun[$product->id] = $product;
+        }
+        $product_ids = [
+            1282,
+            1283,
+            1284,
+            1285,
+            1286,
+            1287,
+            10
+        ];
+        return view('acr_ftr::product_lisans', compact('urun', 'product_ids'));
     }
 
     function indirim()
@@ -162,7 +285,20 @@ class AcrSepetController extends Controller
         $acr_user_table_config_model = new Acr_user_table_conf();
         $config                      = $acr_user_table_config_model->first();
         $email                       = $config->email;
-        return View('acr_ftr::acr_admin_orders', compact('orders', 'email', 'siparis'));
+
+        $product_model = new Product();
+        $products      = $product_model->whereIn('id', [
+            1283,
+            1284,
+            1285,
+            1286,
+            1287,
+            10
+        ])->get();
+        foreach ($products as $product) {
+            $urun[$product->id] = $product;
+        }
+        return View('acr_ftr::acr_admin_orders', compact('orders', 'email', 'siparis', 'urun'));
     }
 
     function product_sepet_ekle(Request $request)
@@ -264,30 +400,61 @@ class AcrSepetController extends Controller
         return self::sepet_row($products);
     }
 
-    function price_set($product, $indirim = 0)
+    function price_set_lisans($product, $indirim = 0, $adet_data = null, $ay_data = null)
     {
-        $price_not_dis = $product->product->price * $product->adet * $product->lisans_ay;
+        $price_not_dis = $product->price * $adet_data * $ay_data;
+        if ($price_not_dis == 0) {
+            $price_not_dis = 1;
+        }
+        $priceData     = empty($product->dis_price) ? $product->price : $product->dis_price;
+        $price         = $priceData * $adet_data * $ay_data;
+        $adet_kat_sayi = $adet_data > 1 ? pow($adet_data, $product->dis_person) : 0;
+        $ay_kat_sayi   = $ay_data > 1 ? pow($ay_data, $product->dis_moon) : 0;
+        $kat_sayi      = 1 - (($adet_kat_sayi + $ay_kat_sayi) / 100);
+        $dis_price     = $price * $kat_sayi;
+        if ((($dis_price / $price_not_dis) - ((100 - $product->max_dis) / 100)) < 0) {
+            if (((100 - $product->max_dis) / 100) > 0) {
+                $price = ((100 - $product->max_dis) / 100) * $price_not_dis;
+            } else {
+                $price = $dis_price;
+            }
+        } else {
+            $price = $dis_price;
+        }
+        if ($ay_data == 1 && $adet_data == 1) {
+            $price = $product->price;
+        }
+        return $price - $indirim;
+    }
+
+    function price_set($product, $indirim = 0, $adet = null, $ay = null)
+    {
+        if ($product->product_id == 1282) {
+            return $product->price;
+        }
+        $adet_data     = empty($adet) ? $product->adet : $adet;
+        $ay_data       = empty($adet) ? $product->lisans_ay : $ay;
+        $price_not_dis = $product->product->price * $adet_data * $ay_data;
         if ($price_not_dis == 0) {
             $price_not_dis = 1;
         }
         $priceData = empty($product->product->dis_price) ? $product->product->price : $product->product->dis_price;
-
-        $price = $priceData * $product->adet * $product->lisans_ay;
-        if ($product->adet > 1) {
-            $price     = $product->product->dis_price * $product->adet * $product->lisans_ay;
-            $dis_price = $price - ($price * $product->product->dis_person * $product->adet);
+        $price     = $priceData * $adet_data * $ay_data;
+        if ($adet_data > 1) {
+            $price     = $product->product->dis_price * $adet_data * $ay_data;
+            $dis_price = $price - ($price * $product->product->dis_person * $adet_data);
         } else {
             $dis_price = $price;
         }
-        if ($product->lisans_ay > 1) {
-            if ($product->adet == 1) {
-                $dis_price = $priceData * $product->adet * $product->lisans_ay;
+        if ($ay_data > 1) {
+            if ($adet_data == 1) {
+                $dis_price = $priceData * $adet_data * $ay_data;
             }
-            $dis_price = $dis_price - ($dis_price * $product->product->dis_moon * $product->lisans_ay);
+            $dis_price = $dis_price - ($dis_price * $product->product->dis_moon * $ay_data);
         } else {
             $dis_price = $dis_price;
         }
-        if ($product->lisans_ay == 1 && $product->adet == 1) {
+        if ($ay_data == 1 && $adet_data == 1) {
             $dis_price = $product->product->price;
         }
         if ((($dis_price / $price_not_dis) - ((100 - $product->product->max_dis) / 100)) < 0) {
@@ -336,19 +503,28 @@ class AcrSepetController extends Controller
         $promo_user     = $promo[0];
         $promo_user_ids = $promo[1];
         foreach ($products as $product) {
-            if (in_array($product->product_id, $promo_user_ids && $promo_user[$product->product_id]['min_ay'] <= $product->lisans_ay && $promo_user[$product->product_id]['min_adet'] <= $product->adet)) {
-                $indirim = $promo_user[$product->product_id]['price'];
-            } else {
+            if (empty($promo_user[$product->product_id])) {
                 $indirim = 0;
+            } else {
+                if (in_array($product->product_id, $promo_user_ids && $promo_user[$product->product_id]['min_ay'] <= $product->lisans_ay && $promo_user[$product->product_id]['min_adet'] <= $product->adet)) {
+                    $indirim = @$promo_user[$product->product_id]['price'];
+                } else {
+                    $indirim = 0;
+                }
             }
+
             $price     = $product->product->price * $product->adet * $product->lisans_ay;
             $dis_price = self::price_set($product, $indirim);
             $veri      .= '<tr class="sepet_row" id="sapet_row_' . $product->id . '">
                             <td>' . $product->product->product_name . '</td>
-                            <td>
-                            <input size="3" style="width: 70px; margin: 0; padding:2px;" onchange="sepet_adet_guncelle(' . $product->id . ')" onkeyup="sepet_adet_guncelle(' . $product->id . ')"
-                             id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/> 
-                            </td>
+                            <td>';
+            if ($product->product_id == 1282) {
+                $veri .= 1;
+            } else {
+                $veri .= '<input size="3" style="width: 70px; margin: 0; padding:2px;" onchange="sepet_adet_guncelle(' . $product->id . ')" onkeyup="sepet_adet_guncelle(' . $product->id . ')"
+                             id="sepet_adet_' . $product->id . '" value="' . $product->adet . '"/>';
+            }
+            $veri .= '</td>
                              <td>';
             if ($price > $dis_price) {
                 $veri          .= '<span  id="product_dis_' . $product->id . '"><strike style="color: #be3946; font-size: 9pt;">' . round($price, 2) . '</strike>   ' . self::discount($price, $dis_price) . '</span>';
@@ -456,9 +632,11 @@ class AcrSepetController extends Controller
                 $query->with('product');
             }
         ])->first();
-        foreach ($sepet->products as $product) {
-            if ($product->adet < $product->product->min_adet) {
-                return redirect()->to('/acr/ftr/card/sepet')->with('msg', '<div style="text-align: center; margin-right: auto; margin-left: auto;" class="alert alert-danger">' . $product->product->product_name . ' ürününü en az ' . $product->product->min_adet . ' adet sipariş verebilirsiniz. </div>');
+        if (!empty($sepet->products)) {
+            foreach ($sepet->products as $product) {
+                if ($product->adet < $product->product->min_adet) {
+                    return redirect()->to('/acr/ftr/card/sepet')->with('msg', '<div style="text-align: center; margin-right: auto; margin-left: auto;" class="alert alert-danger">' . $product->product->product_name . ' ürününü en az ' . $product->product->min_adet . ' adet sipariş verebilirsiniz. </div>');
+                }
             }
         }
         $sepet_nav   = self::sepet_nav($order_id, 2);
@@ -529,9 +707,12 @@ class AcrSepetController extends Controller
 
     function sepet_total_price($sepet_id = null, Request $request)
     {
-        $sepet_id      = empty($sepet_id) ? $request->sepet_id : $sepet_id;
-        $ps_model      = new Product_sepet();
-        $product       = $ps_model->where('id', $sepet_id)->with('product')->first();
+        $sepet_id = empty($sepet_id) ? $request->sepet_id : $sepet_id;
+        $ps_model = new Product_sepet();
+        $product  = $ps_model->where('id', $sepet_id)->with('product')->first();
+        if ($product->id != 1282) {
+            return $product->price;
+        }
         $price         = self::price_set($product);
         $not_dis_price = $product->product->price * $product->adet * $product->lisans_ay;
         $dis_rate      = self::dis_rate($not_dis_price, $price);
@@ -571,7 +752,11 @@ class AcrSepetController extends Controller
         $products    = $ps_model->where('sepet_id', $productData->sepet_id)->with('product')->get();
         $price       = [];
         foreach ($products as $product) {
-            $price[] = self::price_set($product, $indirim);;
+            if ($product->product_id != 1282) {
+                $price[] = self::price_set($product, $indirim);
+            } else {
+                $price[] = $product->price;
+            }
         }
         $prices = array_sum($price);
         $prices = round($prices, 2);
@@ -784,7 +969,7 @@ class AcrSepetController extends Controller
         $row        .= '</div>';
         $row        .= '<div class="form-group">';
         $row        .= '<label>T.C. Kimlik No (11 Hane olmalıdır.) </label>';
-        $row        .= '<input  type="number"  required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranızı " value="' . @$adress->tc . '">';
+        $row        .= '<input  type="number" maxlength="11"  size="11" required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranızı " value="' . @$adress->tc . '">';
         $row        .= '</div>';
         // citys
         $row .= '<div class="form-group">';
