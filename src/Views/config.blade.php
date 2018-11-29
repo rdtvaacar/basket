@@ -94,15 +94,15 @@
                             <?php echo csrf_field() ?>
                             <div class="form-group with-border">
                                 <label>SetApiKey</label>
-                                <input class="form-control" name="setApiKey" value="{{@$iyzico->setApiKey}}"/>
+                                <input class="form-control" name="setApiKey" value="{{--{{@$iyzico->setApiKey}}--}}"/>
                             </div>
                             <div class="form-group with-border">
                                 <label>SetSecretKey</label>
-                                <input class="form-control" name="setSecretKey" value="{{@$iyzico->setSecretKey}}"/>
+                                <input class="form-control" name="setSecretKey" value="{{--{{@$iyzico->setSecretKey}}--}}"/>
                             </div>
                             <div class="form-group with-border">
                                 <label>SetBaseUrl</label>
-                                <input class="form-control" name="setBaseUrl" value="{{@$iyzico->setBaseUrl}}"/>
+                                <input class="form-control" name="setBaseUrl" value="{{--{{@$iyzico->setBaseUrl}}--}}"/>
                             </div>
                             <div class="form-group with-border">
                                 <label>SetCallbackUrl</label>
@@ -160,14 +160,14 @@
                             <?php echo csrf_field() ?>
                             <div class="form-group with-border">
                                 <label>Client ID</label>
-                                <input class="form-control" name="client_id" value="{{@$parasut_conf->client_id}}"/>
+                                <input class="form-control" name="client_id" value="{{--{{@$parasut_conf->client_id}}--}}"/>
                             </div>
                             <div class="form-group with-border">
                                 <label>Client Secret</label>
                                 <input class="form-control" name="client_secret"
-                                       value="{{@$parasut_conf->client_secret}}"/>
+                                       value={{--"{{@$parasut_conf->client_secret}}--}}"/>
                             </div>
-                            <div class="form-group with-border">
+                            <div class=" form-group with-border">
                                 <label>Üyelik Numarsı (Company ID)</label>
                                 <input class="form-control" type="number" name="company_id"
                                        value="{{@$parasut_conf->company_id}}"/>
@@ -175,14 +175,14 @@
                             <div class="form-group with-border">
                                 <label>Email</label>
                                 <input class="form-control" type="email" name="username"
-                                       value="{{@$parasut_conf->username}}"/>
+                                       value="{{--{{@$parasut_conf->username}}--}}"/>
                             </div>
                             <div class="form-group with-border">
                                 <label>Şifre</label>
                                 <input class="form-control" type="password" name="password"
-                                       value="{{@$parasut_conf->password}}"/>
+                                       value="{{--{{@$parasut_conf->password}}--}}"/>
                             </div>
-                            <input name="id" type="hidden" value="{{@$parasut_conf->id}}"/>
+                            <input name="id" type="hidden" value="{{--{{@$parasut_conf->id}}--}}"/>
                             <button class="btn btn-primary"> KAYDET</button>
                         </form>
                     </div>
