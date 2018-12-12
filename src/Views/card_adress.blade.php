@@ -43,8 +43,8 @@
                                                    value="<?php echo $adress->id ?>" class="flat-red"
                                                    <?php echo $checked ?> style="position: absolute; opacity: 0;"></div>
                                         <div style="float: left; width: 90%; margin-left: 20px;">
-                                            <div style="font-size: 14pt; "><?php echo $adress->name ?> - <span
-                                                        style="font-weight: 200;"><?php echo $adress->county->name . '/' . $adress->city->name ?></span>
+                                            <div style="font-size: 14pt; ">{{ $adress->name}}- <span
+                                                        style="font-weight: 200;">{{$adress->county->name . '/' . $adress->city->name }}</span>
                                             </div>
                                         </div>
                                     </label>

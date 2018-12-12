@@ -165,7 +165,7 @@
                             <div class="form-group with-border">
                                 <label>Client Secret</label>
                                 <input class="form-control" name="client_secret"
-                                       value="{{--{{@$parasut_conf->client_secret}}--}}"/>
+                                       value={{--"{{@$parasut_conf->client_secret}}--}}"/>
                             </div>
                             <div class=" form-group with-border">
                                 <label>Üyelik Numarsı (Company ID)</label>
