@@ -1,6 +1,4 @@
-#  LARAVEL - ACR FİLE -- FİLE UPLOAD CLASS
-
-[Query-File-Upload](https://github.com/blueimp/jQuery-File-Upload): Paketi refarans alarak oluşturulmuştur.
+#  LARAVEL - ACR BASKET
 
 ## Kurulum:
 #### composer json : 
