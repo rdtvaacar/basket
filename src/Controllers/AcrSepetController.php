@@ -130,9 +130,10 @@ class AcrSepetController extends Controller
                 break;
         }
         $kat_sayi   = 1.359;
+        $data_fiyat = self::price_set_lisans($lisans, 0, 1, 1) * $adet * $ay;
         $sum_fiyat  = array_sum($fiyat) * $adet * $ay * $kat_sayi + $fiyat_usb;
         $fiyat      = round($sum_fiyat + $lisans_fiyat, 2);
-        $dis_rate   = round($this->dis_rate(($lisans->price * $adet * $ay) + $sum_fiyat, $fiyat), 2);
+        $dis_rate   = round($this->dis_rate(($data_fiyat) + $sum_fiyat, $fiyat), 2);
         $indirimsiz = round($fiyat * (1 + $dis_rate), 2);
         $dis_rate   = '%' . $dis_rate * 100;
         $kisi_basi  = round($fiyat / $adet, 2);
@@ -402,29 +403,22 @@ class AcrSepetController extends Controller
 
     function price_set_lisans($product, $indirim = 0, $adet_data = null, $ay_data = null)
     {
-        $price_not_dis = $product->price * $adet_data * $ay_data;
-        if ($price_not_dis == 0) {
-            $price_not_dis = 1;
-        }
-        $priceData     = empty($product->dis_price) ? $product->price : $product->dis_price;
-        $price         = $priceData * $adet_data * $ay_data;
-        $adet_kat_sayi = $adet_data > 1 ? pow($adet_data, $product->dis_person) : 0;
-        $ay_kat_sayi   = $ay_data > 1 ? pow($ay_data, $product->dis_moon) : 0;
-        $kat_sayi      = 1 - (($adet_kat_sayi + $ay_kat_sayi) / 100);
-        $dis_price     = $price * $kat_sayi;
-        if ((($dis_price / $price_not_dis) - ((100 - $product->max_dis) / 100)) < 0) {
-            if (((100 - $product->max_dis) / 100) > 0) {
-                $price = ((100 - $product->max_dis) / 100) * $price_not_dis;
-            } else {
-                $price = $dis_price;
-            }
+        $priceData = empty($product->dis_price) ? $product->price : $product->dis_price;
+        $price     = $priceData * $adet_data * $ay_data;
+        $org_price = $price;
+        $discount  = $this->dis_rate($product->price, $product->dis_price);
+        $kat       = (100 - (100 * $discount)) / 100;
+        $ay_kat    = $kat - $ay_data / 20;
+        $adet_kat  = $kat - $adet_data / 20;
+        $price     = $price * $ay_kat * $adet_kat;
+
+        if (100 - ($price / $org_price * 100) >= $product->max_dis) {
+            $org_price = $product->max_dis / 240 * $org_price;
         } else {
-            $price = $dis_price;
+            $org_price = $price;
         }
-        if ($ay_data == 1 && $adet_data == 1) {
-            $price = $product->price;
-        }
-        return $price - $indirim;
+        return $org_price - $indirim;
+
     }
 
     function price_set($product, $indirim = 0, $adet = null, $ay = null)
