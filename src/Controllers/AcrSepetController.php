@@ -704,10 +704,10 @@ class AcrSepetController extends Controller
         $sepet_id = empty($sepet_id) ? $request->sepet_id : $sepet_id;
         $ps_model = new Product_sepet();
         $product  = $ps_model->where('id', $sepet_id)->with('product')->first();
-        if ($product->id != 1282) {
-            return $product->price;
-        }
         $price         = self::price_set($product);
+        if ($product->id != 1282) {
+           return round($price,2);
+        }
         $not_dis_price = $product->product->price * $product->adet * $product->lisans_ay;
         $dis_rate      = self::dis_rate($not_dis_price, $price);
         if ($product->dis_rate != $dis_rate) {
