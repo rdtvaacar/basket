@@ -4,13 +4,12 @@ namespace Acr\Ftr\Controllers;
 
 use Acr\Ftr\Model\Acr_user_table_conf;
 use Acr\Ftr\Model\AcrFtrAdress;
-use Acr\Ftr\Model\Sepet;
-use Auth;
-use App\Http\Controllers\MarketController;
-use App\Siparis;
-use DB;
 use Acr\Ftr\Model\AcrFtrIyzico;
-use Request;
+use Acr\Ftr\Model\Sepet;
+use App\Siparis;
+use Auth;
+use DB;
+use Illuminate\Http\Request;
 
 class iyzicoController extends Controller
 {
@@ -60,6 +59,7 @@ class iyzicoController extends Controller
 
     function odemeFormIc($price = null, $paidPrice = null, $basketId = null)
     {
+        $req                         = new Request();
         $acr_user_table_config_model = new Acr_user_table_conf();
         $acr_user_table_config       = $acr_user_table_config_model->first();
         $iyzico_model                = new AcrFtrIyzico();
@@ -89,12 +89,12 @@ class iyzicoController extends Controller
         $buyer->setName($ad);
         $buyer->setSurname($ad);
         $buyer->setGsmNumber(Auth::user()->tel);
-        $buyer->setEmail(Auth::user()->$email);
+        $buyer->setEmail(trim(Auth::user()->$email));
         $buyer->setIdentityNumber(rand(10000000000, 99999999999));
         $buyer->setLastLoginDate(date('Y-m-d H:i:s', strtotime(Auth::user()->updated_at)));
         $buyer->setRegistrationDate(date('Y-m-d H:i:s', strtotime(Auth::user()->created_at)));
         $buyer->setRegistrationAddress($adres);
-        $buyer->setIp(Request::ip());
+        $buyer->setIp($req->ip());
         $buyer->setCity($sehir);
         $buyer->setCountry("Turkey");
         $buyer->setZipCode($adresses->post_code);
@@ -122,7 +122,6 @@ class iyzicoController extends Controller
         $firstBasketItem->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
         $firstBasketItem->setPrice("1");
         $basketItems[0] = $firstBasketItem;
-
         $request->setBasketItems($basketItems);
 # make request
         $checkoutFormInitialize = \Iyzipay\Model\CheckoutFormInitialize::create($request, Self::option());
@@ -130,10 +129,10 @@ class iyzicoController extends Controller
         print_r($checkoutFormInitialize->getCheckoutFormContent());
     }
 
-    function order_result(\Illuminate\Http\Request $request)
+    function order_result(Request $req)
     {
         $sepet_model = new Sepet();
-        $token       = $request->token;
+        $token       = $req->token;
         $request     = new \Iyzipay\Request\RetrieveCheckoutFormRequest();
         $request->setLocale(\Iyzipay\Model\Locale::TR);
         $request->setConversationId("123456789");
@@ -141,11 +140,14 @@ class iyzicoController extends Controller
         # make request
         $checkoutForm = \Iyzipay\Model\CheckoutForm::retrieve($request, Self::option());
         # print result
-        $siparis = $sepet_model->where('id', $checkoutForm->getBasketId())->first();
+        $sepet_id = $checkoutForm->getBasketId();
+        $siparis  = $sepet_model->where('id', $sepet_id)
+            ->first();
         if ($checkoutForm->getStatus() == "success" && $checkoutForm->getPaymentStatus() == "SUCCESS" && $siparis->siparis_onay != 1) {
-            $sepet_model->where('id', $checkoutForm->getBasketId())->update(['order_result' => 2]);
+            $sepet_model->where('id', $sepet_id)->update(['order_result' => 2]);
+
             $sepetController = new AcrSepetController();
-            return $sepetController->orders_active(null, $checkoutForm->getBasketId());
+            return $sepetController->orders_active($req, $sepet_id);
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Acr\Ftr\Model;
 
-use Illuminate\Database\Eloquent\Model;
 use Auth;
 use DB;
+use Illuminate\Database\Eloquent\Model;
 
 
 class Sepet extends Model
@@ -23,8 +23,23 @@ class Sepet extends Model
         return $this->belongsTo('App\user');
     }
 
-    function create($session_id = null, $product_id)
+    function create($session_id = null, $product_id, $data = null, $data_notes = null, $sepet_data = null)
     {
+
+        if ($product_id == 1282) {
+            if (Auth::check()) {
+                $sepet_id = Sepet::where('siparis', 0)->where('user_id', Auth::user()->id)->first();
+                if (!empty($sepet_id)) {
+                    Product_sepet::where('product_id', 1282)->where('user_id', Auth::user()->id)->where('sepet_id', $sepet_id)->delete();
+                }
+            } else {
+                $sepet_id = Sepet::where('siparis', 0)->where('session_id', $session_id)->first();
+                if (!empty($sepet_id)) {
+                    Product_sepet::where('product_id', 1282)->where('user_id', Auth::user()->id)->where('sepet_id', $sepet_id)->delete();
+                }
+
+            }
+        }
         $sepet_id      = self::product_sepet_id($session_id);
         $product_model = new Product();
         $product       = $product_model->where('id', $product_id)->first();
@@ -35,20 +50,41 @@ class Sepet extends Model
                 $sepet_id = Sepet::insertGetId(['session_id' => $session_id]);
             }
         }
-        if (Auth::check()) {
-            Product_sepet::insert(['product_id' => $product_id, 'user_id' => Auth::user()->id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
-
-        } else {
-            Product_sepet::insert(['product_id' => $product_id, 'sepet_id' => $sepet_id, 'type' => $product->type]);
+        if (!empty($sepet_data)) {
+            Sepet::where('id', $sepet_id)->update($sepet_data);
         }
-        return response()->json(['status' => 1, 'title' => 'Bilgi', 'msg' => 'Ürün başarıyla sepete eklendi.', 'data' => $sepet_id]);
+        if (Auth::check()) {
+            $data_1     = [
+                'product_id' => $product_id,
+                'user_id'    => Auth::user()->id,
+                'sepet_id'   => $sepet_id,
+                'type'       => $product->type
+            ];
+            $data_merge = array_merge($data_1, $data);
+        } else {
+            $data_1     = [
+                'product_id' => $product_id,
+                'sepet_id'   => $sepet_id,
+                'type'       => $product->type
+            ];
+            $data_merge = array_merge($data_1, $data);
+        }
+        $ps_id = Product_sepet::insert($data_merge);
+        if (!empty($data_notes)) {
+            $data_notes = array_merge($data_notes[0], ['sepet_id' => $sepet_id]);
+            $ps_notes   = new Product_sepet_notes();
+            $ps_notes->where('product_id', $product_id)->where('sepet_id', $sepet_id)->delete();
+            $ps_notes->insert($data_notes);
+        }
+        return response()->json([
+            'status' => 1,
+            'title'  => 'Bilgi',
+            'msg'    => 'Ürün başarıyla sepete eklendi.',
+            'data'   => $sepet_id
+        ]);
 
     }
 
-    function product()
-    {
-        return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
-    }
 
     function Acrproducts()
     {
@@ -63,6 +99,16 @@ class Sepet extends Model
     function delete()
     {
 
+    }
+
+    function note()
+    {
+        return $this->hasOne('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');
+    }
+
+    function notes()
+    {
+        return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'id');
     }
 
     function sepet_birle($session_id)
@@ -124,5 +170,10 @@ class Sepet extends Model
     function price_update($sepet_id, $total_price)
     {
         Sepet::where('id', $sepet_id)->where('siparis', 0)->update(['price' => $total_price]);
+    }
+
+    function adress()
+    {
+        return $this->hasOne('Acr\Ftr\Model\AcrFtrAdress', 'user_id', 'user_id');
     }
 }

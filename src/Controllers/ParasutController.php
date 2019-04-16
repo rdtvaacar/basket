@@ -2,8 +2,8 @@
 
 namespace Acr\Ftr\Controllers;
 
-use Acr\Ftr\Model\Parasut_conf;
 use Acr\Ftr\Controllers\Parasut\Client;
+use Acr\Ftr\Model\Parasut_conf;
 use Illuminate\Http\Request;
 
 class ParasutController

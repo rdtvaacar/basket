@@ -19,7 +19,6 @@
                                 <form method="post" action="/acr/ftr/card/payment/havale_eft">
                                     <?php
                                     echo csrf_field();
-
                                     foreach ($banks as $bank) {
 
                                     ?>

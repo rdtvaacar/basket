@@ -15,7 +15,7 @@
                             <thead>
                             <tr>
                                 <th>Sipariş NO:</th>
-                                <th>Açıklama</th>
+                                <th>İsim</th>
                                 <th>Fiyat</th>
                                 <th>KDV</th>
                                 <th>TOPLAM</th>
@@ -33,17 +33,19 @@
                             foreach ($orders->items as $order) {
                             $order = (Object)$order;
                             ?>
-                            <tr id="{{$order->id}}">
-                                <td>{{$order->id}}</td>
-                                <td>{{$order->description}}<br>
-                                    {{$order->billing_phone}}</td>
+                            <tr>
+                                <td>{{$order->order_id}}</td>
+                                <td>{{$order->invoice_name}}<br>
+                                    {{$order->tel}}</td>
                                 <td>{{$toplam_fiyat[] = $order->gross_total}}</td>
                                 <td>{{$toplam_kdv[] = $order->total_vat}}</td>
                                 <td>{{$toplam_ciro[] = $order->total_paid}}</td>
                                 <td>{{$order->created_at}}</td>
                                 <td>{{$order->billing_address}}</td>
                                 <td>
-                                    <div onclick="invoice_delete({{$order->id}})" class="btn btn-warning btn-sm" title="Faturayı İptal Et">İPTL</div>
+                                    <div onclick="invoice_delete({{$order->id}})" class="btn btn-warning btn-sm"
+                                         title="Faturayı İptal Et">İPTL
+                                    </div>
                                 </td>
                             </tr>
                             <?php } ?>
@@ -67,11 +69,13 @@
         </div>
     </section>
 
-    <div class="modal fade" id="ftrModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;">
+    <div class="modal fade" id="ftrModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         style="display: none;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="/icon/close48.png"></span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true"><img src="/icon/close48.png"></span></button>
                     <h4 class="modal-title" id="myModalLabel">Yeni Fatura Ekle</h4>
                 </div>
                 <div id="menuModalIcerik" class="modal-body">
@@ -90,47 +94,48 @@
     <script src="/plugins/datatables/dataTables.bootstrap.min.js"></script>
     <script>
         $('#data_table').DataTable({
-            "paging"      : true,
+            "paging": true,
             "lengthChange": false,
-            "searching"   : true,
-            "ordering"    : true,
-            "info"        : true,
-            "autoWidth"   : true,
-            "language"    : {
-                "sProcessing" : "İşleniyor...",
-                "lengthMenu"  : "Sayfada _MENU_ satır gösteriliyor",
-                "zeroRecords" : "Gösterilecek sonuç yok.",
-                "info"        : "Toplam _PAGES_ sayfadan _PAGE_. sayfa gösteriliyor",
-                "infoEmpty"   : "Gösterilecek öğe yok",
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": true,
+            "language": {
+                "sProcessing": "İşleniyor...",
+                "lengthMenu": "Sayfada _MENU_ satır gösteriliyor",
+                "zeroRecords": "Gösterilecek sonuç yok.",
+                "info": "Toplam _PAGES_ sayfadan _PAGE_. sayfa gösteriliyor",
+                "infoEmpty": "Gösterilecek öğe yok",
                 "infoFiltered": "(filtered from _MAX_ total records)",
-                "search"      : "Arama yap",
-                "oPaginate"   : {
-                    "sFirst"   : "İlk",
+                "search": "Arama yap",
+                "oPaginate": {
+                    "sFirst": "İlk",
                     "sPrevious": "Önceki",
-                    "sNext"    : "Sonraki",
-                    "sLast"    : "Son"
+                    "sNext": "Sonraki",
+                    "sLast": "Son"
                 }
 
             }
         });
+
         function sepet_adet_guncelle(sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/sepet_adet_guncelle',
-                data   : 'sepet_id=' + sepet_id + '&adet=' + adet,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/sepet_adet_guncelle',
+                data: 'sepet_id=' + sepet_id + '&adet=' + adet,
                 success: function (veri) {
                     $('.sepet_count').html(veri);
                     $.ajax({
-                        type   : 'post',
-                        url    : '/acr/ftr/product/sepet/sepet_total_price',
-                        data   : 'sepet_id=' + sepet_id,
+                        type: 'post',
+                        url: '/acr/ftr/product/sepet/sepet_total_price',
+                        data: 'sepet_id=' + sepet_id,
                         success: function (msg) {
                             $('#product_price_' + sepet_id).html(msg + '₺');
                             $.ajax({
-                                type   : 'post',
-                                url    : '/acr/ftr/product/sepet/product_sepet_total_price',
-                                data   : 'sepet_id=' + sepet_id,
+                                type: 'post',
+                                url: '/acr/ftr/product/sepet/product_sepet_total_price',
+                                data: 'sepet_id=' + sepet_id,
                                 success: function (msg) {
                                     $('#acr_sepet_total_price').html(msg + '₺');
                                     $('#product_dis_' + sepet_id).hide();
@@ -143,24 +148,25 @@
                 }
             });
         }
+
         function sepet_lisans_ay_guncelle(sepet_id) {
 
             var lisans_ay = $('#sepet_lisans_ay_' + sepet_id).val();
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/product/sepet/sepet_lisans_ay_guncelle',
-                data   : 'sepet_id=' + sepet_id + '&lisans_ay=' + lisans_ay,
+                type: 'post',
+                url: '/acr/ftr/product/sepet/sepet_lisans_ay_guncelle',
+                data: 'sepet_id=' + sepet_id + '&lisans_ay=' + lisans_ay,
                 success: function () {
                     $.ajax({
-                        type   : 'post',
-                        url    : '/acr/ftr/product/sepet/sepet_total_price',
-                        data   : 'sepet_id=' + sepet_id,
+                        type: 'post',
+                        url: '/acr/ftr/product/sepet/sepet_total_price',
+                        data: 'sepet_id=' + sepet_id,
                         success: function (msg) {
                             $('#product_price_' + sepet_id).html(msg + '₺');
                             $.ajax({
-                                type   : 'post',
-                                url    : '/acr/ftr/product/sepet/product_sepet_total_price',
-                                data   : 'sepet_id=' + sepet_id,
+                                type: 'post',
+                                url: '/acr/ftr/product/sepet/product_sepet_total_price',
+                                data: 'sepet_id=' + sepet_id,
                                 success: function (msg) {
                                     $('#acr_sepet_total_price').html(msg + '₺');
                                     $('#product_dis_' + sepet_id).hide();
@@ -171,6 +177,7 @@
                 }
             });
         }
+
         function ftrModal() {
             $('#ftrModal').modal('show');
         }
@@ -178,9 +185,9 @@
         function invoice_delete(id) {
             if (confirm('Silmek istediğinizden emin misiniz.') == true) {
                 $.ajax({
-                    type   : 'delete',
-                    url    : '/acr/ftr/admin/sales_invoices',
-                    data   : 'id=' + id,
+                    type: 'delete',
+                    url: '/acr/ftr/admin/sales_invoices',
+                    data: 'id=' + id,
                     success: function () {
                         $('#' + id).fadeOut(400);
                     }

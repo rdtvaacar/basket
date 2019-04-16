@@ -1,8 +1,25 @@
 @extends('acr_ftr.index')
+@section('title')
+    <title>{{$product->product_name}}</title>
+@stop
 @section('header')
+    <link rel="canonical" href="{{$web}}?product_id={{$product->id}}"/>
     <style>
-        .kisiKarti ul {
+        .scroll::-webkit-scrollbar {
+            width: 5px;
+        }
 
+        .scroll::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        .scroll::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .kisiKarti ul {
             margin: 0;
             padding: 0;
             float: left;
@@ -31,15 +48,12 @@
 
         .stun {
             border-bottom: rgba(39, 41, 47, 1) 1px dotted;
-
         }
 
         .stun_1 {
-
         }
 
         .stun_2 {
-
         }
 
         .price-table .col-md-2, .price-table .col-md-4, .price-table .col-md-6 {
@@ -225,22 +239,13 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/blueimp/css/blueimp-gallery.min.css">
 @stop
 @section('acr_ftr')
     <section class="content">
         <div class="row">
+            {!! $msg !!}
             <div class=" col-md-12">
-                <form action="/acr/ftr/product" method="post"></form>
-                <select class="form-control" id="kat_1" style="float: left; width:280px;">
-                    <option value="all_categories">Kategoriler</option>
-                    @foreach($p_kats as $kat)
-                        <option value="{{$kat->id}}"><b>{{@$kat->kat_isim}}</b></option>
-                    @endforeach
-                </select>
-                <div id="categories_1"></div>
-                <div id="categories_2"></div>
-                <div id="categories_3"></div>
-
                 <div onmouseenter="sepet_goster()" onmouseleave="sepet_gizle()" style="position:relative; float: right">
                     <a href="/acr/ftr/card/sepet" style="float: right;" class="btn btn-app">
                         <span class="badge bg-teal sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>
@@ -273,85 +278,173 @@
                         </div>
                     </div>
                 </div>
-                <div style="float: right">
-                    <div class="input-group">
-                        <input placeholder="Arama..." id="search_product"/>
-                    </div>
-                </div>
-                <div style="clear:both;"></div>
-                <div class="box">
-                    <div class="box-header with-border">ÜRÜNLER</div>
-                    <div class="box-body">
-                        <div class="paginate" style="text-align: center">{{$products->links()}}</div>
-                        <div class="price-table">
-                            {!! $products_table !!}
+            </div>
+            <div style="clear:both;"></div>
+
+            <div class=" col-md-5">
+                <form method="post" action="/acr/ftr/product/sepet/ekle">
+                    {{csrf_field()}}
+                    <div class="box box-primary">
+                        <div class="box-header">
+                            <strong>{{$product->product_name}}</strong>
+                            <hr>
                         </div>
-                        <div class="paginate" style="text-align: center">{{$products->links()}}</div>
+                        <div class="box-body">
+                            <div class="text-green" style="font-size: 3em; text-align: center"><strong>{{$product->price}}₺</strong></div>
+                            <hr>
+                            @if(count($product->product_yakas)>0)
+                                <label>Yaka Seçiniz</label>
+                                <select required class="form-control" name="yaka_id">
+                                    <option value="">SEÇİNİZ</option>
+                                    @foreach($product->product_yakas as $yaka)
+                                        <option {{@$ps->yaka_id==$yaka->yaka->id?'selected':''}} value="{{$yaka->yaka->id}}">{{$yaka->yaka->name}}</option>
+                                    @endforeach
+                                </select>
+                                <hr>
+                            @endif
+                            @if(count($product->product_sizes)>0)
+                                <label>Beden Seçiniz</label>
+                                <select required class="form-control" name="size_id">
+                                    <option value="">SEÇİNİZ</option>
+                                    @foreach($product->product_sizes as $size)
+                                        <option {{@$ps->size_id==$size->size->id?'selected':''}} value="{{$size->size->id}}">{{$size->size->name}}</option>
+                                    @endforeach
+                                </select>
+                                <hr>
+                            @endif
+                            @if(count($product->product_kols)>0)
+                                <label>Kol Boyu Seçiniz</label>
+                                <select required class="form-control" name="kol_id">
+                                    <option value="">SEÇİNİZ</option>
+                                    @foreach($product->product_kols as $kol)
+                                        <option {{@$ps->kol_id==$kol->kol->id?'selected':''}} value="{{$kol->kol->id}}">{{$kol->kol->name}}</option>
+                                    @endforeach
+                                </select>
+                                <hr>
+                            @endif
+                            @if(count($product->product_notes)>0)
+                                @foreach($product->product_notes as $note)
+                                    <div></div> <label>{{$note->name}}</label>
+                                    <input required class="form-control" name="notes[]">
+                                    <input type="hidden" value="{{$note->id}}" name="note_ids[]">
+                                    <hr>
+                                @endforeach
+                            @endif
+                            <button type="submit" style="float: right" class="btn bg-orange btn-lg btn-block">SEPETE EKLE</button>
+                            <input type="hidden" name="product_id" value="{{$product->id}}">
+                            <input type="hidden" name="tavsiye_adet" value="{{$product->tavsiye_adet}}">
+                            <input type="hidden" name="tavsiye_ay" value="{{$product->tavsiye_ay}}">
+                        </div>
+                        <div class="box-footer">
+                            <a class="text-yellow" href="/acr/ftr/card/sepet">Sepete Git (<span class="text-aqua sepet_count" style="font-size: 12pt;"><?php echo $sepet_count ?></span>)</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class=" col-md-7">
+                <div class="box box-primary">
+                    <div class="box-body">
+                        <div class=" col-md-10">
+                            <div id="product_img">
+                                @if(!empty($product->file))
+                                    <img width="100%" class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$product->file->acr_file_id}}/medium/{{$product->file->file_name}}.{{$product->file->file_type}}"
+                                         alt="{{$product->file->file_name_org}}"/>
+                                    @if(count($product->files)>1)
+                                        <img style="position: absolute; right: 20px; top: 80px; z-index: 999;  cursor:pointer;" onclick="next_image()" src="/icon/right-arrow.png"/>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                        <div class=" col-md-2">
+                            <div style="overflow: auto; height:700px;" class="scroll">
+                                <?php $file_ids[] = ''; ?>
+                                @foreach($product->files as $file)
+                                    <?php $file_ids[] = $file->id ?>
+                                    <div onclick="product_image({{$product->id}},{{$file->id}})" style="float: left; cursor:pointer;">
+                                        <img class="img-thumbnail" src="//eticaret.webuldum.com/acr_files/{{$file->acr_file_id}}/thumbnail/{{$file->file_name}}.{{$file->file_type}}" alt="{{$file->org_file_name}}"/>
+                                    </div>
+                                @endforeach
+                                <?php if (count($file_ids) > 1) {
+                                    $next_id = $file_ids[1];
+                                } else {
+                                    $next_id = 0;
+                                }?>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="sepetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div id="sepetAciklama"></div>
+            <div class=" col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3><strong>Ürün Özellikleri</strong></h3>
                     </div>
-                </div>
-            </div>
-            <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div style="text-align: center;" id="imageModal_div"></div>
+                    <div class="box-body">
+                        @foreach($product->attributes as $attribute)
+                            <div style="text-indent: 20px; padding-top: 10px;">
+                                <strong>{{$attribute->att_name}}</strong>
+                            </div>
+                            <div style="text-indent: 20px; padding: 10px; border-bottom: 1px solid #d6dadf" class="text-muted">
+                                {!! $attribute->att_text !!}
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    @if(!empty($product->uyari))
+        <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="/icon/close.png"></span></button>
+                        <h4 class="modal-title"><span class="text-red"><b>UYARI!!!</b></span></h4>
+                    </div>
+                    <div class="modal-body">
+                        {{$product->uyari}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">KAPAT</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    @endif
 @stop
 @section('footer')
+    <script src="/blueimp/js/blueimp-gallery.min.js"></script>
     <script>
-        $('#search_product').keypress(function () {
-            var search = $(this).val();
-            var len = search.length;
-            if (len > 2) {
-                $.ajax({
-                    type: 'post',
-                    url: '/acr/ftr/product/ara',
-                    data: 'search=' + search,
-                    success: function (veri) {
-                        $('.price-table').html(veri);
-                        $('.paginate').hide();
+        @if(!empty($product->uyari))
+        $(document).ready(function () {
+            $('#myModal').modal('show')
+        })
+        @endif
+        document.getElementById('links').onclick = function (event) {
+            event = event || window.event;
+            var target = event.target || event.srcElement,
+                link = target.src ? target.parentNode : target,
+                options = { index: link, event: event },
+                links = this.getElementsByTagName('a');
+            blueimp.Gallery(links, options);
+        };
 
-
-                    }
-                });
-            }
-        });
-        $('#kat_1').change(function () {
-            var kat_id = $(this).val();
-            categories(1, kat_id);
-        });
-
-        function categories(kat, kat_id) {
+        function product_image (product_id, img_id) {
             $.ajax({
                 type: 'post',
-                url: '/acr/ftr/product/categories',
-                data: 'kat_id=' + kat_id + '&kat=' + kat,
+                url: '/acr/ftr/product/img',
+                data: 'img_id=' + img_id + '&product_id=' + product_id,
                 success: function (veri) {
-                    if (kat_id == "all_categories") {
-                        $('#categories_' + kat).hide();
-                        $('.all_categories').fadeIn()
-                    } else {
-                        $('.all_categories').fadeOut();
-                        $('.kat_' + kat_id).fadeIn();
-                        $('#categories_' + kat).show();
-                        $('#categories_' + kat).html(veri)
-                    }
-
+                    $('#product_img').html(veri);
                 }
             });
         }
 
-        function urunGoster(att_id, product_id) {
+        function next_image () {
+            product_image({{$product->id}},{{$next_id}})
+        }
+
+        function urunGoster (att_id, product_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/attribute/modal',
@@ -364,7 +457,7 @@
             });
         }
 
-        function sepete_ekle(product_id) {
+        function sepete_ekle (product_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/create',
@@ -376,7 +469,7 @@
             });
         }
 
-        function sepet_goster() {
+        function sepet_goster () {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/products',
@@ -388,11 +481,11 @@
             });
         }
 
-        function sepet_gizle() {
+        function sepet_gizle () {
             $('#sepet_row').hide();
         }
 
-        function sepet_adet_guncelle(sepet_id) {
+        function sepet_adet_guncelle (sepet_id) {
             var adet = $('#sepet_adet_' + sepet_id).val();
             $.ajax({
                 type: 'post',
@@ -413,17 +506,15 @@
                                 success: function (msg) {
                                     $('#acr_sepet_total_price').html(msg + '₺');
                                     $('#product_dis_' + sepet_id).hide();
-
                                 }
                             });
                         }
                     });
-
                 }
             });
         }
 
-        function sepet_delete(sepet_id) {
+        function sepet_delete (sepet_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/delete',
@@ -435,7 +526,7 @@
             });
         }
 
-        function image_viewer(product_id, image_id) {
+        function image_viewer (product_id, image_id) {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/image/modal',
@@ -447,7 +538,7 @@
             });
         }
 
-        function sepet_delete_all() {
+        function sepet_delete_all () {
             $.ajax({
                 type: 'post',
                 url: '/acr/ftr/product/sepet/delete_all',

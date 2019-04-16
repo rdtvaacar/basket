@@ -19,7 +19,8 @@
                 <div class="box box-warning">
                     <div class="box-header with-border">
                         <h2 class="page-header">
-                            <i class="fa fa-globe"></i> SİPARİŞ NUMARANIZ : <span class="text-red"><b><?php echo $siparis_id = empty($siparis->id) ? 0 : $siparis->id; ?></b></span>
+                            <i class="fa fa-globe"></i> SİPARİŞ NUMARANIZ : <span
+                                    class="text-red"><b><?php echo $siparis_id = empty($siparis->id) ? 0 : $siparis->id; ?></b></span>
                             <small class="pull-right">Tarih: {{date('d/m/Y',strtotime($siparis->updated_at))}}</small>
                         </h2>
                     </div>
@@ -28,28 +29,29 @@
                             <div class="col-sm-5 invoice-col">
                                 Satıcı
                                 <address>
-                                    <strong>{{$company->name}}</strong><br>
-                                    {{$company->adress}}<br>
-                                    {{$company->county}} / {{$company->city}}<br>
-                                    Phone: {{$company->tel}}<br>
-                                    Email: {{$company->email}}
+                                    <strong>{{@$company->name}}</strong><br>
+                                    {{@$company->adress}}<br>
+                                    {{@$company->county}} / {{$company->city}}<br>
+                                    Phone: {{@$company->tel}}<br>
+                                    Email: {{@$company->email}}
                                 </address>
                             </div>
                             <!-- /.col -->
                             <div class="col-sm-5 invoice-col">
                                 Alıcı
                                 <address>
-                                    <strong>{{$user_adress->type ==2 ? $user_adress->company:$user_adress->invoice_name}}</strong><br>
-                                    {{$user_adress->adress}}<br>
-                                    {{$user_adress->county->name}} / {{$user_adress->city->name}}<br>
-                                    Telefon: {{$user_adress->tel}}<br>
+                                    <strong>{{@$user_adress->type ==2 ? @$user_adress->company:@$user_adress->invoice_name}}</strong><br>
+                                    {{@$user_adress->adress}}<br>
+                                    {{@$user_adress->county->name}} / {{@$user_adress->city->name}}<br>
+                                    Telefon: {{@$user_adress->tel}}<br>
                                     Email: {{Auth::user()->email}}
                                 </address>
                             </div>
                             <!-- /.col -->
                             <div class="col-sm-2 invoice-col">
 
-                                <b>Sipariş NO:</b> <?php echo $siparis_id = empty($siparis->id) ? 0 : $siparis->id; ?><br>
+                                <b>Sipariş NO:</b> <?php echo $siparis_id = empty($siparis->id) ? 0 : $siparis->id; ?>
+                                <br>
                                 <b>Tarih:</b> {{date('d/m/Y',strtotime($siparis->updated_at))}}<br>
                                 <b>Hesap ID'niz:</b> {{Auth::user()->id}}
                             </div>
@@ -70,37 +72,54 @@
                                         <th>Ay</th>
                                         <th>Birim Fiyatı</th>
                                         <th>İndirim Oranı</th>
-                                        <th>KDV</th>
                                         <th>Fiyat</th>
+                                        <th>KDV</th>
                                         <th>Toplam</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($ps as $key=> $pss)
                                         <?php
-                                        $toplam = $sepetController->price_set($pss);
-                                        $tKdv = $toplam * $pss->product->kdv / 100;
-                                        $toplamKdv[] = $tKdv;
-                                        $araToplam[] = $toplam - $tKdv;
+                                        if (in_array($pss->product_id, $promo_user_ids) && $promo_user[$pss->product_id]['min_ay'] <= $pss->lisans_ay && $promo_user[$pss->product_id]['min_adet'] <= $pss->adet) {
+                                            $indirim = $promo_user[$pss->product_id]['price'];
+                                        } else {
+                                            $indirim = 0;
+                                        }
+                                        $toplam = $sepetController->price_set($pss, $indirim);
+                                        $fiyat = $toplam * 100 / ($pss->product->kdv + 100);
+                                        $toplamKdv[] = $toplam - $fiyat;
+                                        $araToplam[] = $fiyat;
 
                                         ?>
                                         <tr>
                                             <td>{{$key + 1}}</td>
                                             <td>{{$pss->product->product_name}}</td>
-                                            <td><span class="text-danger"><b>{{$u_kods[] = $pss->product->id}}</b></span></td>
+                                            <td>
+                                                <span class="text-danger"><b>{{$u_kods[] = $pss->product->id}}</b></span>
+                                            </td>
                                             <td>{{$pss->adet}}</td>
                                             <td>{{$pss->lisans_ay}}</td>
                                             <td>
-                                                <?php echo empty($pss->product->dis_price) || ($pss->adet == 1 && $pss->lisans_ay == 1) || $pss->product->dis_price == 0 || $pss->product->price == $pss->product->dis_price ? $pss->product->price :
-                                                    '<strike style="font-size: 10pt;">' . $pss->product->price . ' </strike> ' . $pss->product->dis_price ?>₺
+                                                <?php echo empty($pss->product->dis_price) || ($pss->adet == 1 && $pss->lisans_ay == 1) || $pss->product->dis_price == 0 || $pss->product->price == $pss->product->dis_price ? $pss->product->price : '<strike style="font-size: 10pt;">' . $pss->product->price . ' </strike> ' . $pss->product->dis_price ?>
+                                                ₺
                                             </td>
                                             <td>%{{round($pss->dis_rate,2) * 100}}</td>
-                                            <td><span style="font-size:8pt;" class="text-muted">%{{$pss->product->kdv}} </span>{{round($tKdv,2)}}₺</td>
-                                            <td>{{round($toplam - $tKdv,2)}}₺</td>
+                                            <td>
+                                                {{round($fiyat,2)}}
+                                                ₺
+                                            </td>
+                                            <td><span style="font-size:8pt;"
+                                                      class="text-muted">%{{$pss->product->kdv}} </span>{{round($toplam - $fiyat,2)}}
+                                                ₺
+                                            </td>
                                             <td>{{round($toplam,2)}}₺</td>
                                         </tr>
                                     @endforeach
-
+                                    @if($indirim>0)
+                                        <tr>
+                                            <td colspan="10"><span class="text-red">{{$indirim}}₺ değerindeki indirim promosyonunuz otomatik olarak tanımlandı.</span></td>
+                                        </tr>
+                                    @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -117,7 +136,8 @@
                             </div>
                             <!-- /.col -->
                             <div class="col-xs-6">
-                                <p class="lead">Toplam Alış-veriş Miktarı {{date('d/m/Y',strtotime($siparis->updated_at))}}</p>
+                                <p class="lead">Toplam Alış-veriş
+                                    Miktarı {{date('d/m/Y',strtotime($siparis->updated_at))}}</p>
 
                                 <div class="table-responsive">
                                     <table class="table">
@@ -134,7 +154,8 @@
                                             <th>Toplam:</th>
                                             <td>
                                                 {{-- <strike style="font-size: 10pt;">{{round(array_sum($araToplam) + array_sum($toplamKdv),2)}}</strike>--}}
-                                                <span style="font-size: 14pt;" class="text-red">{{round((array_sum($araToplam) + array_sum($toplamKdv)),2)}}₺</span>
+                                                <span style="font-size: 14pt;" class="text-red">{{round((array_sum($araToplam) + array_sum($toplamKdv)),2)}}
+                                                    ₺</span>
                                             </td>
                                         </tr>
                                         </tbody>

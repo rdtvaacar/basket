@@ -11,10 +11,10 @@
 
 namespace Acr\Ftr\Controllers\Parasut;
 
-use Acr\Ftr\Controllers\Parasut\Exception\InternalServerErrorException;
 use Acr\Ftr\Controllers\Parasut\Exception\NotFoundException;
 use Acr\Ftr\Controllers\Parasut\Exception\UnauthorizedException;
 use Acr\Ftr\Controllers\Parasut\Exception\UnprocessableEntityException;
+use Acr\Ftr\Controllers\Parasut\Exception\InternalServerErrorException;
 
 /**
  * Client
