@@ -25,12 +25,10 @@
                     <label for="name">Alıcı Adı Soyadı</label>
                     <input name="invoice_name" value="@if(!empty(old('invoice_name'))){{old('invoice_name')}}@else{{!empty($adress->invoice_name)?@$adress->invoice_name:@$user->name}}@endif" class="form-control"/>
                     <div style="clear:both;"></div>
-
                     <hr>
                     <label for="name">T.C. Kimlik No (Zorunlu Değil)</label>
                     <input name="tc" value="@if(!empty(old('tc'))){{old('tc')}}@else{{!empty($adress->tc)?@$adress->tc:@$user->TC}}@endif" class="form-control"/>
                     <div style="clear:both;"></div>
-
                     <hr>
                     <label for="adress">Adres</label>
                     <textarea class="form-control" name="adress">@if(!empty(old('adress'))){{old('adress')}}@else{{!empty($adress->adress)?@$adress->adress:''}}@endif</textarea>
@@ -47,7 +45,6 @@
 
                     </select>
                     <div style="clear:both;"></div>
-
                     <hr>
                     <label for="city_id">İlçe</label>
                     <div id="county">
@@ -56,7 +53,6 @@
                         </select>
                     </div>
                     <div style="clear:both;"></div>
-
                     <hr>
                     <label for="tel">Telefon</label>
                     <input name="tel" value="@if(!empty(old('tel'))){{old('tel')}}@else{{!empty($adress->tel)?@$adress->tel:@$user->tel}}@endif" class="form-control"/>
