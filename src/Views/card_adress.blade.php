@@ -133,6 +133,21 @@
             });
         }
 
+        $("#adressForm").submit(function (event) {
+            event.preventDefault(); //prevent default action
+            var post_url = $(this).attr("action"); //get form action url
+            var request_method = $(this).attr("method"); //get form GET/POST method
+            var form_data = $(this).serialize(); //Encode form elements for submission
+
+            $.ajax({
+                url: post_url,
+                type: request_method,
+                data: form_data
+            }).done(function (response) { //
+                $("#server-results").html(response);
+            });
+        });
+
         $('.type_b').on('ifChecked', function (event) {
             $('#kurumsal').hide();
         });
@@ -152,6 +167,19 @@
                 });
             }
         }
+
+        $('.adress_id').change(function () {
+            const id = $(this).val()
+            $.ajax({
+                type: "post",
+                url: "/acr/ftr/card/adress/county",
+                data: 'id=' + id,
+                success: function () {
+                    toastr.success('Adress seçildi')
+
+                }
+            });
+        })
 
 
     </script>

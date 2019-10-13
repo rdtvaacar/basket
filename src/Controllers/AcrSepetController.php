@@ -18,8 +18,10 @@ use Acr\Ftr\Model\Promotion;
 use Acr\Ftr\Model\Promotion_user;
 use Acr\Ftr\Model\Sepet;
 use AcrMenu;
+use App\Adress;
 use App\Handlers\Commands\my;
 use App\Http\Controllers\MarketController;
+use App\User;
 use Auth;
 use Redirect;
 use Session;
@@ -621,6 +623,7 @@ class AcrSepetController extends Controller
         }
         $order_id = $request->input('order_id');
         $order_id = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
+        $sepet_id = $order_id;
         $sepet    = $sepet_model->where('id', $order_id)->with([
             'products' => function ($query) {
                 $query->with('product');
@@ -633,12 +636,14 @@ class AcrSepetController extends Controller
                 }
             }
         }
+
         $sepet_nav   = self::sepet_nav($order_id, 2);
-        $adres_form  = self::adress_form($request);
+        $adres_form  = $this->adress_form($request);
         $adresses    = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
         $order_link  = empty($order_id) ? '' : '?order_id=' . $order_id;
         $order_input = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
         self::ps_dis_rate_set($order_id); // product_sepet dis_rate oranlarını hesaplar
+
         return View('acr_ftr::card_adress', compact('sepet_nav', 'adres_form', 'adresses', 'order_input', 'order_link'));
     }
 
@@ -704,9 +709,9 @@ class AcrSepetController extends Controller
         $sepet_id = empty($sepet_id) ? $request->sepet_id : $sepet_id;
         $ps_model = new Product_sepet();
         $product  = $ps_model->where('id', $sepet_id)->with('product')->first();
-        $price         = self::price_set($product);
+        $price    = self::price_set($product);
         if ($product->id != 1282) {
-           return round($price,2);
+            return round($price, 2);
         }
         $not_dis_price = $product->product->price * $product->adet * $product->lisans_ay;
         $dis_rate      = self::dis_rate($not_dis_price, $price);
@@ -949,106 +954,11 @@ class AcrSepetController extends Controller
 
     function adress_form(Request $request, $adress = null, $user_id = null)
     {
-        $city_model = new City();
-        $cities     = $city_model->get();
-        $row        = '<form method="post" action="/acr/ftr/card/adress/create">';
-        $row        .= csrf_field();
-        $row        .= '<div class="form-group">';
-        $row        .= '<label>Adres İsmi</label>';
-        $row        .= '<input required name="name" id="name" class="form-control" placeholder="Adres İsmi, Örn: Ev adresim, Kurum Adresim" value="' . @$adress->name . '">';
-        $row        .= '</div>';
-        $row        .= '<div class="form-group">';
-        $row        .= '<label>Alıcı İsmi (Ad Soyad şeklinde giriniz aksi halde sistem hata verir.)</label> ';
-        $row        .= '<input required name="invoice_name" id="invoice_name" class="form-control" placeholder="Adınız Soyadınız" value="' . @$adress->invoice_name . '">';
-        $row        .= '</div>';
-        $row        .= '<div class="form-group">';
-        $row        .= '<label>T.C. Kimlik No (11 Hane olmalıdır.) </label>';
-        $row        .= '<input  type="number" maxlength="11"  size="11" required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranızı " value="' . @$adress->tc . '">';
-        $row        .= '</div>';
-        // citys
-        $row .= '<div class="form-group">';
-        $row .= '<label>Şehir</label>';
-        $row .= '<select required name="city" id="city" class="form-control">';
-        $row .= '<option  value="">Şehir Seçiniz</option>';
-        foreach ($cities as $city) {
-            if ($city->id != 0) {
-                $select = $city->id == @$adress->city_id ? 'selected="selected"' : '';
-            } else {
-                $select = '';
-            }
-            $row .= '<option ' . $select . ' value="' . $city->id . '">';
-            $row .= $city->name;
-            $row .= '</option>';
-        }
-        $row .= '</select>';
-        $row .= '</div>';
-        $row .= '<div id="county">';
-        if (!empty($adress->city_id)) {
-            $row .= self::county_row($request, $adress->city_id, @$adress);
-        }
-        $row .= '</div>';
-        $row .= '<div class="form-group">';
-        $row .= '<label>Açık Adres</label>';
-        $row .= '<textarea required name="adress"  class="form-control" placeholder="Açık Adres">' . @$adress->adress . '</textarea>';
-        $row .= '</div>';
-        $row .= '<div class="form-group">';
-        $row .= '<label>Adres Posta Kodu</label>';
-        $row .= '<input required name="post_code" type="number" class="form-control" placeholder="Posta Kodu" value="' . @$adress->post_code . '">';
-        $row .= '</div>';
-        $row .= '<div class="form-group">';
-        $row .= '<label>Telefon</label>';
-        $row .= '<input required name="tel" type="number"  class="form-control" placeholder="Telefon" value="' . @$adress->tel . '">';
-        $row .= '</div>';
-        // kurumsal
-        if (@$adress->type == 1 || empty($adress->type)) {
-            $type_c_1 = 'checked';
-            $type_c_2 = '';
-        } else {
-            $type_c_1 = '';
-            $type_c_2 = 'checked';
-        }
-        $row .= '<div class="form-group">';
-        $row .= '<label class="type_b">';
-        $row .= '<input type="radio" name="type" value="1" class="flat-red" ' . $type_c_1 . '  style="position: absolute; opacity: 0;">';
-        $row .= '<div style="margin-left: 10px; font-size: 14pt; float: right;">Bireysel </div>';
-        $row .= '</label>';
-        $row .= '<label  style="margin-left: 30px;"  class="type_k">';
-        $row .= '<input  type="radio" name="type" value="2" class="flat-red" ' . $type_c_2 . ' style="position: absolute; opacity: 0;">';
-        $row .= '<div  style="margin-left: 10px; font-size: 14pt; float: right;">Kurumsal </div>';
-        $row .= '</label>';
-        $row .= '</div>';
-        // kurumsal fatura Bilgileri
-        $display = @$adress->type == 1 || empty(@$adress->type) ? 'none' : 'normal';
-        $row     .= '<div id="kurumsal" style="display: ' . $display . '">';
-        $row     .= '<div class="form-group">';
-        $row     .= '<label>Kurum İsmi</label>';
-        $row     .= '<input name="company"  class="form-control" placeholder="Kurum İsmi" value="' . @$adress->company . '">';
-        $row     .= '</div>';
-        $row     .= '<div class="form-group">';
-        $row     .= '<label>Kurum Vergi No</label>';
-        $row     .= '<input name="tax_number" type="number"  class="form-control" placeholder="Kurum Vergi No" value="' . @$adress->tax_number . '">';
-        $row     .= '</div>';
-        $row     .= '<div class="form-group">';
-        $row     .= '<label>Kurum Vergi Dairesi</label>';
-        $row     .= '<input name="tax_office"  class="form-control" placeholder="Kurum Vergi Dairesi" value="' . @$adress->tax_office . '">';
-        $row     .= '</div>';
-        // e fatura
-        if (@$adress->e_fatura == 2) {
-            $e_fatura_check = 'checked';
-        } else {
-            $e_fatura_check = '';
-        }
-        $row .= '<label for="e_fatura" class="">';
-        $row .= '<input name="e_fatura" id="e_fatura" type="checkbox" ' . $e_fatura_check . ' class="minimal-red" value="2"  style="position: absolute; opacity: 0;">';
-        $row .= '<div style="margin-left: 10px; font-size: 14pt; float: right;">E-Fatura Mükellefiyim</div>';
-        $row .= '</label>';
-        $row .= '</div>';
-        $row .= '<input type="hidden" name="adress_id"  value="' . @$adress->id . '">';
-        $row .= '<input type="hidden" name="user_id"  value="' . @$user_id . '">';
-        $row .= '<button type="submit" class="btn btn-primary">ADRES KAYDET <span class="fa fa-angle-double-right"></span> </button>';
-        $row .= '</form>';
-        $row .= '<div style="clear:both;"></div>';
-        return $row;
+        $modelCity = new City();
+        $userModel = new User();
+        $user      = $userModel->find(auth()->id());
+        $cities    = $modelCity->get();
+        return view('acr_ftr::adress_form', compact('user', 'cities', 'adress'))->render();
     }
 
     function county_row(Request $request, $city_id = null, $adress = null)
@@ -1057,13 +967,13 @@ class AcrSepetController extends Controller
         if (empty($city_id)) {
             $city_id = $request->input('city_id');
         }
-        $counties = $county_model->where('city_id', $city_id)->get();
+        $county_id = $request->county_id;
+        $counties  = $county_model->where('city_id', $city_id)->get();
         // citys
         $row = '<div class="form-group">';
-        $row .= '<label>İlçe</label>';
-        $row .= '<select required name="county" class="form-control">';
+        $row .= '<select required name="county_id" class="form-control">';
         foreach ($counties as $county) {
-            $select = $county->id == @$adress->county_id ? 'selected="selected"' : '';
+            $select = $county->id == $county_id ? 'selected="selected"' : '';
             $row    .= '<option ' . $select . ' value="' . $county->id . '">';
             $row    .= $county->name;
             $row    .= '</option>';
@@ -1076,79 +986,57 @@ class AcrSepetController extends Controller
 
     function adress_create(Request $request)
     {
-        self::adress_create_api($request);
-        return Redirect()->back();
+        $res = self::adress_create_api($request);
+        if ($res['status'] == 405) {
+            return redirect()->back()->withInput()->withErrors($res['validator']);
+        }
+        return redirect()->to('/acr/ftr/card/payment');
+
     }
 
     function adress_create_api(Request $request)
     {
-        $roles = AcrMenu::roles();
-        if (in_array(1, $roles)) {
-            $user_id = empty($request->user_id) ? Auth::user()->id : $request->user_id;
-
-        } else {
-            $user_id = Auth::user()->id;
-        }
-        $rules   = array(
-            'name'      => 'required',
-            // make sure the email is an actual email
-            'city'      => 'required',
-            // password can only be alphanumeric and has to be greater than 3 characters
-            'county'    => 'required',
-            'post_code' => 'required',
-            'tel'       => 'required'
+        $all   = $request->all();
+        $page  = $request->page;
+        $rules = array(
+            'name'         => 'required',
+            'invoice_name' => 'required|min:4',
+            'adress'       => 'required|min:4',
+            'tel'          => 'required',
+            'city_id'      => 'required|not_in:0',
+            'county_id'    => 'required|not_in:0',
         );
-        $massage = [
-            'name.required'      => 'Adres İsmi Giriniz',
-            'city.required'      => 'Şehir Seçiniz.',
-            'county.required'    => 'İlçe Seçiniz.',
-            'post_code.required' => 'Posta Kodu Giriniz.',
-            'tel.required'       => 'Telefon Numarası Giriniz.'
-        ];
-        // run the validation rules on the inputs from the form
-        $validator = Validator::make($request->all(), $rules, $massage);
-        // if the validator fails, redirect back to the form
-        if ($validator->fails()) {
-            return Redirect()->back()->withErrors($validator)// send back all errors to the login form
-            ->withInput($request->all()); //
-        } else {
-            $e_fatura         = empty($request->input('e_fatura')) ? 1 : $request->input('e_fatura');
-            $adress_model     = new AcrFtrAdress();
-            $invoice_name_exp = explode(' ', $request->input('invoice_name'));
-            if (empty($invoice_name_exp)) {
-                $invoice_name = $request->invoice_name . ' invoice_name';
+
+        $mesajlar  = array(
+            'name.required'         => 'Adres başlığı zorunludur',
+            'invoice_name.required' => 'Alıcı adı zorunludur',
+            'invoice_name.min'      => 'Lütfen ad soyad formatında doldurun, aksi hataya sebep olur',
+            'adress.required'       => 'Adres bilgisi zorunludur',
+            'adress.min'            => 'Adres bilgisi yetersiz gibi görünüyor',
+            'tel.required'          => 'Telefon bilgisi zorunludur',
+            'city_id.required'      => 'Şehir bilgisi zorunludur',
+            'county_id.required'    => 'İlçe bilgisi zorunludur',
+            'city_id.not_in'        => 'Şehir bilgisi zorunludur',
+            'county_id.not_in'      => 'İlçe bilgisi zorunludur',
+        );
+        $validator = Validator::make($all, $rules, $mesajlar);
+        if ($validator->passes()) {
+            unset($all['_token']);
+            unset($all['page']);
+            $model = new AcrFtrAdress();
+            $id    = $request->id;
+            $data  = array_merge($all, ['user_id' => auth()->id(), 'active' => 1]);
+            $model->where('user_id', auth()->id())->update(['active' => 2]);
+            if ($id) {
+                $model->where('id', $id)->where('user_id', auth()->id())->update($data);
             } else {
-                $invoice_name = $request->invoice_name;
+                $id = $model->insertGetId($data);
             }
-            $tc        = strlen($request->input('tc')) < 11 ? '11111111111' : $request->input('tc');
-            $data      = [
-                'user_id'      => $user_id,
-                'name'         => $request->input('name'),
-                'invoice_name' => $invoice_name,
-                'tc'           => $tc,
-                'adress'       => $request->input('adress'),
-                'city_id'      => $request->input('city'),
-                'county_id'    => $request->input('county'),
-                'post_code'    => $request->input('post_code'),
-                'tel'          => $request->input('tel'),
-                'type'         => $request->input('type'),
-                'company'      => $request->input('company'),
-                'tax_number'   => $request->input('tax_number'),
-                'tax_office'   => $request->input('tax_office'),
-                'e_fatura'     => $e_fatura,
-                'active'       => 1,
+            $this->parasut_contact_update($id);
 
-            ];
-            $adress_id = $request->input('adress_id') ? $request->input('adress_id') : 0;
-            $adress_id = $adress_model->create($adress_id, $data);
-            self::parasut_contact_update($adress_id);
-            return response()->json([
-                'status' => 1,
-                'title'  => 'Bilgi',
-                'msg'    => 'Adres bilgileri başarıyla eklendi.',
-                'data'   => null
-            ]);
-
+            return ['status' => 200, 'url' => '/acr/ftr/card/payment'];
+        } else {
+            return ['status' => 405, 'validator' => $validator];
         }
     }
 
