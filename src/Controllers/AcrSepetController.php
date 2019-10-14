@@ -21,6 +21,7 @@ use AcrMenu;
 use App\Adress;
 use App\Handlers\Commands\my;
 use App\Http\Controllers\MarketController;
+use App\OSepet;
 use App\User;
 use Auth;
 use Redirect;
@@ -1040,6 +1041,117 @@ class AcrSepetController extends Controller
         }
     }
 
+    function faturaBas2(Request $request)
+    {
+        $my_roles = AcrMenu::roles();
+        if (!in_array(1, $my_roles)) {
+            return 'Erişim reddedildi';
+        }
+        $sepet_id   = $request->sepet_id;
+        $sepetModel = new OSepet();
+        $sepet      = $sepetModel->where('id', $sepet_id)->with(['urunler', 'user'])->first();
+        foreach ($sepet->urunler as $item) {
+            $acr_fatura_product[] = [
+                'order_id'     => $sepet_id,
+                'name'         => $item->name,
+                'kdv'          => $sepet->kdv,
+                'fiyat'        => $sepet->dis_price,
+                'toplam_fiyat' => $sepet->dis_price,
+                'adet'         => $sepet->adet,
+            ];
+        }
+        $adress_model = new AcrFtrAdress();
+        $parasut      = new ParasutController();
+        $adress_row   = $adress_model->where('user_id', $sepet->user_id)->where('active', 1)->with('user')->first();
+        if (empty($adress_row->parasut_id)) {
+            $parasut_contact    = self::parasut_contact_data($adress_row);
+            $parasut_contact_id = $parasut->contact($parasut_contact);
+            $adress             = $adress_model->find($adress_row->id);
+            $adress->parasut_id = $parasut_contact_id;
+            $adress->save();
+        } else {
+            $parasut_contact_id = $adress_row->parasut_id;
+        }
+        $payment_add_contact = ['balance' => $sepet->price];
+        $parasut->contact_update($parasut_contact_id, $payment_add_contact);
+        $kdvRate                = 18;
+        $data                   = [
+            'name'       => 'Site Aboneliği',
+            'quantity'   => 1,
+            'unit_price' => $sepet->dis_price,
+            'vat_rate'   => $kdvRate
+        ];
+        $product_id             = $parasut->product($data);
+        $parasut_product_data[] = [
+            'product_id'    => $product_id,
+            // the parasut products
+            'quantity'      => $sepet->adet,
+            'unit_price'    => $sepet->dis_price - $sepet->kdv,
+            'discount'      => $sepet->price - $sepet->dis_price,
+            'vat_rate'      => $kdvRate,
+            'discount_type' => 'amount',
+            'discount_rate' => $sepet->rate,
+        ];
+        $parasut_sale_data      = [
+            'description'        => $adress_row->invoice_name,
+            'item_type'          => 'invoice',
+            'contact_id'         => $parasut_contact_id,
+            'gross_total'        => $sepet->dis_price - $sepet->kdv,
+            'net_total'          => $sepet->dis_price,
+            'archived'           => null,
+            'issue_date'         => date('Y-m-d'),
+            'details_attributes' => $parasut_product_data,
+            'total_paid'         => $sepet->dis_price,
+            'payment_status'     => 'paid',
+            'payments'           => [
+                "id"           => 1,
+                "payable_id"   => 1,
+                "payable_type" => "SalesInvoice",
+                "amount"       => $sepet->dis_price,
+                "notes"        => null,
+                "flow"         => "in",
+                "is_overdue"   => false,
+                "is_paid"      => true,
+            ]
+        ];
+        $invoice                = $parasut->sale($parasut_sale_data);
+        $fatura_data            = [
+            'order_id'           => $sepet_id,
+            'parasut_invoice_id' => $invoice->id,
+            'invoice_name'       => $adress_row->invoice_name,
+            'adress'             => $adress_row->adress . ' ' . $adress_row->county->name . '/' . $adress_row->city->name,
+            'tax_office'         => $adress_row->tax_office,
+            'tax_number'         => $adress_row->tax_number,
+            'tc'                 => !empty($adress_row->tc) ? $adress_row->tc : '11111111111',
+            'tarih'              => $adress_row->updated_at,
+            'user_id'            => $adress_row->user_id,
+            'tel'                => $adress_row->tel,
+            'post_code'          => $adress_row->post_code,
+            'type'               => $adress_row->type,
+            'payment_type'       => $sepet->odeme_type,
+            'guncel'             => 1,
+            // '0 eski 1 güncel,
+            'fiyat'              => $sepet->dis_price,
+            'fiyat_yazi'         => self::paraYazi($sepet->dis_price)
+        ];
+        $this->fatura_olustur($fatura_data, $acr_fatura_product);
+        $parasut       = new ParasutController();
+        $company_model = new Company_conf();
+        $company       = $company_model->first();
+        $payment       = $sepet->odeme_type == 1 ? 'KREDIKARTI/BANKAKARTI' : 'EFT/HAVALE';
+        $e_arsiv       = [
+            "note"          => "Bu fatura $company->url aracılığıyla oluşturulmuştur.",
+            "to"            => "urn=>mail=>" . $sepet->user->email,
+            'internet_sale' => [
+                'url'              => $company->url,
+                'payment_type'     => $payment,
+                'payment_platform' => '-',
+                'payment_date'     => date('Y-m-d')
+            ]
+        ];
+        $parasut->e_arsiv($invoice->id, $e_arsiv);
+    }
+
     function parasut_contact_update($adress_id)
     {
         $adress_model    = new AcrFtrAdress();
@@ -1113,7 +1225,7 @@ class AcrSepetController extends Controller
             'category_id'               => null,
             'city'                      => $adress_row->city->name,
             'district'                  => $adress_row->county->name,
-            'email'                     => Auth::user()->$user_email,
+            'email'                     => $adress_row->user->$user_email,
             'address_attributes'        => [
                 'address' => $adress_row->adress,
                 'phone'   => $adress_row->tel,

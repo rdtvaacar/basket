@@ -53,6 +53,7 @@ Route::group(['middleware' => ['web']], function () {
             Route::get('/card/payment/havale_eft', 'AcrSepetController@paymet_havale_eft');
             Route::post('/order/result', 'iyzicoController@order_result');
             Route::get('/card/payment/bank_card', 'AcrSepetController@payment_bank_card');
+            Route::post('/fatura/bas/2', 'AcrSepetController@faturaBas2');
 
 
             // orders

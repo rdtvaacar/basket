@@ -40,4 +40,8 @@ class AcrFtrAdress extends Model
         AcrFtrAdress::where('id', $adress_id)->update(['active' => 1]);
     }
 
+    function user()
+    {
+        return $this->hasOne('App\User', 'id', 'user_id');
+    }
 }

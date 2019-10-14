@@ -27,7 +27,7 @@
                     <div style="clear:both;"></div>
                     <hr>
                     <label for="name">T.C. Kimlik No (Zorunlu Değil)</label>
-                    <input type="number" name="tc" value="@if(!empty(old('tc'))){{old('tc')}}@else{{!empty($adress->tc)?@$adress->tc:@$user->TC}}@endif" class="form-control"/>
+                    <input name="tc" value="@if(!empty(old('tc'))){{old('tc')}}@else{{!empty($adress->tc)?@$adress->tc:@$user->TC}}@endif" class="form-control"/>
                     <div style="clear:both;"></div>
                     <hr>
                     <label for="adress">Adres</label>
